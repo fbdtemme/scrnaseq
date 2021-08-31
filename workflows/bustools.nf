@@ -13,8 +13,8 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
     exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(', ')}"
 }
 
-//Check if GTF is supplied properly
-if( params.gtf ){
+// Check if GTF is supplied properly
+if (params.gtf) {
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
@@ -22,7 +22,7 @@ if( params.gtf ){
 }
 
 //Setup FastA channels
-if( params.genome_fasta ){
+if (params.genome_fasta) {
     Channel
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
@@ -32,10 +32,10 @@ if( params.genome_fasta ){
 
 // Check if files for index building are given if no index is specified
 if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
-  exit 1, "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+    exit 1, "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
 }
 
-//Setup channel for salmon index if specified
+// Setup channel for salmon index if specified
 if (params.kallisto_index) {
     Channel
         .fromPath(params.kallisto_index)
@@ -45,13 +45,14 @@ if (params.kallisto_index) {
 
 // Kallist gene map
 // Check if txp2gene file has been provided
-if (params.kallisto_gene_map){
-      Channel
-      .fromPath(params.kallisto_gene_map)
-      .set{ ch_kallisto_gene_map } 
+if (params.kallisto_gene_map) {
+    Channel
+        .fromPath(params.kallisto_gene_map)
+        .set{ ch_kallisto_gene_map } 
 }
-if (!params.gtf && !params.kallisto_gene_map){
-  exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+
+if (!params.gtf && !params.kallisto_gene_map) {
+    exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
 }
 
 // Get the protocol parameter
@@ -59,7 +60,11 @@ if (!params.gtf && !params.kallisto_gene_map){
 kb_workflow = "standard"
 
 // Create a channel for input read files
-if (params.input)      { ch_input      = file(params.input)      } else { exit 1, 'Input samplesheet file not specified!' }
+if (params.input) { 
+    ch_input = file(params.input)
+} else { 
+    exit 1, 'Input samplesheet file not specified!'
+}
 
 // Check AWS batch settings
 // TODO use the Checks.awsBatch() function instead
@@ -82,29 +87,28 @@ def multiqc_options                 = modules['multiqc_kb']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
-include { GENE_MAP }                          from '../modules/local/gene_map'                addParams( options: [:] )
-include { KALLISTOBUSTOOLS_COUNT }            from '../modules/local/kallistobustools_count'  addParams( options: kallistobustools_count_options )
-include { GET_SOFTWARE_VERSIONS }             from '../modules/local/get_software_versions'   addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                           from '../modules/local/multiqc_kb'              addParams( options: multiqc_options )
+include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                      addParams( options: [:] )
+include { GENE_MAP }                    from '../modules/local/gene_map'                              addParams( options: [:] )
+include { KALLISTOBUSTOOLS_COUNT }      from '../modules/local/kallistobustools/count/main'           addParams( options: kallistobustools_count_options )
+include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'                 addParams( options: [publish_files: ['csv':'']]       )
+include { MULTIQC }                     from '../modules/local/multiqc/kallistobustools/main'         addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'                    addParams( options: [:] )
-include { KALLISTOBUSTOOLS_REF }       from '../modules/nf-core/software/kallistobustools/ref/main'       addParams( options: kallistobustools_ref_options )
+include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'                addParams( options: [:] )
+include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/software/kallistobustools/ref/main'  addParams( options: kallistobustools_ref_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
 def multiqc_report    = []
 
-workflow KALLISTO_BUSTOOLS {
+workflow BUSTOOLS {
     ch_software_versions = Channel.empty()
 
-    /*
-    * Check input files and stage input data
-    */
+    // Check input files and stage input data
+    // TODO this is duplicated in the other workflows
     INPUT_CHECK( ch_input )
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
@@ -114,27 +118,21 @@ workflow KALLISTO_BUSTOOLS {
     .map { it -> [ it[0], it[1].flatten() ] }
     .set { ch_fastq }
 
-    /*
-    * Generate Kallisto Gene Map if not supplied and index is given
-    * If index is given, the gene map will be generated in the 'kb ref' step
-    */ 
+    // Generate Kallisto Gene Map if not supplied and index is given
+    // If index is given, the gene map will be generated in the 'kb ref' step 
     if (!params.kallisto_gene_map && params.kallisto_index) {
       GENE_MAP( gtf )
       ch_kallisto_gene_map = GENE_MAP.out.gene_map
     }
 
-    /*
-    * Generate kallisto index
-    */ 
+    // Generate kallisto index
     if (!params.kallisto_index) { 
       KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
       ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
       ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
     }
 
-    /*
-    * Quantification with kallistobustools count
-    */
+    // Quantification with kallistobustools count
     KALLISTOBUSTOOLS_COUNT(
       ch_fastq,
       ch_kallisto_index,
@@ -148,12 +146,10 @@ workflow KALLISTO_BUSTOOLS {
     )
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
 
-    // collect software versions
+    // Collect software versions
     GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
 
-    /*
-    * MultiQC
-    */
+    // MultiQC
     if (!params.skip_multiqc) {
         workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)

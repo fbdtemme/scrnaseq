@@ -1,18 +1,18 @@
 /*
- * Alignment with Cellranger
+ * Transcript counts with Cellranger
  */
 
 params.cellranger_mkgtf_options    = [:]
 params.cellranger_mkref_options    = [:]
 params.cellranger_count_options    = [:]
 
-include {METADATA} from "../../modules/local/software/metadata/main.nf" addParams(options: params.cellranger_mkgtf_options)
-include {CELLRANGER_MKGTF} from "../../modules/local/software/cellranger/mkgtf/main.nf" addParams(options: params.cellranger_mkgtf_options)
-include {CELLRANGER_MKREF} from "../../modules/local/software/cellranger/mkref/main.nf" addParams(options: params.cellranger_mkref_options)
-include {CELLRANGER_COUNT} from "../../modules/local/software/cellranger/count/main.nf" addParams(options: params.cellranger_count_options)
+//include { METADATA }         from '../../modules/local/software/metadata/main'         addParams(options: params.cellranger_mkgtf_options)
+include { CELLRANGER_MKGTF } from '../../modules/local/software/cellranger/mkgtf/main' addParams(options: params.cellranger_mkgtf_options)
+include { CELLRANGER_MKREF } from '../../modules/local/software/cellranger/mkref/main' addParams(options: params.cellranger_mkref_options)
+include { CELLRANGER_COUNT } from '../../modules/local/software/cellranger/count/main' addParams(options: params.cellranger_count_options)
 
 // Define workflow to subset and index a genome region fasta file
-workflow CELLRANGER_ALIGN {
+workflow CELLRANGER {
     take:
         fasta
         gtf
@@ -20,7 +20,7 @@ workflow CELLRANGER_ALIGN {
 
     main:
         // Set sample channel from samplesheet input
-        METADATA            ( samplesheet )
+        //METADATA            ( samplesheet )
     
         // Filter GTF based on gene biotypes passed in params.modules
         CELLRANGER_MKGTF    ( gtf )

@@ -1,5 +1,5 @@
 // Import generic module functions
-include { saveFiles } from './functions'
+include { saveFiles } from '../../functions'
 
 params.options = [:]
 
@@ -25,7 +25,7 @@ process GENE_MAP {
     output:
     path "transcripts_to_genes.txt" , emit: gene_map
 
-    script:
+    script: // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
     if("${gtf}".endsWith('.gz')){
       name = "${gtf.baseName}"
       unzip = "gunzip -f ${gtf}"

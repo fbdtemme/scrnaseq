@@ -4,8 +4,23 @@
                          nf-core/scrnaseq
 ========================================================================================
  nf-core/scrnaseq Analysis Pipeline.
- #### Homepage / Documentation
- https://github.com/nf-core/scrnaseq
+ ----------------------------------------------------------------------------------------
+    nf-core/scrnaseq:
+        An open-source pipeline to compute abundances for single cell datasets. 
+----------------------------------------------------------------------------------------
+    @Website
+    https://nf-co.re/scrnaseq
+----------------------------------------------------------------------------------------
+    @Documentation
+    https://nf-co.re/scrnaseq/usage
+----------------------------------------------------------------------------------------
+    @Github
+    https://github.com/nf-core/scrnaseq
+----------------------------------------------------------------------------------------
+    @Slack
+    https://nfcore.slack.com/channels/scrnaseq
+----------------------------------------------------------------------------------------
+ 
 ----------------------------------------------------------------------------------------
 */
 
@@ -51,20 +66,32 @@ workflow {
 
     // Run salmon alevin pipeline
     if (params.aligner == "alevin") {
-        include { SCRNASEQ_ALEVIN } from './workflows/alevin'
-        SCRNASEQ_ALEVIN()
+        include { ALEVIN } from '../workflows/alevin'
+        ALEVIN()
+    }
+
+    // Run salmon alevin-fry pipeline
+    if (params.aligner == "alevinfry") {
+        include { ALEVIN_FRY } from '../workflows/alevinfry'
+        ALEVINFRY()
     }
 
     // Run STARSolo pipeline
     if (params.aligner == "star") {
-        include { STARSOLO } from './workflows/starsolo'
+        include { STARSOLO } from '../workflows/starsolo'
         STARSOLO()
     }
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
-        include { KALLISTO_BUSTOOLS } from './workflows/kallisto_bustools'
-        KALLISTO_BUSTOOLS()
+        include { KALLISTO_BUSTOOLS } from '../workflows/bustools'
+        BUSTOOLS()
+    }
+
+    // Run cell ranger pipeline
+    if (params.aligner == "cellranger") {
+        include { CELLRANGER } from '../workflows/cellranger'
+        CELLRANGER()
     }
     
 }
