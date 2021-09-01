@@ -72,7 +72,7 @@ workflow {
 
     // Run salmon alevin-fry pipeline
     if (params.aligner == "alevinfry") {
-        include { ALEVIN_FRY } from '../workflows/alevinfry'
+        include { ALEVINFRY } from '../workflows/alevinfry'
         ALEVINFRY()
     }
 

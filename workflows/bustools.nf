@@ -21,7 +21,7 @@ if (params.gtf) {
         .set { gtf }
 }
 
-//Setup FastA channels
+// Setup FastA channels
 if (params.genome_fasta) {
     Channel
         .fromPath(params.genome_fasta)
@@ -83,6 +83,7 @@ def modules = params.modules.clone()
 def kallistobustools_ref_options    = modules['kallistobustools_ref']
 def kallistobustools_count_options  = modules['kallistobustools_count']
 def multiqc_options                 = modules['multiqc_kb']
+def fastqc_options                  = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -91,13 +92,14 @@ include { INPUT_CHECK }                 from '../subworkflows/local/input_check'
 include { GENE_MAP }                    from '../modules/local/gene_map'                              addParams( options: [:] )
 include { KALLISTOBUSTOOLS_COUNT }      from '../modules/local/kallistobustools/count/main'           addParams( options: kallistobustools_count_options )
 include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'                 addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                     from '../modules/local/multiqc/kallistobustools/main'         addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'                addParams( options: [:] )
-include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/software/kallistobustools/ref/main'  addParams( options: kallistobustools_ref_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
+include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
+include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'                 addParams( options: fastqc_options)
+include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'                addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -108,7 +110,6 @@ workflow BUSTOOLS {
     ch_software_versions = Channel.empty()
 
     // Check input files and stage input data
-    // TODO this is duplicated in the other workflows
     INPUT_CHECK( ch_input )
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
@@ -118,36 +119,46 @@ workflow BUSTOOLS {
     .map { it -> [ it[0], it[1].flatten() ] }
     .set { ch_fastq }
 
+    // Run FastQC
+    FASTQC (
+        ch_reads
+    )
+
     // Generate Kallisto Gene Map if not supplied and index is given
     // If index is given, the gene map will be generated in the 'kb ref' step 
     if (!params.kallisto_gene_map && params.kallisto_index) {
-      GENE_MAP( gtf )
-      ch_kallisto_gene_map = GENE_MAP.out.gene_map
+        GENE_MAP( gtf )
+        ch_kallisto_gene_map = GENE_MAP.out.gene_map
     }
 
     // Generate kallisto index
     if (!params.kallisto_index) { 
-      KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
-      ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
-      ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
+        KALLISTOBUSTOOLS_REF ( 
+            genome_fasta, gtf, 
+            kb_workflow 
+        )
+        ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
+        ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
     }
 
     // Quantification with kallistobustools count
-    KALLISTOBUSTOOLS_COUNT(
-      ch_fastq,
-      ch_kallisto_index,
-      ch_kallisto_gene_map,
-      [],
-      [],
-      false,
-      false,
-      kb_workflow,
-      protocol
+    KALLISTOBUSTOOLS_COUNT (
+        ch_fastq,
+        ch_kallisto_index,
+        ch_kallisto_gene_map,
+        [],
+        [],
+        false,
+        false,
+        kb_workflow,
+        protocol
     )
-    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
 
     // Collect software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
+    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
+    GET_SOFTWARE_VERSIONS ( 
+        ch_software_versions.map { it }.collect() 
+    )
 
     // MultiQC
     if (!params.skip_multiqc) {
@@ -158,7 +169,8 @@ workflow BUSTOOLS {
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
             GET_SOFTWARE_VERSIONS.out.yaml.collect(),
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
+            FASTQC.out.zip.collect{it[1]}.ifEmpty([])
         )
         multiqc_report = MULTIQC.out.report.toList()
     }

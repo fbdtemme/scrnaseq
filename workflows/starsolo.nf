@@ -21,7 +21,7 @@ if (params.gtf) {
         .set { gtf }
 }
 
-// Setup FastA channels
+// Setup Fasta channels
 if (params.genome_fasta) {
     Channel
         .fromPath(params.genome_fasta)
@@ -29,7 +29,7 @@ if (params.genome_fasta) {
         .set { genome_fasta }
 } 
 
-// Setup Transcript FastA channels
+// Setup Transcript Fasta channels
 if (params.transcript_fasta) {
     Channel
         .fromPath(params.transcript_fasta)
@@ -96,22 +96,23 @@ def modules = params.modules.clone()
 
 def star_genomegenerate_options     = modules['star_genomegenerate']
 def star_align_options              = modules['star_align']
-def multiqc_options                 = modules['multiqc_alevin']
+def multiqc_options                 = modules['multiqc']
+def fastqc_options                  = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                    addParams( options: [:] )
 include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'               addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                     from '../modules/local/multiqc/starsolo/main'               addParams( options: multiqc_options )
 include { STAR_ALIGN }                  from '../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
-include { STAR_GENOMEGENERATE }         from '../modules/nf-core/software/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
-
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
+include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
+include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'               addParams( options: fastqc_options)
+include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'              addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -122,7 +123,6 @@ workflow STARSOLO {
     ch_software_versions = Channel.empty()
 
     // Check input files and stage input data
-    // TODO this is duplicated in the other workflows
     INPUT_CHECK( ch_input )
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
@@ -132,42 +132,46 @@ workflow STARSOLO {
     .map { it -> [ it[0], it[1].flatten() ] }
     .set { ch_fastq }
 
-    // unzip barcodes
+    // Run FastQC
+    FASTQC (
+        ch_reads
+    )
+
+    // Unzip barcodes
     if (params.protocol.contains("10X") && !params.barcode_whitelist) {
         GUNZIP( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
     }
 
-    /*
-    * Build STAR index if not supplied
-    */
+    // Build STAR index if not supplied
     if (!params.star_index) {
-      STAR_GENOMEGENERATE( genome_fasta, gtf )
-      star_index = STAR_GENOMEGENERATE.out.index
-    }
+        STAR_GENOMEGENERATE ( 
+            genome_fasta, 
+            gtf 
+        )
+        star_index = STAR_GENOMEGENERATE.out.index
+    } 
   
-    /*
-    * Perform mapping with STAR
-    */ 
-    STAR_ALIGN( 
-      ch_fastq,
-      star_index,
-      gtf,
-      ch_barcode_whitelist,
-      protocol
+    // Perform mapping with STAR
+    STAR_ALIGN ( 
+        ch_fastq,
+        star_index,
+        gtf,
+        ch_barcode_whitelist,
+        protocol
     )
+
+    // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
-    ch_star_multiqc      = STAR_ALIGN.out.log_final
+    GET_SOFTWARE_VERSIONS ( 
+        ch_software_versions.map { it }.collect() 
+    )
 
-    // collect software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
-
-    /*
-    * MultiQC
-    */
+    // MultiQC
     if (!params.skip_multiqc) {
         workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)
+        ch_star_multiqc     = STAR_ALIGN.out.log_final
 
         MULTIQC (
             ch_multiqc_config,
