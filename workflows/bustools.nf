@@ -16,17 +16,17 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 // Check if GTF is supplied properly
 if (params.gtf) {
     Channel
-        .fromPath(params.gtf)
-        .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .set { gtf }
+    .fromPath(params.gtf)
+    .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
+    .set { gtf }
 }
 
 // Setup FastA channels
 if (params.genome_fasta) {
     Channel
-        .fromPath(params.genome_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
-        .set { genome_fasta }
+    .fromPath(params.genome_fasta)
+    .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+    .set { genome_fasta }
 } 
 
 
@@ -38,17 +38,17 @@ if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
 // Setup channel for salmon index if specified
 if (params.kallisto_index) {
     Channel
-        .fromPath(params.kallisto_index)
-        .ifEmpty { exit 1, "Kallisto index not found: ${params.kallisto_index}" }
-        .set { ch_kallisto_index }
+    .fromPath(params.kallisto_index)
+    .ifEmpty { exit 1, "Kallisto index not found: ${params.kallisto_index}" }
+    .set { ch_kallisto_index }
 }
 
 // Kallist gene map
 // Check if txp2gene file has been provided
 if (params.kallisto_gene_map) {
     Channel
-        .fromPath(params.kallisto_gene_map)
-        .set{ ch_kallisto_gene_map } 
+    .fromPath(params.kallisto_gene_map)
+    .set{ ch_kallisto_gene_map } 
 }
 
 if (!params.gtf && !params.kallisto_gene_map) {
@@ -82,16 +82,16 @@ def modules = params.modules.clone()
 
 def kallistobustools_ref_options    = modules['kallistobustools_ref']
 def kallistobustools_count_options  = modules['kallistobustools_count']
-def multiqc_options                 = modules['multiqc_kb']
+def multiqc_options                 = modules['multiqc']
 def fastqc_options                  = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                      addParams( options: [:] )
-include { GENE_MAP }                    from '../modules/local/gene_map'                              addParams( options: [:] )
+include { GENE_MAP }                    from '../modules/local/genemap/main'                          addParams( options: [:] )
 include { KALLISTOBUSTOOLS_COUNT }      from '../modules/local/kallistobustools/count/main'           addParams( options: kallistobustools_count_options )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'                 addParams( options: [publish_files: ['csv':'']]       )
+include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'              addParams( options: [publish_files: ['csv':'']]       )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -110,7 +110,7 @@ workflow BUSTOOLS {
     ch_software_versions = Channel.empty()
 
     // Check input files and stage input data
-    INPUT_CHECK( ch_input )
+    INPUT_CHECK ( ch_input )
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
         [ meta, reads ]
@@ -120,14 +120,12 @@ workflow BUSTOOLS {
     .set { ch_fastq }
 
     // Run FastQC
-    FASTQC (
-        ch_reads
-    )
+    FASTQC ( ch_fastq )
 
     // Generate Kallisto Gene Map if not supplied and index is given
     // If index is given, the gene map will be generated in the 'kb ref' step 
     if (!params.kallisto_gene_map && params.kallisto_index) {
-        GENE_MAP( gtf )
+        GENE_MAP ( gtf )
         ch_kallisto_gene_map = GENE_MAP.out.gene_map
     }
 
@@ -156,23 +154,23 @@ workflow BUSTOOLS {
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
-    GET_SOFTWARE_VERSIONS ( 
-        ch_software_versions.map { it }.collect() 
-    )
+    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
 
     // MultiQC
     if (!params.skip_multiqc) {
         workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)
 
-        MULTIQC (
-            ch_multiqc_config,
-            ch_multiqc_custom_config.collect().ifEmpty([]),
-            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-            FASTQC.out.zip.collect{it[1]}.ifEmpty([])
-        )
-        multiqc_report = MULTIQC.out.report.toList()
+        ch_multiqc_files = Channel.empty()
+        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)
+        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+
+        MULTIQC ( ch_multiqc_files.collect() )
+        multiqc_report       = MULTIQC.out.report.toList()
+        ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
     }
 
 }

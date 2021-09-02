@@ -16,25 +16,25 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 // Check if GTF is supplied properly
 if (params.gtf) {
     Channel
-        .fromPath(params.gtf)
-        .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .set { gtf }
+    .fromPath(params.gtf)
+    .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
+    .set { gtf }
 }
 
 // Setup Fasta channels
 if (params.genome_fasta) {
     Channel
-        .fromPath(params.genome_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
-        .set { genome_fasta }
+    .fromPath(params.genome_fasta)
+    .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+    .set { genome_fasta }
 } 
 
 // Setup Transcript Fasta channels
 if (params.transcript_fasta) {
     Channel
-        .fromPath(params.transcript_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-        .set { transcriptome_fasta }
+    .fromPath(params.transcript_fasta)
+    .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
+    .set { transcriptome_fasta }
 } 
 
 // Check if STAR index is supplied properly
@@ -58,8 +58,8 @@ if (params.input) {
 // Check if txp2gene file has been provided
 if (params.txp2gene) {
     Channel
-        .fromPath(params.txp2gene)
-        .set{ ch_txp2gene } 
+    .fromPath(params.txp2gene)
+    .set{ ch_txp2gene } 
 }
 
 // Check AWS batch settings
@@ -81,12 +81,12 @@ whitelist_folder = "$baseDir/assets/whitelist/"
 if (params.protocol.contains("10X") && !params.barcode_whitelist) {
     barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
     Channel.fromPath(barcode_filename)
-        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-        .set{ barcode_whitelist_gzipped }
+    .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+    .set{ barcode_whitelist_gzipped }
 } else if (params.barcode_whitelist) {
     Channel.fromPath(params.barcode_whitelist)
-        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-        .set{ ch_barcode_whitelist }
+    .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+    .set{ ch_barcode_whitelist }
 }
 
 ////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ def fastqc_options                  = modules['fastqc']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                    addParams( options: [:] )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'               addParams( options: [publish_files: ['csv':'']]       )
+include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'            addParams( options: [publish_files: ['csv':'']]       )
 include { STAR_ALIGN }                  from '../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ workflow STARSOLO {
     ch_software_versions = Channel.empty()
 
     // Check input files and stage input data
-    INPUT_CHECK( ch_input )
+    INPUT_CHECK ( ch_input )
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
         [ meta, reads ]
@@ -133,13 +133,11 @@ workflow STARSOLO {
     .set { ch_fastq }
 
     // Run FastQC
-    FASTQC (
-        ch_reads
-    )
+    FASTQC ( ch_fastq )
 
     // Unzip barcodes
     if (params.protocol.contains("10X") && !params.barcode_whitelist) {
-        GUNZIP( barcode_whitelist_gzipped )
+        GUNZIP ( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
     }
 
@@ -163,9 +161,7 @@ workflow STARSOLO {
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
-    GET_SOFTWARE_VERSIONS ( 
-        ch_software_versions.map { it }.collect() 
-    )
+    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
 
     // MultiQC
     if (!params.skip_multiqc) {
@@ -173,14 +169,17 @@ workflow STARSOLO {
         ch_workflow_summary = Channel.value(workflow_summary)
         ch_star_multiqc     = STAR_ALIGN.out.log_final
 
-        MULTIQC (
-            ch_multiqc_config,
-            ch_multiqc_custom_config.collect().ifEmpty([]),
-            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-            ch_star_multiqc.collect{it[1]}.ifEmpty([]),
-        )
-        multiqc_report = MULTIQC.out.report.toList()
+        ch_multiqc_files = Channel.empty()
+        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)
+        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(ch_star_multiqc.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+
+        MULTIQC ( ch_multiqc_files.collect() )
+        multiqc_report       = MULTIQC.out.report.toList()
+        ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
     }
 
 }

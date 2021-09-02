@@ -66,31 +66,31 @@ workflow {
 
     // Run salmon alevin pipeline
     if (params.aligner == "alevin") {
-        include { ALEVIN } from '../workflows/alevin'
+        include { ALEVIN } from './workflows/alevin'
         ALEVIN()
     }
 
     // Run salmon alevin-fry pipeline
     if (params.aligner == "alevinfry") {
-        include { ALEVINFRY } from '../workflows/alevinfry'
+        include { ALEVINFRY } from './workflows/alevinfry'
         ALEVINFRY()
     }
 
     // Run STARSolo pipeline
     if (params.aligner == "star") {
-        include { STARSOLO } from '../workflows/starsolo'
+        include { STARSOLO } from './workflows/starsolo'
         STARSOLO()
     }
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
-        include { KALLISTO_BUSTOOLS } from '../workflows/bustools'
+        include { KALLISTO_BUSTOOLS } from './workflows/bustools'
         BUSTOOLS()
     }
 
     // Run cell ranger pipeline
     if (params.aligner == "cellranger") {
-        include { CELLRANGER } from '../workflows/cellranger'
+        include { CELLRANGER } from './workflows/cellranger'
         CELLRANGER()
     }
     
