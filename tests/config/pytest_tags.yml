@@ -1,0 +1,10 @@
+gffread_transcriptome:
+  - tests/config/**
+  - modules/local/gffread/transcriptome/**
+  - tests/modules/gffread/transcriptome/**
+
+samplesheet_check:
+  - tests/config/**
+  - modules/local/samplesheetcheck/**
+  - tests/modules/samplesheetcheck/**
+

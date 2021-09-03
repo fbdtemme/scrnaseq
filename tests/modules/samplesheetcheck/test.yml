@@ -1,0 +1,6 @@
+- name: samplesheet-check
+  command: nextflow run ./tests/modules/samplesheetcheck/main.nf -entry test_samplesheet_check -c ./tests/config/nextflow.config
+  tags:
+    - samplesheet_check
+  files:
+    - path: "./results/pipeline_info/samplesheet.valid.csv"
