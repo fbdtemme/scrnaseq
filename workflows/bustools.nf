@@ -90,13 +90,13 @@ def fastqc_options                  = modules['fastqc']
 ////////////////////////////////////////////////////
 include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                      addParams( options: [:] )
 include { GENE_MAP }                    from '../modules/local/genemap/main'                          addParams( options: [:] )
-include { KALLISTOBUSTOOLS_COUNT }      from '../modules/local/kallistobustools/count/main'           addParams( options: kallistobustools_count_options )
 include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'              addParams( options: [publish_files: ['csv':'']]       )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
 include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
+include { KALLISTOBUSTOOLS_COUNT }      from '../modules/nf-core/modules/kallistobustools/count/main' addParams( options: kallistobustools_count_options )
 include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
 include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'                 addParams( options: fastqc_options)
 include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'                addParams( options: multiqc_options )
@@ -106,7 +106,7 @@ include { MULTIQC }                     from '../modules/nf-core/modules/multiqc
 ////////////////////////////////////////////////////
 def multiqc_report    = []
 
-workflow BUSTOOLS {
+workflow KALLISTO_BUSTOOLS {
     ch_software_versions = Channel.empty()
 
     // Check input files and stage input data
@@ -146,8 +146,6 @@ workflow BUSTOOLS {
         ch_kallisto_gene_map,
         [],
         [],
-        false,
-        false,
         kb_workflow,
         protocol
     )

@@ -85,7 +85,7 @@ workflow {
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         include { KALLISTO_BUSTOOLS } from './workflows/bustools'
-        BUSTOOLS()
+        KALLISTO_BUSTOOLS()
     }
 
     // Run cell ranger pipeline
