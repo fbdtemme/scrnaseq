@@ -3,5 +3,4 @@
   tags:
     - gffread_transcriptome
   files:
-    - path: "./results/gffread/gencode.vM19.annotation.chr19.out.gtf"
     - path: "./results/gffread/GRCm38.p6.genome.chr19.fa.transcriptome.fa"
