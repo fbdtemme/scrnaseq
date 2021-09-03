@@ -46,7 +46,7 @@ The `nf-core/scrnaseq` was initiated by [Peter J. Bailey](https://github.com/Pet
 We thank the following people for their extensive assistance in the development
 of this pipeline:
 
-[Jose Fernandez Navarro](https://github.com/jfnavarro)
+[Jose Fernandez Navarro](https://github.com/jfnavarro)\
 [Florian De Temmerman](https://github.com/fbdtemme)
 
 ## Contributions and Support
