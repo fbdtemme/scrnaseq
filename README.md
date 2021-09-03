@@ -15,23 +15,24 @@
 ## Introduction
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
-**nf-core/scrnaseq** is a bioinformatics best-practise analysis pipeline for
+**nf-core/scrnaseq** is a bioinformatics best-practise analysis pipeline for processing and quantification of single cell RNA-seq datasets. 
 
-The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
-
-This is a community effort in building a pipeline capable to support:
+Currently, the pipeline supports the following tools:
 
 * Alevin + AlevinQC
+* Alevin-fry
 * STARSolo
 * Kallisto + BUStools
+* Cellranger 
+
+The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
 ## Pipeline Summary
 
 By default, the pipeline currently performs the following:
 
-<!-- TODO nf-core: Fill in short bullet-pointed list of default steps of pipeline -->
-
 * Sequencing quality control (`FastQC`)
+* Quantification (`Alevin`, `Alevin-fry`, `STARSolo`, `Kallisto BUStools`, `Cellranger`)
 * Overall pipeline run summaries (`MultiQC`)
 
 ## Documentation
@@ -45,7 +46,8 @@ The `nf-core/scrnaseq` was initiated by [Peter J. Bailey](https://github.com/Pet
 We thank the following people for their extensive assistance in the development
 of this pipeline:
 
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
+[Jose Fernandez Navarro](https://github.com/jfnavarro)
+[Florian De Temmerman](https://github.com/fbdtemme)
 
 ## Contributions and Support
 
