@@ -1,0 +1,5 @@
+- name: star-alignsolo
+  command: nextflow run ./tests/modules/star/alignsolo/main.nf -entry test_star_alignsolo -c ./tests/config/nextflow.config
+  tags:
+    - star/alignsolo
+    - star

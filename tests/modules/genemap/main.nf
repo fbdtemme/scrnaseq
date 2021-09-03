@@ -2,10 +2,10 @@
 
 nextflow.enable.dsl = 2
 
-include { SAMPLESHEET_CHECK } from '../../../modules/local/samplesheetcheck/main.nf' addParams( options: [:] )
+include { GENE_MAP }              from '../../../modules/local/genemap/main.nf'  addParams( options: [:] )
 
-workflow test_samplesheet_check {
+workflow test_gene_map {
     gtf = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
-
+    
     GENE_MAP ( gtf )
 }
