@@ -9,13 +9,14 @@ process STAR_ALIGN {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
 
-    conda (params.enable_conda ? 'bioconda::star=2.7.8a' : null)
+    // Note: 2.7X indices incompatible with AWS iGenomes.
+    conda (params.enable_conda ? 'bioconda::star=2.7.9a' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container 'https://depot.galaxyproject.org/singularity/star:2.7.8a--h9ee0642_1'
+        container 'https://depot.galaxyproject.org/singularity/star:2.7.9a--h9ee0642_0'
     } else {
-        container 'quay.io/biocontainers/star:2.7.8a--h9ee0642_1'
+        container 'quay.io/biocontainers/star:2.7.9a--h9ee0642_0'
     }
 
     input:
@@ -30,6 +31,7 @@ process STAR_ALIGN {
     tuple val(meta), path('*Log.final.out')   , emit: log_final
     tuple val(meta), path('*Log.out')         , emit: log_out
     tuple val(meta), path('*Log.progress.out'), emit: log_progress
+    tuple val(meta), path('*Solo.out')        , emit: solo_results
     path  '*.version.txt'                     , emit: version
 
     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
