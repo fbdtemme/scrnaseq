@@ -17,7 +17,8 @@ workflow test_star_alignsolo {
     tx2gene             = file(params.test_data_scrnaseq["reference"]["mouse_tx2gene"], checkIfExists: true)
     fastq               = [[id:"S10_L001", single_end:false], [
                                 file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
-                                file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+                                file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]
+                          ]
     protocol            = "CB_UMI_Simple"
     chemistry           = "V2"
 
@@ -29,7 +30,6 @@ workflow test_star_alignsolo {
     )
     star_index = STAR_GENOMEGENERATE.out.index
   
-    // Perform mapping with STAR
     STAR_ALIGN ( 
         fastq,
         star_index,
