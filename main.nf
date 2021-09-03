@@ -57,7 +57,6 @@ log.info NfcoreSchema.params_summary_log(workflow, params, json_schema)
 //Checks.hostname(workflow, params, log)
 
 
-
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
