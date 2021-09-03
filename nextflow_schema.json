@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/nextflow_schema.json",
     "title": "nf-core/scrnaseq pipeline parameters",
-    "description": "Pipeline for processing of 10xGenomics single cell rnaseq data",
+    "description": "Pipeline for processing single cell rnaseq data",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -13,9 +13,12 @@
             "properties": {
                 "input": {
                     "type": "string",
-                    "fa_icon": "fas fa-dna",
-                    "description": "Input FastQ files",
-                    "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input).",
+                    "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
                     "type": "string",
@@ -35,8 +38,7 @@
         "mandatory_arguments": {
             "title": "Mandatory arguments",
             "type": "object",
-            "description": "",
-            "default": "",
+            "description": "List of parameters that are required.",
             "properties": {
                 "barcode_whitelist": {
                     "type": "string",
@@ -45,13 +47,14 @@
                 },
                 "aligner": {
                     "type": "string",
-                    "description": "Name of the tool to use for scRNA (pseudo-) alignment. Available are: \"alevin\", \"star\", \"kallisto\", \"cellranger\". Default 'alevin'.",
+                    "description": "Name of the tool to use for quantification. Available are: \"alevin\", \"star\", \"kallisto\", \"alevinfry\", \"cellranger\". Default 'alevin'.",
                     "default": "alevin",
-                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n- CellRanger\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "help_text": "The workflow can handle five types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n Salmon Alevin-fry\n- STARsolo\n- CellRanger\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center"
                 },
                 "protocol": {
                     "type": "string",
+                    "description": "Name of the protocol used to to generate the single cell RNA-seq data",
                     "default": "10XV2",
                     "fa_icon": "fas fa-cogs",
                     "enum": [
@@ -78,14 +81,18 @@
                 },
                 "genome_fasta": {
                     "type": "string",
-                    "fa_icon": "fas fa-font",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "If you have no genome reference available, the pipeline can build one using a FASTA file. This requires additional time and resources, so it's better to use a pre-build index if possible."
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "fa_icon": "far fa-file-code"
                 },
                 "igenomes_base": {
                     "type": "string",
+                    "format": "directory-path",
                     "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes/",
+                    "default": "s3://ngi-igenomes/igenomes",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
                 },
@@ -98,31 +105,47 @@
                 },
                 "transcript_fasta": {
                     "type": "string",
-                    "description": "A cDNA fastq file",
-                    "fa_icon": "fas fa-dna"
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "fa_icon": "far fa-file-code",
+                    "description": "Path to FASTA transcriptome file."
                 },
                 "gtf": {
                     "type": "string",
-                    "description": "Reference GTF annotation file",
-                    "fa_icon": "fas fa-code-branch"
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "description": "Path to GTF annotation file.",
+                    "fa_icon": "fas fa-code-branch",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified."
+                },
+                "gff": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.gff(\\.gz)?$",
+                    "fa_icon": "fas fa-code-branch",
+                    "description": "Path to GFF3 annotation file.",
+                    "help_text": "This parameter must be specified if `--genome` or `--gtf` are not specified."
                 },
                 "save_reference": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
-                    "fa_icon": "fas fa-bookmark"
+                    "fa_icon": "fas fa-save"
                 }
             }
         },
         "alevin_options": {
             "title": "Alevin Options",
             "type": "object",
-            "description": "",
-            "default": "",
+            "description": "List of options for the Samon Alevin aligner",
             "properties": {
                 "salmon_index": {
                     "type": "string",
-                    "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
-                    "fa_icon": "fas fa-fish"
+                    "format": "path",
+                    "fa_icon": "fas fa-bezier-curve",
+                    "description": "Path to directory or tar.gz archive for pre-built Salmon index."
                 },
                 "txp2gene": {
                     "type": "string",
@@ -135,42 +158,32 @@
         "starsolo_options": {
             "title": "STARSolo Options",
             "type": "object",
-            "description": "",
-            "default": "",
+            "description": "List of options for the STARSolo aligner",
+            "fa_icon": "fas fa-star",
             "properties": {
                 "star_index": {
                     "type": "string",
-                    "description": "Specify a path to the precomputed STAR index.",
-                    "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
-                    "fa_icon": "fas fa-asterisk"
+                    "format": "path",
+                    "fa_icon": "fas fa-bezier-curve",
+                    "description": "Path to directory or tar.gz archive for pre-built STAR index."
                 },
                 "star_ignore_sjdbgtf": {
-                    "type": "string"
+                    "type": "boolean",
+                    "hidden": true,
+                    "fa_icon": "fas fa-toolbox",
                 }
-            },
-            "fa_icon": "fas fa-star"
+            }
         },
         "kallisto_bus_options": {
             "title": "Kallisto/BUS Options",
             "type": "object",
-            "description": "Params related to Kallisto/BUS tool",
-            "default": "",
+            "description": "List of options for the Kallisto Bustools aligner",
             "fa_icon": "fas fa-fish",
             "properties": {
                 "kallisto_gene_map": {
                     "type": "string",
                     "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
                     "fa_icon": "fas fa-fish"
-                },
-                "bustools_correct": {
-                    "type": "boolean",
-                    "description": "If set to false, skip the correct steps after mapping with Kallisto.",
-                    "fa_icon": "fas fa-bus-alt"
-                },
-                "skip_bustools": {
-                    "type": "boolean",
-                    "description": "Skip BUStools entirely in workflow",
-                    "fa_icon": "fas fa-forward"
                 },
                 "kallisto_index": {
                     "type": "string",
