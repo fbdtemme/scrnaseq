@@ -117,7 +117,7 @@ include { MULTIQC }                     from '../modules/nf-core/modules/multiqc
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
-def multiqc_report    = []
+def multiqc_report = []
 
 workflow STARSOLO {
     ch_software_versions = Channel.empty()
@@ -158,6 +158,8 @@ workflow STARSOLO {
         ch_barcode_whitelist,
         protocol
     )
+
+    // TODO process output to obtain counts
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))

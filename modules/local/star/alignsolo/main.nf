@@ -20,8 +20,8 @@ process STAR_ALIGN {
 
     input:
     tuple val(meta), path(reads)
-    path  index
-    path  gtf
+    path index
+    path gtf
     path whitelist
     val protocol
 
