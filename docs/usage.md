@@ -9,10 +9,12 @@
 The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --reads samplesheet.csv --fasta human.fasta --gtf human.gtf --aligner alevin -profile docker
 ```
 
-This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and other options.
+
+<!-- TODO add description of parameters, specially aligner -->
 
 Note that the pipeline will create the following files in your working directory:
 

@@ -13,14 +13,38 @@ and processes data using the following steps:
   * [:warning: Please read this documentation on the nf-core website: https://nf-co.re/scrnaseq/output](#warning-please-read-this-documentation-on-the-nf-core-website-httpsnf-corescrnaseqoutput)
   * [Introduction](#introduction)
   * [Pipeline overview](#pipeline-overview)
-  * [Kallisto & Bustools Results](#kallisto--bustools-results)
+  * [FastQC](#fastqc-results)
+  * [Kallisto & Bustools](#kallisto--bustools-results)
   * [STARsolo](#starsolo)
   * [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
+  * [Salmon Alevin-fry](#salmon-alevin-fry)
+  * [CellRanger](#cellranger)
   * [Other output data](#other-output-data)
   * [MultiQC](#multiqc)
   * [Pipeline information](#pipeline-information)
 
-## Kallisto & Bustools Results
+## FastQC
+
+<details markdown="1">
+<summary>Output files</summary>
+
+* `fastqc/`
+    * `*_fastqc.html`: FastQC report containing quality metrics.
+    * `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+
+> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. To see how your reads look after adapter and quality trimming please refer to the FastQC reports in the `trimgalore/fastqc/` directory.
+
+</details>
+
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+
+![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
+
+![MultiQC - FastQC mean quality scores plot](images/mqc_fastqc_quality.png)
+
+![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
+
+## Kallisto & Bustools
 
 See [Kallisto](https://pachterlab.github.io/kallisto/about) for details about Kallisto and [Bustools](https://bustools.github.io/) for more information on BusTools.
 
@@ -74,6 +98,10 @@ For details on how to load these into R and perform further downstream analysis,
   * Contains the indexed reference transcriptome for Salmon Alevin
 * `alevin/txp2gene.tsv`
   * The transcriptome to gene mapping TSV file utilized by Salmon Alevin
+
+## Salmon Alevin-fry
+
+## CellRanger
 
 ## Other output data
 
