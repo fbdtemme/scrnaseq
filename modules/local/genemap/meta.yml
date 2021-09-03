@@ -1,0 +1,25 @@
+name: genemap
+description: Genrates a transcript to genes table from a reference file
+keywords:
+    - gtf
+    - gff
+    - transcripts
+    - genes
+tools:
+    - t2g:
+        description: |
+            A local script that is meant to be used to generate a transcripts to genes table
+            from a reference file (gtf or gff)
+input:
+    - gtf:
+        type: value
+        description: Reference file 
+        pattern: "File containing the annotation *.{gtf,gff}"
+output:
+    - gene_map:
+        type: file
+        description: A tab delimited file containing the mapping of transcripts to genes
+        pattern: "*.{txt}"
+authors:
+    - "@jfnvarro"
+    - "@XXX"
