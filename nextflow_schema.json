@@ -170,7 +170,7 @@
                 "star_ignore_sjdbgtf": {
                     "type": "boolean",
                     "hidden": true,
-                    "fa_icon": "fas fa-toolbox",
+                    "fa_icon": "fas fa-toolbox"
                 }
             }
         },
