@@ -1,0 +1,41 @@
+- name: salmon-alevin
+  command: nextflow run ./tests/modules/salmon/alevin/main.nf -entry test_salmon_alevin -c ./tests/config/nextflow.config
+  tags:
+    - salmon
+    - salmon-alevin
+  files:
+    - path: ./results/salmon/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/salmon/S10_L001_alevin_results/lib_format_counts.json
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/featureDump.txt
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/quants_mat_cols.txt
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/quants_mat.gz
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/quants_mat.mtx.gz
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/quants_mat_rows.txt
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/quants_tier_mat.gz
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/raw_cb_frequency.txt
+    - path: ./results/salmon/S10_L001_alevin_results/alevin/whitelist.txt
+    - path: ./results/salmon/S10_L001_alevin_results/logs/salmon_quant.log
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/alevin_meta_info.json
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/ambig_info.tsv
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/expected_bias.gz
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/fld.gz
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/observed_bias_3p.gz
+    - path: ./results/salmon/S10_L001_alevin_results/aux_info/observed_bias.gz
+    - path: ./results/salmon/S10_L001_alevin_results/libParams/flenDist.txt
+    - path: ./results/index/salmon/ref_indexing.log
+    - path: ./results/index/salmon/refseq.bin
+    - path: ./results/index/salmon/versionInfo.json
+    - path: ./results/index/salmon/complete_ref_lens.bin
+    - path: ./results/index/salmon/mphf.bin
+    - path: ./results/index/salmon/pre_indexing.log
+    - path: ./results/index/salmon/ctable.bin
+    - path: ./results/index/salmon/duplicate_clusters.tsv
+    - path: ./results/index/salmon/reflengths.bin
+    - path: ./results/index/salmon/info.json
+    - path: ./results/index/salmon/refAccumLengths.bin
+    - path: ./results/index/salmon/ctg_offsets.bin
+    - path: ./results/index/salmon/rank.bin
+    - path: ./results/index/salmon/pos.bin
+    - path: ./results/index/salmon/seq.bin

@@ -1,0 +1,29 @@
+gffread_transcriptome:
+  - tests/config/**
+  - modules/local/gffread/transcriptome/**
+  - tests/modules/gffread/transcriptome/**
+
+samplesheet_check:
+  - tests/config/**
+  - modules/local/samplesheetcheck/**
+  - tests/modules/samplesheetcheck/**
+
+salmon-alevin:
+  - tests/config/**
+  - modules/local/salmon/alevin/**
+  - tests/modules/salmon/alevin/**
+
+salmon-alevinqc:
+  - tests/config/**
+  - modules/local/salmon/alevinqc/**
+  - tests/modules/salmon/alevinqc/**
+
+gene_map:
+  - tests/config/**
+  - modules/local/genemap/**
+  - tests/modules/genemap/**
+
+star-alignsolo:
+  - tests/config/**
+  - modules/local/star/alignsolo/**
+  - tests/modules/star/alignsolo/**
