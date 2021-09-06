@@ -4,18 +4,6 @@
 
 class Workflow {
 
-    // Citation string
-    private static String citation(workflow) {
-        return "If you use ${workflow.manifest.name} for your analysis please cite:\n\n" +
-               "* The pipeline\n" + 
-               "  https://doi.org/10.5281/zenodo.3901628\n\n" +
-               "* The nf-core framework\n" +
-               "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
-               "* Software dependencies\n" +
-               "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
-    }
-
-
     // Exit pipeline if incorrect --genome key provided
     static void genomeExists(params, log) {
         if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {

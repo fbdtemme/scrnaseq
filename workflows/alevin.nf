@@ -69,9 +69,6 @@ if (params.txp2gene) {
     .set{ ch_txp2gene } 
 }
 
-// Check AWS batch settings
-// TODO use the Checks.awsBatch() function instead
-
 // Stage config files
 ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
@@ -223,10 +220,11 @@ workflow ALEVIN {
 ////////////////////////////////////////////////////
 
 workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
+    if (params.email || params.email_on_fail) {
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+    }
+    NfcoreTemplate.summary(workflow, params, log)
 }
-
 ////////////////////////////////////////////////////
 /* --                  THE END                 -- */
 ////////////////////////////////////////////////////
