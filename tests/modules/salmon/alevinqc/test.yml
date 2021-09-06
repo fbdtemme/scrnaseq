@@ -1,0 +1,7 @@
+- name: alevinqc
+  command: nextflow run ./tests/modules/salmon/alevinqc/main.nf -entry test_salmon_alevinqc -c ./tests/config/nextflow.config
+  tags:
+    - alevinqc
+    - salmon-alevinqc
+  files:
+    - path: ./results/alevinqc/alevinReport.html
