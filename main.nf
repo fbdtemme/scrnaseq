@@ -87,7 +87,7 @@ workflow {
         KALLISTO_BUSTOOLS()
     }
 
-    // Run cell ranger pipeline
+    // Run cellranger pipeline
     if (params.aligner == "cellranger") {
         include { CELLRANGER } from './workflows/cellranger'
         CELLRANGER()
