@@ -90,7 +90,7 @@ def fastqc_options                  = modules['fastqc']
 ////////////////////////////////////////////////////
 include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                      addParams( options: [:] )
 include { GENE_MAP }                    from '../modules/local/genemap/main'                          addParams( options: [:] )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'              addParams( options: [publish_files: ['csv':'']]       )
+include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions.nf'       addParams( options: [publish_files: ['csv':'']] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */

@@ -103,8 +103,8 @@ def fastqc_options                  = modules['fastqc']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                    addParams( options: [:] )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'            addParams( options: [publish_files: ['csv':'']]       )
 include { STAR_ALIGN }                  from '../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
+include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions.nf'              addParams( options: [publish_files: ['csv':'']] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */

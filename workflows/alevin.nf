@@ -112,7 +112,7 @@ include { INPUT_CHECK        }          from '../subworkflows/local/input_check'
 include { GFFREAD_TRANSCRIPTOME }       from '../modules/local/gffread/transcriptome/main'   addParams( options: [:] )
 include { SALMON_ALEVIN }               from '../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
 include { ALEVINQC }                    from '../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'     addParams( options: [publish_files: ['csv':'']]       )
+include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions.nf'       addParams( options: [publish_files: ['csv':'']] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
