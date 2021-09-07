@@ -29,8 +29,8 @@ def fastqc_options                      = modules['fastqc']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
-include { GET_SOFTWARE_VERSIONS }    from '../modules/local/getsoftwareversions'          addParams( options: [publish_files: ['csv':'']]       )
-include { INPUT_CHECK }              from '../subworkflows/local/input_check'             addParams( options: [:] )
+include { GET_SOFTWARE_VERSIONS }    from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['csv':'']]       )
+include { INPUT_CHECK }              from '../subworkflows/local/input_check'               addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
