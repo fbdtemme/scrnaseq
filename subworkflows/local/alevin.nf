@@ -166,13 +166,10 @@ workflow ALEVIN {
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
     // MultiQC
-    if (!params.skip_multiqc) {
-        ch_salmon_multiqc   = SALMON_ALEVIN.out.alevin_results
-
-        ch_multiqc_files = Channel.empty()
-        ch_multiqc_files = ch_multiqc_files.mix(ch_salmon_multiqc.collect{it[1]}.ifEmpty([]))
-    }
-
+    ch_salmon_multiqc   = SALMON_ALEVIN.out.alevin_results
+    ch_multiqc_files = Channel.empty()
+    ch_multiqc_files = ch_multiqc_files.mix(ch_salmon_multiqc.collect{it[1]}.ifEmpty([]))
+    
     emit:
     software_versions          = ch_software_versions
     multiqc_files              = ch_multiqc_files
