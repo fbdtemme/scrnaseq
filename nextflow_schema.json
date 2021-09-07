@@ -47,10 +47,11 @@
                 },
                 "aligner": {
                     "type": "string",
-                    "description": "Name of the tool to use for quantification. Available are: \"alevin\", \"star\", \"kallisto\", \"alevinfry\", \"cellranger\". Default 'alevin'.",
+                    "description": "Tools to use for quantification. Available are: \"alevin\", \"star\", \"kallisto\", \"alevinfry\", \"cellranger\". Default 'alevin'.",
                     "default": "alevin",
-                    "help_text": "The workflow can handle five types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n Salmon Alevin-fry\n- STARsolo\n- CellRanger\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
-                    "fa_icon": "fas fa-align-center"
+                    "help_text": "Multiple separated with commas.\n\nThe workflow can handle five types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n Salmon Alevin-fry\n- STARsolo\n- CellRanger\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "fa_icon": "fas fa-align-center",
+                    "pattern": "^((alevin|star|kallisto|alevinfry|cellranger)*,?)*$"
                 },
                 "protocol": {
                     "type": "string",

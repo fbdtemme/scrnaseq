@@ -57,42 +57,21 @@ log.info NfcoreSchema.params_summary_log(workflow, params, json_schema)
 //Checks.hostname(workflow, params, log)
 
 
+
+
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
 
+include { SCRNASEQ } from './workflows/scrnaseq'
+
+workflow NFCORE_SCRNASEQ {
+    SCRNASEQ ()
+}
+
+
 workflow {
-
-    // Run salmon alevin pipeline
-    if (params.aligner == "alevin") {
-        include { ALEVIN } from './workflows/alevin'
-        ALEVIN()
-    }
-
-    // Run salmon alevin-fry pipeline
-    if (params.aligner == "alevinfry") {
-        include { ALEVINFRY } from './workflows/alevinfry'
-        ALEVINFRY()
-    }
-
-    // Run STARSolo pipeline
-    if (params.aligner == "star") {
-        include { STARSOLO } from './workflows/starsolo'
-        STARSOLO()
-    }
-
-    // Run kallisto bustools pipeline
-    if (params.aligner == "kallisto") {
-        include { KALLISTO_BUSTOOLS } from './workflows/bustools'
-        KALLISTO_BUSTOOLS()
-    }
-
-    // Run cell ranger pipeline
-    if (params.aligner == "cellranger") {
-        include { CELLRANGER } from './workflows/cellranger'
-        CELLRANGER()
-    }
-    
+    NFCORE_SCRNASEQ ()
 }
 
 ////////////////////////////////////////////////////

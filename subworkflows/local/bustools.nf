@@ -2,8 +2,6 @@
 /* --         KALLISTO BUSTOOLS WORKFLOW       -- */
 ////////////////////////////////////////////////////
 
-params.summary_params = [:]
-
 ////////////////////////////////////////////////////
 /* --     Collect configuration parameters     -- */
 ////////////////////////////////////////////////////
@@ -35,7 +33,7 @@ if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
     exit 1, "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
 }
 
-// Setup channel for salmon index if specified
+// Setup channel for kallisto index if specified
 if (params.kallisto_index) {
     Channel
     .fromPath(params.kallisto_index)
@@ -69,11 +67,6 @@ if (params.input) {
 // Check AWS batch settings
 // TODO use the Checks.awsBatch() function instead
 
-// Stage config files
-ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
-ch_output_docs           = file("$projectDir/docs/output.md", checkIfExists: true)
-ch_output_docs_images    = file("$projectDir/docs/images/", checkIfExists: true)
 
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
@@ -82,24 +75,19 @@ def modules = params.modules.clone()
 
 def kallistobustools_ref_options    = modules['kallistobustools_ref']
 def kallistobustools_count_options  = modules['kallistobustools_count']
-def multiqc_options                 = modules['multiqc']
-def fastqc_options                  = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                      addParams( options: [:] )
-include { GENE_MAP }                    from '../modules/local/genemap/main'                          addParams( options: [:] )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'              addParams( options: [publish_files: ['csv':'']]       )
+include { INPUT_CHECK }                 from '../../subworkflows/local/input_check'                      addParams( options: [:] )
+include { GENE_MAP }                    from '../../modules/local/genemap/main'                          addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
-include { KALLISTOBUSTOOLS_COUNT }      from '../modules/nf-core/modules/kallistobustools/count/main' addParams( options: kallistobustools_count_options )
-include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
-include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'                 addParams( options: fastqc_options)
-include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'                addParams( options: multiqc_options )
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
+include { KALLISTOBUSTOOLS_COUNT }      from '../../modules/nf-core/modules/kallistobustools/count/main' addParams( options: kallistobustools_count_options )
+include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -107,20 +95,11 @@ include { MULTIQC }                     from '../modules/nf-core/modules/multiqc
 def multiqc_report    = []
 
 workflow KALLISTO_BUSTOOLS {
+    take:
+    reads
+
+    main:
     ch_software_versions = Channel.empty()
-
-    // Check input files and stage input data
-    INPUT_CHECK ( ch_input )
-    .map {
-        meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
-        [ meta, reads ]
-    }
-    .groupTuple(by: [0])
-    .map { it -> [ it[0], it[1].flatten() ] }
-    .set { ch_fastq }
-
-    // Run FastQC
-    FASTQC ( ch_fastq )
 
     // Generate Kallisto Gene Map if not supplied and index is given
     // If index is given, the gene map will be generated in the 'kb ref' step 
@@ -141,7 +120,7 @@ workflow KALLISTO_BUSTOOLS {
 
     // Quantification with kallistobustools count
     KALLISTOBUSTOOLS_COUNT (
-        ch_fastq,
+        reads,
         ch_kallisto_index,
         ch_kallisto_gene_map,
         [],
@@ -150,38 +129,12 @@ workflow KALLISTO_BUSTOOLS {
         protocol
     )
 
+    ch_multiqc_files = Channel.empty()
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
+    ch_multiqc_files = ch_multiqc_files.mix(KALLISTOBUSTOOLS_COUNT.out.count.map{it[1]}.ifEmpty([]))
 
-    // MultiQC
-    if (!params.skip_multiqc) {
-        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-        ch_workflow_summary = Channel.value(workflow_summary)
-
-        ch_multiqc_files = Channel.empty()
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-
-        MULTIQC ( ch_multiqc_files.collect() )
-        multiqc_report       = MULTIQC.out.report.toList()
-        ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
-    }
-
+    emit: 
+    software_versions        = ch_software_versions
+    multiqc_files            = ch_multiqc_files
 }
-
-////////////////////////////////////////////////////
-/* --              COMPLETION EMAIL            -- */
-////////////////////////////////////////////////////
-
-workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
-}
-
-////////////////////////////////////////////////////
-/* --                  THE END                 -- */
-////////////////////////////////////////////////////

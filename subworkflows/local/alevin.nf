@@ -2,7 +2,6 @@
 /* --         SALMON ALEVIN WORKFLOW           -- */
 ////////////////////////////////////////////////////
 
-params.summary_params = [:]
 
 ////////////////////////////////////////////////////
 /* --     Collect configuration parameters     -- */
@@ -55,12 +54,6 @@ if (params.salmon_index) {
     .set { salmon_index_alevin }
 }
 
-// Create a channel for input read files
-if (params.input) { 
-    ch_input = file(params.input)
-} else { 
-    exit 1, 'Input samplesheet file not specified!'
-}
 
 // Check if txp2gene file has been provided and create channel
 if (params.txp2gene) {
@@ -71,12 +64,6 @@ if (params.txp2gene) {
 
 // Check AWS batch settings
 // TODO use the Checks.awsBatch() function instead
-
-// Stage config files
-ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
-ch_output_docs           = file("$projectDir/docs/output.md", checkIfExists: true)
-ch_output_docs_images    = file("$projectDir/docs/images/", checkIfExists: true)
 
 // Get the protocol parameter
 (protocol, chemistry) = Workflow.formatProtocol(params.protocol, "alevin")
@@ -105,49 +92,33 @@ def salmon_index_options                = modules['salmon_index']
 def gffread_txp2gene_options            = modules['gffread_tx2pgene']
 def salmon_alevin_options               = modules['salmon_alevin']
 def alevin_qc_options                   = modules['alevinqc']
-def multiqc_options                     = modules['multiqc']
-def fastqc_options                      = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }          from '../subworkflows/local/input_check'             addParams( options: [:] )
-include { GFFREAD_TRANSCRIPTOME }       from '../modules/local/gffread/transcriptome/main'   addParams( options: [:] )
-include { SALMON_ALEVIN }               from '../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
-include { ALEVINQC }                    from '../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'     addParams( options: [publish_files: ['csv':'']]       )
+include { GFFREAD_TRANSCRIPTOME }       from '../../modules/local/gffread/transcriptome/main'   addParams( options: [:] )
+include { SALMON_ALEVIN }               from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
+include { ALEVINQC }                    from '../../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
-include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'       addParams( options: fastqc_options)
-include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'      addParams( options: multiqc_options )
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
+include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
+include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
-def multiqc_report    = []
-
 workflow ALEVIN {
+    take:
+    reads
+
+    main:
+
     ch_software_versions = Channel.empty()
 
-    // Check input files and stage input data
-    INPUT_CHECK ( ch_input )
-    .map {
-        meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
-        [ meta, reads ]
-    }
-    .groupTuple(by: [0])
-    .map { it -> [ it[0], it[1].flatten() ] }
-    .set { ch_fastq }
-
-    // Run FastQC
-    FASTQC ( ch_fastq )
-
-    // Unzip barcodes
+  // Unzip barcodes
     if (params.protocol.contains("10X") && !params.barcode_whitelist) {
         GUNZIP ( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
@@ -178,7 +149,7 @@ workflow ALEVIN {
 
     // Perform quantification with salmon alevin
     SALMON_ALEVIN ( 
-        ch_fastq, 
+        reads, 
         salmon_index_alevin, 
         ch_txp2gene, 
         protocol, 
@@ -194,39 +165,15 @@ workflow ALEVIN {
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
-    // Get software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map{it}.collect() )
-
     // MultiQC
     if (!params.skip_multiqc) {
-        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-        ch_workflow_summary = Channel.value(workflow_summary)
         ch_salmon_multiqc   = SALMON_ALEVIN.out.alevin_results
 
         ch_multiqc_files = Channel.empty()
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
         ch_multiqc_files = ch_multiqc_files.mix(ch_salmon_multiqc.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-
-        MULTIQC ( ch_multiqc_files.collect() )
-        multiqc_report       = MULTIQC.out.report.toList()
-        ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
     }
 
+    emit:
+    software_versions          = ch_software_versions
+    multiqc_files              = ch_multiqc_files
 }
-
-////////////////////////////////////////////////////
-/* --              COMPLETION EMAIL            -- */
-////////////////////////////////////////////////////
-
-workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
-}
-
-////////////////////////////////////////////////////
-/* --                  THE END                 -- */
-////////////////////////////////////////////////////

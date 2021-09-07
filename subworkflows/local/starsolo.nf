@@ -2,8 +2,6 @@
 /* --         STARSolo WORKFLOW                -- */
 ////////////////////////////////////////////////////
 
-params.summary_params = [:]
-
 ////////////////////////////////////////////////////
 /* --     Collect configuration parameters     -- */
 ////////////////////////////////////////////////////
@@ -96,44 +94,28 @@ def modules = params.modules.clone()
 
 def star_genomegenerate_options     = modules['star_genomegenerate']
 def star_align_options              = modules['star_align']
-def multiqc_options                 = modules['multiqc']
-def fastqc_options                  = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK }                 from '../subworkflows/local/input_check'                    addParams( options: [:] )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/getsoftwareversions/main'            addParams( options: [publish_files: ['csv':'']]       )
-include { STAR_ALIGN }                  from '../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
+include { STAR_ALIGN }                  from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
-include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
-include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'               addParams( options: fastqc_options)
-include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'              addParams( options: multiqc_options )
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
+include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
-def multiqc_report = []
 
 workflow STARSOLO {
+    take:
+    reads
+
+    main:
     ch_software_versions = Channel.empty()
-
-    // Check input files and stage input data
-    INPUT_CHECK ( ch_input )
-    .map {
-        meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
-        [ meta, reads ]
-    }
-    .groupTuple(by: [0])
-    .map { it -> [ it[0], it[1].flatten() ] }
-    .set { ch_fastq }
-
-    // Run FastQC
-    FASTQC ( ch_fastq )
 
     // Unzip barcodes
     if (params.protocol.contains("10X") && !params.barcode_whitelist) {
@@ -152,47 +134,24 @@ workflow STARSOLO {
   
     // Perform mapping with STAR
     STAR_ALIGN ( 
-        ch_fastq,
+        reads,
         star_index,
         gtf,
         ch_barcode_whitelist,
         protocol
     )
 
-    // TODO process output to obtain counts
-
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
 
-    // MultiQC
-    if (!params.skip_multiqc) {
-        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-        ch_workflow_summary = Channel.value(workflow_summary)
-        ch_star_multiqc     = STAR_ALIGN.out.log_final
+    ch_multiqc_files    = Channel.empty()
+    ch_star_multiqc     = STAR_ALIGN.out.log_final
+    ch_multiqc_files    = ch_multiqc_files.mix(ch_star_multiqc.collect{it[1]}.ifEmpty([]))
 
-        ch_multiqc_files = Channel.empty()
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
-        ch_multiqc_files = ch_multiqc_files.mix(ch_star_multiqc.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 
-        MULTIQC ( ch_multiqc_files.collect() )
-        multiqc_report       = MULTIQC.out.report.toList()
-        ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
-    }
-
-}
-
-////////////////////////////////////////////////////
-/* --              COMPLETION EMAIL            -- */
-////////////////////////////////////////////////////
-
-workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
+    emit:
+    software_versions   = ch_software_versions
+    multiqc_files       = ch_multiqc_files
 }
 
 ////////////////////////////////////////////////////
