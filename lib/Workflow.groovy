@@ -45,16 +45,16 @@ class Workflow {
 
     /*
     * Format the protocol
-    * Given the protocol paramter (params.protocol) and the aligner (params.aligner),
+    * Given the protocol paramter (params.protocol) and the tool (params.tools),
     * this function formats the protocol such that it is fit for the respective
     * subworkflow
     */
-    static formatProtocol(protocol, aligner) {
+    static formatProtocol(protocol, Tool) {
         String new_protocol = protocol
         String chemistry = ""
         
         // alevin
-        if (aligner == "alevin") {
+        if (Tool == "alevin") {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "chromium"
@@ -74,7 +74,7 @@ class Workflow {
         }
 
         // star
-        else if (aligner == "star") {
+        else if (Tool == "star") {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "CB_UMI_Simple"
@@ -97,7 +97,7 @@ class Workflow {
         }
 
         // kallisto bustools
-        else if (aligner = "kallisto" ) {
+        else if (Tool = "kallisto" ) {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "10XV1"
@@ -119,7 +119,7 @@ class Workflow {
             }
         }
         else {
-        exit 1, "Aligner not recognized."
+        exit 1, "Tool not recognized."
         }
 
         return [new_protocol, chemistry]

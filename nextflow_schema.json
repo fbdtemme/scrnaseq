@@ -45,7 +45,7 @@
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
                     "fa_icon": "fas fa-barcode"
                 },
-                "aligner": {
+                "tools": {
                     "type": "string",
                     "description": "Tools to use for quantification. Available are: \"alevin\", \"star\", \"kallisto\", \"alevinfry\", \"cellranger\". Default 'alevin'.",
                     "default": "alevin",

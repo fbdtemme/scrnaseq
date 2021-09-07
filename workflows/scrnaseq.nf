@@ -39,7 +39,7 @@ include { INPUT_CHECK }              from '../subworkflows/local/input_check'   
 include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'       addParams( options: fastqc_options)
 include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'      addParams( options: multiqc_options )
 
-def tools = params.aligner ? params.aligner.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
+def tools = params.tools ? params.tools.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
 
 ////////////////////////////////////////////////////
 /* CONDITIONALY IMPORT LOCAL MODULES/SUBWORKFLOWS */
