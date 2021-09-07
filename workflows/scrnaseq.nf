@@ -29,7 +29,7 @@ def fastqc_options                      = modules['fastqc']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
-include { GET_SOFTWARE_VERSIONS }    from '../modules/local/getsoftwareversions/main'     addParams( options: [publish_files: ['csv':'']]       )
+include { GET_SOFTWARE_VERSIONS }    from '../modules/local/getsoftwareversions'          addParams( options: [publish_files: ['csv':'']]       )
 include { INPUT_CHECK }              from '../subworkflows/local/input_check'             addParams( options: [:] )
 
 ////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ workflow SCRNASEQ {
     fastqc_zip = Channel.empty()
     if (!params.skip_fastqc) {
         FASTQC ( ch_fastq )
-        
+
         ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
         ch_multiqc_files = ch_multiqc_files.mix(fastqc_zip.map { it -> it[1] }.collect())
     } 
