@@ -1,16 +1,39 @@
+
 ////////////////////////////////////////////////////
-/* --     Collect configuration parameters     -- */
+/* --    VALIDATE INPUTS                       -- */
 ////////////////////////////////////////////////////
 
-params.summary_params = [:]
+def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
+
+// Validate input parameters
+WorkflowScrnaseq.initialise(params, log)
+
+// Check input path parameters to see if they exist
+checkPathParamList = [
+    params.input, 
+    params.multiqc_config,
+    params.genome_fasta,
+    params.transcript_fasta, 
+    params.gtf,
+    params.salmon_index,
+    params.star_index,
+    params.kallisto_index,
+    params.txp2gene,
+    params.kallisto_gene_map
+]
+
+for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
+
 
 // Create a channel for input read files
 if (params.input) { 
     ch_input = file(params.input)
-} else { 
-    exit 1, 'Input samplesheet file not specified!'
 }
 
+
+////////////////////////////////////////////////////
+/* --    CONFIG FILES                          -- */
+////////////////////////////////////////////////////
 
 // Stage config files
 ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
@@ -42,9 +65,8 @@ include { MULTIQC }                     from '../modules/nf-core/modules/multiqc
 def tools = params.tools ? params.tools.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
 
 ////////////////////////////////////////////////////
-/* CONDITIONALY IMPORT LOCAL MODULES/SUBWORKFLOWS */
+/*    IMPORT LOCAL MODULES/SUBWORKFLOWS           */
 ////////////////////////////////////////////////////
-
 
 
 if ("alevin" in tools) {
@@ -84,18 +106,26 @@ workflow SCRNASEQ {
     .set { ch_fastq }
 
     // Run FastQC
-    fastqc_zip = Channel.empty()
     if (!params.skip_fastqc) {
         FASTQC ( ch_fastq )
 
-        ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
-        ch_multiqc_files = ch_multiqc_files.mix(fastqc_zip.map { it -> it[1] }.collect())
+        ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map { it -> it[1] }.collect())
     } 
 
     // Dispatch to specified tool
 
     if ("alevin" in tools) {
-        ALEVIN ( ch_fastq )
+        ALEVIN ( 
+            ch_fastq,
+            params.genome_fasta,
+            params.transcript_fasta,
+            params.gtf,
+            params.txp2gene,
+            params.salmon_index,
+            params.protocol,
+            params.barcode_whitelist
+        )
 
         ch_software_versions = ch_software_versions.mix(ALEVIN.out.software_versions.collect().ifEmpty([]))
         ch_multiqc_files     = ch_multiqc_files.mix(ALEVIN.out.multiqc_files.collect().ifEmpty([]))  
@@ -110,7 +140,14 @@ workflow SCRNASEQ {
 
     // Run STARSolo pipeline
     if ("star" in tools) {
-        STARSOLO( ch_fastq )
+        STARSOLO( 
+            ch_fastq,
+            params.genome_fasta,
+            params.gtf,
+            params.star_index,
+            params.protocol,
+            params.barcode_whitelist
+        )
 
         ch_software_versions = ch_software_versions.mix(STARSOLO.out.software_versions.collect().ifEmpty([]))
         ch_multiqc_files     = ch_multiqc_files.mix(STARSOLO.out.multiqc_files.collect().ifEmpty([]))    
@@ -118,13 +155,20 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("kallisto" in tools) {
-        KALLISTO_BUSTOOLS( ch_fastq )
+        KALLISTO_BUSTOOLS( 
+            ch_fastq,
+            params.genome_fasta,
+            params.gtf,
+            params.kallisto_gene_map,
+            params.kallisto_index,
+            params.protocol
+        )
 
         ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect().ifEmpty([]))
         ch_multiqc_files     = ch_multiqc_files.mix(KALLISTO_BUSTOOLS.out.multiqc_files.collect().ifEmpty([]))    
     }
 
-  // Run kallisto bustools pipeline
+    // Run kallisto bustools pipeline
     if ("cellranger" in tools) {
         CELLRANGER( ch_fastq )
 
@@ -137,7 +181,7 @@ workflow SCRNASEQ {
 
      // MultiQC
     if (!params.skip_multiqc) {
-        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
+        workflow_summary    = WorkflowScrnaseq.paramsSummaryMultiqc(workflow, summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)
 
         ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)

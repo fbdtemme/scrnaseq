@@ -1,87 +1,11 @@
 ////////////////////////////////////////////////////
-/* --         SALMON ALEVIN WORKFLOW           -- */
+/* --         SALMON ALEVIN SUBWORKFLOW        -- */
 ////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////
-/* --     Collect configuration parameters     -- */
-////////////////////////////////////////////////////
-
-// Check if genome exists in the config file
-if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
-    exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(', ')}"
-}
-
-// Check if GTF is supplied properly
-if (params.gtf) {
-    Channel
-    .fromPath(params.gtf)
-    .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-    .set { gtf }
-}
-
-// Check if TXP2Gene is provided for Alevin
-if (!params.gtf && !params.txp2gene) {
-    exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to quantify with Alevin"
-}
-
-// Setup Genome Fasta channels
-if (params.genome_fasta) {
-    Channel
-    .fromPath(params.genome_fasta)
-    .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
-    .set { genome_fasta }
-} 
-
-// Setup Transcript Fasta channels
-if (params.transcript_fasta) {
-  Channel
-    .fromPath(params.transcript_fasta)
-    .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-    .set { transcriptome_fasta }
-} 
-
-// Check if files for index building are given if no index is specified
-if (!params.salmon_index && !params.genome_fasta) {
-    exit 1, "Must provide a genome fasta file ('--genome_fasta') or a transcript fasta ('--transcript_fasta') if no index is given!"
-}
-
-// Setup channel for salmon index if specified
-if (params.salmon_index) {
-    Channel
-    .fromPath(params.salmon_index)
-    .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
-    .set { salmon_index_alevin }
-}
-
-
-// Check if txp2gene file has been provided and create channel
-if (params.txp2gene) {
-    Channel
-    .fromPath(params.txp2gene)
-    .set{ ch_txp2gene } 
-}
-
-// Check AWS batch settings
-// TODO use the Checks.awsBatch() function instead
-
-// Get the protocol parameter
-(protocol, chemistry) = Workflow.formatProtocol(params.protocol, "alevin")
 
 // Whitelist files for STARsolo and Kallisto
-whitelist_folder = "$baseDir/assets/whitelist/"
+def whitelist_folder = "$baseDir/assets/whitelist/"
 
-// Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
-if (params.protocol.contains("10X") && !params.barcode_whitelist) {
-    barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
-    Channel.fromPath(barcode_filename)
-    .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-    .set{ barcode_whitelist_gzipped }
-} else if (params.barcode_whitelist){
-    Channel.fromPath(params.barcode_whitelist)
-    .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-    .set{ ch_barcode_whitelist }
-}
 
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
@@ -112,50 +36,72 @@ include { SALMON_INDEX }                from '../../modules/nf-core/modules/salm
 ////////////////////////////////////////////////////
 workflow ALEVIN {
     take:
-    reads
+    reads               // channel: [ val(meta), [ reads ] ]
+    genome_fasta        // channel: /path/to/genome.fasta
+    transcript_fasta    // channel: /path/to/transcriptome/fasta
+    gtf                 // channel: /path/to/annotation.gtf
+    txp2gene            // channel: /path/to/txp2gene.txt
+    salmon_index        // channel: /path/to/salmon/index
+    protocol            // channel: protocol
+    barcode_whitelist   // channel: /path/to/barcode_whitelist.txt
 
     main:
 
     ch_software_versions = Channel.empty()
 
-  // Unzip barcodes
-    if (params.protocol.contains("10X") && !params.barcode_whitelist) {
+    // Get the protocol parameter suitable for passing to alevin
+    (alevin_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "alevin")
+
+    // Setup correct barcode whitelist and unzip of necessary
+    if (protocol.contains("10X") && !barcode_whitelist) {
+        barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
+        Channel.fromPath(barcode_filename)
+        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+        .set{ barcode_whitelist_gzipped }
+
         GUNZIP ( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
+    } else {
+         Channel.fromPath(barcode_whitelist)
+        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+        .set{ ch_barcode_whitelist }
     }
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
-    if (!params.transcript_fasta && params.genome_fasta && params.gtf) {
+    if (!transcript_fasta && genome_fasta && gtf) {
         GFFREAD_TRANSCRIPTOME ( genome_fasta, gtf )
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
-        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.ifEmpty(null))
     }
     
     // Build salmon index
-    if (!params.salmon_index) {
+    if (!salmon_index) {
         SALMON_INDEX ( genome_fasta, transcriptome_fasta )
         salmon_index_alevin = SALMON_INDEX.out.index
+    } else {
+        // Setup channel for salmon index if specified
+        salmon_index_alevin = Channel.fromPath(salmon_index)
     }
-
+    
     // Build txp2gene map
-    if (!params.txp2gene){
+    if (!txp2gene){
         GFFREAD_TXP2GENE ( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
         // Only collect version if not already done for gffread
-        if (!GFFREAD_TRANSCRIPTOME.out.version) {
-            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
+        if (!GFFREAD_TRANSCRIPTOME.out) {
+            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.ifEmpty(null))
         }
     }
-
+    
     // Perform quantification with salmon alevin
     SALMON_ALEVIN ( 
         reads, 
         salmon_index_alevin, 
         ch_txp2gene, 
-        protocol, 
+        alevin_protocol, 
         ch_barcode_whitelist 
     )
-
+    
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
 
