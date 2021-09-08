@@ -8,13 +8,19 @@ class WorkflowScrnaseq {
     {
         genomeExists(params, log)
 
+        if (params.gtf && params.gff) {
+            log.error "Must provide either a GTF('--gtf') or a GFF3 file ('--gff'), not both"
+            System.exit(1)
+        }
+
         def tools = params.tools.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') }
 
         if ('alevin' in tools) {
+            
             // Check if gtf or TXP2Gene is provided for Alevin
-            if (!params.gtf && !params.txp2gene) {
-                log.error "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to quantify with Alevin"
-                 System.exit(1)
+            if (!(params.gtf || params.gff) && !params.txp2gene) {
+                log.error "Must provide either a GTF/GFF3 file ('--gtf/--gff') or transcript to gene mapping ('--txp2gene') to quantify with Alevin"
+                System.exit(1)
             }
 
             // Check if files for index building are given if no index is specified
@@ -26,19 +32,19 @@ class WorkflowScrnaseq {
 
         if ('kallisto' in tools) {
             // Check if files for index building are given if no index is specified
-            if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
-                log.error "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+            if (!params.kallisto_index && (!params.genome_fasta || !(params.gtf || params.gff))) {
+                log.error "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') or gff file ('--gff') if no index is given!"
                 System.exit(1)
             }
 
-            if (!params.gtf && !params.kallisto_gene_map) {
-                log.error "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+            if (!(params.gtf || params.gff) && !params.kallisto_gene_map) {
+                log.error "Must provide either a GTF/GFF3 file ('--gtf/--gff') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
                 System.exit(1)
             }
         }
 
         if ('star' in tools) {
-            if (!params.star_index && (!params.gtf || !params.genome_fasta)) {
+            if (!params.star_index && (!(params.gtf || params.gff) || !params.genome_fasta)) {
                 log.error "STAR needs either a GTF + FASTA or a precomputed index supplied."
                 System.exit(1)
             }

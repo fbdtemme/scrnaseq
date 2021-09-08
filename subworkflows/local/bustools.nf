@@ -24,7 +24,7 @@ workflow KALLISTO_BUSTOOLS {
     take:
     reads              // channel: [ val(meta), [ reads ] ]
     genome_fasta       // channel: /path/to/genome.fasta
-    gtf                // channel: /path/to/annotation.gtf 
+    gtf                // channel: /path/to/annotation.gtf
     kallisto_gene_map  // channel: /path/to/genemap.txt
     kallisto_index     // channel: /path/to/kallisto/index
     protocol           // channel: protocol
