@@ -2,7 +2,48 @@
  * This file holds several functions specific to the pipeline.
  */
 
-class Workflow {
+class WorkflowScrnaseq {
+    
+    static void initialise(params, log)
+    {
+        genomeExists(params, log)
+
+        def tools = params.tools.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') }
+
+        if ('alevin' in tools) {
+            // Check if gtf or TXP2Gene is provided for Alevin
+            if (!params.gtf && !params.txp2gene) {
+                log.error "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to quantify with Alevin"
+                 System.exit(1)
+            }
+
+            // Check if files for index building are given if no index is specified
+            if (!params.salmon_index && !params.genome_fasta) {
+                log.error "Must provide a genome fasta file ('--genome_fasta') or a transcript fasta ('--transcript_fasta') if no index is given!"
+                System.exit(1)
+            }
+        }
+
+        if ('kallisto' in tools) {
+            // Check if files for index building are given if no index is specified
+            if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
+                log.error "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+                System.exit(1)
+            }
+
+            if (!params.gtf && !params.kallisto_gene_map) {
+                log.error "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+                System.exit(1)
+            }
+        }
+
+        if ('star' in tools) {
+            if (!params.star_index && (!params.gtf || !params.genome_fasta)) {
+                log.error "STAR needs either a GTF + FASTA or a precomputed index supplied."
+                System.exit(1)
+            }
+        }
+    }
 
     // Exit pipeline if incorrect --genome key provided
     static void genomeExists(params, log) {
@@ -16,7 +57,7 @@ class Workflow {
         }
     }
 
-    /*
+        /*
      * Get workflow summary for MultiQC
      */
     static String paramsSummaryMultiqc(workflow, summary) {
@@ -45,16 +86,16 @@ class Workflow {
 
     /*
     * Format the protocol
-    * Given the protocol paramter (params.protocol) and the aligner (params.aligner),
+    * Given the protocol paramter (params.protocol) and the tool (params.tools),
     * this function formats the protocol such that it is fit for the respective
     * subworkflow
     */
-    static formatProtocol(protocol, aligner) {
+    static formatProtocol(protocol, tool) {
         String new_protocol = protocol
         String chemistry = ""
         
         // alevin
-        if (aligner == "alevin") {
+        if (tool == "alevin") {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "chromium"
@@ -74,7 +115,7 @@ class Workflow {
         }
 
         // star
-        else if (aligner == "star") {
+        else if (tool == "star") {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "CB_UMI_Simple"
@@ -97,7 +138,7 @@ class Workflow {
         }
 
         // kallisto bustools
-        else if (aligner = "kallisto" ) {
+        else if (tool = "kallisto" ) {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "10XV1"
@@ -119,7 +160,7 @@ class Workflow {
             }
         }
         else {
-        exit 1, "Aligner not recognized."
+        exit 1, "Tool not recognized."
         }
 
         return [new_protocol, chemistry]

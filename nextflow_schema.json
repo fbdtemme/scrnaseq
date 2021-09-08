@@ -45,12 +45,13 @@
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
                     "fa_icon": "fas fa-barcode"
                 },
-                "aligner": {
+                "tools": {
                     "type": "string",
-                    "description": "Name of the tool to use for quantification. Available are: \"alevin\", \"star\", \"kallisto\", \"alevinfry\", \"cellranger\". Default 'alevin'.",
+                    "description": "Tools to use for quantification. Available are: \"alevin\", \"star\", \"kallisto\", \"alevinfry\", \"cellranger\". Default 'alevin'.",
                     "default": "alevin",
-                    "help_text": "The workflow can handle five types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n Salmon Alevin-fry\n- STARsolo\n- CellRanger\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
-                    "fa_icon": "fas fa-align-center"
+                    "help_text": "Multiple separated with commas.\n\nThe workflow can handle five types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n Salmon Alevin-fry\n- STARsolo\n- CellRanger\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "fa_icon": "fas fa-align-center",
+                    "pattern": "^((alevin|star|kallisto|alevinfry|cellranger)*,?)*$"
                 },
                 "protocol": {
                     "type": "string",
@@ -258,6 +259,11 @@
                     "hidden": true,
                     "help_text": "Set to disable colourful command line output and live life in monochrome."
                 },
+                "multiqc_title": {
+                    "type": "string",
+                    "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
+                    "fa_icon": "fas fa-file-signature"
+                },
                 "multiqc_config": {
                     "type": "string",
                     "description": "Custom config file to supply to MultiQC.",
@@ -281,11 +287,23 @@
                 "enable_conda": {
                     "type": "string"
                 },
+                "skip_fastqc": {
+                    "type": "string",
+                    "fa_icon": "fas fa-fast-forward",
+                    "help_text": "Do not run FastQC on input."
+                },
                 "skip_multiqc": {
                     "type": "string"
                 },
                 "seq_center": {
                     "type": "string"
+                },
+                "singularity_pull_docker_container": {
+                    "type": "boolean",
+                    "description": "Instead of directly downloading Singularity images for use with Singularity, force the workflow to pull and convert Docker containers instead.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-toolbox",
+                    "help_text": "This may be useful for example if you are unable to directly pull Singularity containers to run the pipeline due to http/https proxy issues."
                 }
             }
         },

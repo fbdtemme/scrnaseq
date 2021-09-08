@@ -30,42 +30,32 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowMain.initialise(workflow, params, log)
 
 
+
+
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
 
+include { SCRNASEQ } from './workflows/scrnaseq'
+
+workflow NFCORE_SCRNASEQ {
+    SCRNASEQ ()
+}
+
 workflow {
+    NFCORE_SCRNASEQ ()
+}
 
-    // Run salmon alevin pipeline
-    if (params.aligner == "alevin") {
-        include { ALEVIN } from './workflows/alevin'
-        ALEVIN()
-    }
 
-    // Run salmon alevin-fry pipeline
-    if (params.aligner == "alevinfry") {
-        include { ALEVINFRY } from './workflows/alevinfry'
-        ALEVINFRY()
-    }
+////////////////////////////////////////////////////
+/* --              COMPLETION EMAIL            -- */
+////////////////////////////////////////////////////
 
-    // Run STARSolo pipeline
-    if (params.aligner == "star") {
-        include { STARSOLO } from './workflows/starsolo'
-        STARSOLO()
+workflow.onComplete {
+    if (params.email || params.email_on_fail) {
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
-
-    // Run kallisto bustools pipeline
-    if (params.aligner == "kallisto") {
-        include { KALLISTO_BUSTOOLS } from './workflows/bustools'
-        KALLISTO_BUSTOOLS()
-    }
-
-    // Run cellranger pipeline
-    if (params.aligner == "cellranger") {
-        include { CELLRANGER } from './workflows/cellranger'
-        CELLRANGER()
-    }
-    
+    NfcoreTemplate.summary(workflow, params, log)
 }
 
 ////////////////////////////////////////////////////
