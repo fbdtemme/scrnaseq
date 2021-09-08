@@ -18,7 +18,6 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 **nf-core/scrnaseq** is a bioinformatics best-practise analysis pipeline for processing and quantification of single cell RNA-seq datasets.
 
 Currently, the pipeline supports the following tools:
