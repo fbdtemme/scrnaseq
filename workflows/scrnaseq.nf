@@ -52,7 +52,7 @@ def fastqc_options                      = modules['fastqc']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
-include { GET_SOFTWARE_VERSIONS }    from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['csv':'']]       )
+include { GET_SOFTWARE_VERSIONS }    from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['tsv':'']]       )
 include { INPUT_CHECK }              from '../subworkflows/local/input_check'               addParams( options: [:] )
 
 ////////////////////////////////////////////////////
