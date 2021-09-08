@@ -4,7 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta name="description" content="nf-core/scrnaseq: Nextflow RNA-Seq analysis pipeline, part of the nf-core community.">
+  <meta name="description" content="nf-core/scrnaseq: Pipeline for processing of single cell rnaseq data">
   <title>nf-core/scrnaseq Pipeline Report</title>
 </head>
 <body>
@@ -22,17 +22,6 @@
         <p>The exit status of the task that caused the workflow execution to fail was: <code>$exitStatus</code>.</p>
         <p>The full error message was:</p>
         <pre style="white-space: pre-wrap; overflow: visible; margin-bottom: 0;">${errorReport}</pre>
-    </div>
-    """
-} else if(fail_percent_mapped.size() > 0) {
-    out << """
-    <div style="color: #856404; background-color: #fff3cd; border-color: #ffeeba; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px;">
-        <h4 style="margin-top:0; color: inherit;">nf-core/scrnaseq execution completed with warnings!</h4>
-        <p>The pipeline finished successfully, but the following samples were skipped due to very low alignment (&lt; ${min_mapped_reads}%):</p>
-        <ul>
-            <li><code>${fail_percent_mapped.join('</code></li><li><code>')}</code></li>
-        </ul>
-        <p>
     </div>
     """
 } else {
