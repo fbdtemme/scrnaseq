@@ -30,6 +30,8 @@ if (params.input) {
     ch_input = file(params.input)
 }
 
+// Parse tools to make them a list
+def tools = params.tools ? params.tools.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
 
 ////////////////////////////////////////////////////
 /* --    CONFIG FILES                          -- */
@@ -43,10 +45,10 @@ ch_output_docs_images    = file("$projectDir/docs/images/", checkIfExists: true)
 
 
 // Don't overwrite global params.modules, create a copy instead and use that within the main script
-def modules = params.modules.clone()
+def modules               = params.modules.clone()
 
-def multiqc_options                     = modules['multiqc']
-def fastqc_options                      = modules['fastqc'] 
+def multiqc_options       = modules['multiqc']
+def fastqc_options        = modules['fastqc'] 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -59,10 +61,8 @@ include { INPUT_CHECK }              from '../subworkflows/local/input_check'   
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
 
-include { FASTQC  }                     from '../modules/nf-core/modules/fastqc/main'       addParams( options: fastqc_options)
-include { MULTIQC }                     from '../modules/nf-core/modules/multiqc/main'      addParams( options: multiqc_options )
-
-def tools = params.tools ? params.tools.split(',').collect{ it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
+include { FASTQC  }                from '../modules/nf-core/modules/fastqc/main'  addParams( options: fastqc_options)
+include { MULTIQC }                from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
 /*    IMPORT LOCAL MODULES/SUBWORKFLOWS           */
@@ -88,6 +88,10 @@ if ("kallisto" in tools) {
 if ("cellranger" in tools) {
     include { CELLRANGER }          from '../subworkflows/local/cellranger'
 }
+
+////////////////////////////////////////////////////
+/*    SCRNASEQ WORKFLOW        */
+////////////////////////////////////////////////////
 
 workflow SCRNASEQ {
 
@@ -132,10 +136,10 @@ workflow SCRNASEQ {
     }
 
     if ("alevinfry" in tools) {
-        ALEVINFRY( ch_fastq )
+        //ALEVINFRY( ch_fastq )
 
-        ch_software_versions = ch_software_versions.mix(ALEVINFRY.out.software_versions.collect().ifEmpty([]))
-        ch_multiqc_files     = ch_multiqc_files.mix(ALEVINFRY.out.multiqc_files.collect().ifEmpty([]))  
+        //ch_software_versions = ch_software_versions.mix(ALEVINFRY.out.software_versions.collect().ifEmpty([]))
+        //ch_multiqc_files     = ch_multiqc_files.mix(ALEVINFRY.out.multiqc_files.collect().ifEmpty([]))  
     }
 
     // Run STARSolo pipeline
@@ -170,10 +174,10 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("cellranger" in tools) {
-        CELLRANGER( ch_fastq )
+        //CELLRANGER( ch_fastq )
 
-        ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect().ifEmpty([]))
-        ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect().ifEmpty()([]))    
+        //ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect().ifEmpty([]))
+        //ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect().ifEmpty()([]))    
     }
    
     // Get software versions
@@ -184,10 +188,10 @@ workflow SCRNASEQ {
         workflow_summary    = WorkflowScrnaseq.paramsSummaryMultiqc(workflow, summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)
 
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_config)
-        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
+        ch_multiqc_files    = ch_multiqc_files.mix(ch_multiqc_config)
+        ch_multiqc_files    = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+        ch_multiqc_files    = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        ch_multiqc_files    = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
 
         MULTIQC ( ch_multiqc_files.collect() )
         multiqc_report       = MULTIQC.out.report.toList()

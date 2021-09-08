@@ -18,7 +18,7 @@
 * [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
     > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
 
-* [Salmon](https://pubmed.ncbi.nlm.nih.gov/28263959/)
+* [Salmon Alevin](https://pubmed.ncbi.nlm.nih.gov/28263959/)
     > Patro R, Duggal G, Love MI, Irizarry RA, Kingsford C. Salmon provides fast and bias-aware quantification of transcript expression Nat Methods. 2017 Apr;14(4):417-419. doi: 10.1038/nmeth.4197. Epub 2017 Mar 6. PubMed PMID: 28263959; PubMed Central PMCID: PMC5600148.
 
 * [STAR](https://pubmed.ncbi.nlm.nih.gov/23104886/)
@@ -26,8 +26,8 @@
 
 * [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
 
-* [Kallisto]()
-    > 
+* [Kallisto Bustools](https://www.nature.com/articles/s41587-021-00870-2)
+    > Pall Melsted, A. Sina Booeshaghi, Lauren Liu, Fan Gao, Lambda Lu, Kyung Hoi (Joseph) Min, Eduardo da Veiga Beltrame, Kristján Eldjárn Hjörleifsson, Jase Gehring & Lior Pachter† Modular and efficient pre-processing of single-cell RNA-seq, Nature Biotechnology (2021).
 
 ## R packages
 

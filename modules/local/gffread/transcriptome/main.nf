@@ -1,12 +1,11 @@
 // Import generic module functions
 include { initOptions; saveFiles; getSoftwareName } from './functions'
 
-
 params.options = [:]
 options        = initOptions(params.options)
 
 process GFFREAD_TRANSCRIPTOME {
-    tag "${genome_fasta}"
+    tag "gffread_transcriptome"
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,

@@ -10,19 +10,19 @@ def whitelist_folder = "$baseDir/assets/whitelist/"
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
-def star_genomegenerate_options     = modules['star_genomegenerate']
-def star_align_options              = modules['star_align']
+def star_genomegenerate_options  = modules['star_genomegenerate']
+def star_align_options           = modules['star_align']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { STAR_ALIGN }                  from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
+include { STAR_ALIGN }           from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
-include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
+include { GUNZIP }               from '../../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
+include { STAR_GENOMEGENERATE }  from '../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -30,19 +30,19 @@ include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/modules/star
 
 workflow STARSOLO {
     take:
-    reads
-    genome_fasta
-    gtf
-    star_index
-    protocol
-    barcode_whitelist
+    reads              // channel: [ val(meta), [ reads ] ]
+    genome_fasta       // channel: /path/to/genome.fasta
+    gtf                // channel: /path/to/annotation.gtf
+    star_index         // channel: /path/to/start/index
+    protocol           // channel: protocol
+    barcode_whitelist  // channel: /path/to/barcode_whitelist.txt
 
     main:
     ch_software_versions = Channel.empty()
 
     (star_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "star")
    
-    // Setup correct barcode whitelist and unzip of necessary
+    // Setup correct barcode whitelist and unzip if necessary
     if (protocol.contains("10X") && !barcode_whitelist) {
         barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
         Channel.fromPath(barcode_filename)
@@ -78,12 +78,13 @@ workflow STARSOLO {
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
 
-    ch_multiqc_files    = Channel.empty()
-    ch_star_multiqc     = STAR_ALIGN.out.log_final
-    ch_multiqc_files    = ch_multiqc_files.mix(ch_star_multiqc.collect{it[1]}.ifEmpty([]))
+    // Collect multiqc files
+    ch_multiqc_files     = Channel.empty()
+    ch_star_multiqc      = STAR_ALIGN.out.log_final
+    ch_multiqc_files     = ch_multiqc_files.mix(ch_star_multiqc.collect{it[1]}.ifEmpty([]))
 
 
     emit:
-    software_versions   = ch_software_versions
-    multiqc_files       = ch_multiqc_files
+    software_versions    = ch_software_versions
+    multiqc_files        = ch_multiqc_files
 }

@@ -18,7 +18,7 @@ nextflow.enable.dsl = 2
 */
 
 
-//TODO
+//TODO Parse genome parameters here
 
 /*
 ========================================================================================
@@ -28,8 +28,6 @@ nextflow.enable.dsl = 2
 
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowMain.initialise(workflow, params, log)
-
-
 
 
 ////////////////////////////////////////////////////

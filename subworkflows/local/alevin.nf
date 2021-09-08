@@ -14,13 +14,14 @@ def modules = params.modules.clone()
 
 def salmon_index_options                = modules['salmon_index']
 def gffread_txp2gene_options            = modules['gffread_tx2pgene']
+def gffread_transcriptome_options       = modules['gffread_transcriptome']
 def salmon_alevin_options               = modules['salmon_alevin']
 def alevin_qc_options                   = modules['alevinqc']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GFFREAD_TRANSCRIPTOME }       from '../../modules/local/gffread/transcriptome/main'   addParams( options: [:] )
+include { GFFREAD_TRANSCRIPTOME }       from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
 include { SALMON_ALEVIN }               from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
 include { ALEVINQC }                    from '../../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
 
@@ -46,7 +47,6 @@ workflow ALEVIN {
     barcode_whitelist   // channel: /path/to/barcode_whitelist.txt
 
     main:
-
     ch_software_versions = Channel.empty()
 
     // Get the protocol parameter suitable for passing to alevin
@@ -111,12 +111,12 @@ workflow ALEVIN {
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
-    // MultiQC
+    // Collect multiqc files
     ch_salmon_multiqc   = SALMON_ALEVIN.out.alevin_results
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(ch_salmon_multiqc.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files    = Channel.empty()
+    ch_multiqc_files    = ch_multiqc_files.mix(ch_salmon_multiqc.collect{it[1]}.ifEmpty([]))
     
     emit:
-    software_versions          = ch_software_versions
-    multiqc_files              = ch_multiqc_files
+    software_versions   = ch_software_versions
+    multiqc_files       = ch_multiqc_files
 }
