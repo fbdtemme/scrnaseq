@@ -27,3 +27,19 @@ star-alignsolo:
   - tests/config/**
   - modules/local/star/alignsolo/**
   - tests/modules/star/alignsolo/**
+
+subworkflow-alevin:
+  - tests/config/**
+  - tests/subworkflows/local/alevin/**
+  - subworkflows/alevin.nf
+
+subworkflow-kallistobustools:
+  - tests/config/**
+  - tests/subworkflows/local/kallistobustools/**
+  - subworkflows/bustools.nf
+
+# Disabled because of memory requirements
+# subworkflow-starsolo:
+#   - tests/config/**
+#   - tests/subworkflows/local/starsolo/**
+#   - subworkflows/starsolo.nf

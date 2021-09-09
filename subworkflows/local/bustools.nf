@@ -46,6 +46,7 @@ workflow KALLISTO_BUSTOOLS {
     if (!kallisto_gene_map && kallisto_index) {
         GFFREAD_KALLISTO_GENEMAP ( gtf )
         ch_kallisto_gene_map = GFFREAD_KALLISTO_GENEMAP.out.gtf
+        ch_software_versions = ch_software_versions.mix(GFFREAD_KALLISTO_GENEMAP.out.version.ifEmpty(null))
     } else if (kallisto_gene_map) {
         ch_kallisto_gene_map = kallisto_gene_map
     }
@@ -84,7 +85,7 @@ workflow KALLISTO_BUSTOOLS {
     )
 
     // Collect software versions
-    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.ifEmpty(null))
 
     emit: 
     software_versions    = ch_software_versions

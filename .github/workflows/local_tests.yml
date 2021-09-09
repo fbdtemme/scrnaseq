@@ -1,4 +1,4 @@
-name: local modules pytest-workflow
+name: pytest-workflow
 on:
   push:
     branches:
@@ -8,6 +8,8 @@ on:
     branches:
       - main
       - dsl2
+  workflow_dispatch:
+    inputs: []
 
 jobs:
   changes:

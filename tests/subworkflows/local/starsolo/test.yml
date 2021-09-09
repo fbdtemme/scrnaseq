@@ -1,0 +1,97 @@
+- name: subworkflow-starsolo-paired
+  command: nextflow run ./tests/subworkflows/local/starsolo/main.nf -entry test_starsolo -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-starsolo
+  files:
+    - path: ./results/index/star/chrLength.txt
+    - path: ./results/index/star/chrName.txt
+    - path: ./results/index/star/chrNameLength.txt
+    - path: ./results/index/star/chrStart.txt
+    - path: ./results/index/star/exonGeTrInfo.tab
+    - path: ./results/index/star/exonInfo.tab
+    - path: ./results/index/star/geneInfo.tab
+    - path: ./results/index/star/Genome
+    - path: ./results/index/star/genomeParameters.txt
+    - path: ./results/index/star/Log.out
+    - path: ./results/index/star/SA
+    - path: ./results/index/star/SAindex
+    - path: ./results/index/star/sjdbInfo.txt
+    - path: ./results/index/star/sjdbList.fromGTF.out.tab
+    - path: ./results/index/star/sjdbList.out.tab
+    - path: ./results/index/star/transcriptInfo.tab
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/barcodes.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/features.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/matrix.mtx
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/barcodes.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/features.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/matrix.mtx
+    - path: ./results/star/S10_L001.Solo.out/Gene/Features.stats
+    - path: ./results/star/S10_L001.Solo.out/Gene/Summary.csv
+    - path: ./results/star/S10_L001.Solo.out/Gene/UMIperCellSorted.txt
+    - path: ./results/star/S10_L001.Solo.out/Barcodes.stats
+    - path: ./results/star/S10_L001.Aligned.sortedByCoord.out.bam
+    - path: ./results/star/S10_L001.Log.final.out
+    - path: ./results/star/S10_L001.Log.out
+    - path: ./results/star/S10_L001.Log.progress.out
+    - path: ./results/star/S10_L001.SJ.out.tab
+
+- name: subworkflow-starsolo-index
+  command: nextflow run ./tests/subworkflows/local/starsolo/main.nf -entry test_starsolo_index -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-starsolo
+  files:
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/barcodes.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/features.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/matrix.mtx
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/barcodes.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/features.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/matrix.mtx
+    - path: ./results/star/S10_L001.Solo.out/Gene/Features.stats
+    - path: ./results/star/S10_L001.Solo.out/Gene/Summary.csv
+    - path: ./results/star/S10_L001.Solo.out/Gene/UMIperCellSorted.txt
+    - path: ./results/star/S10_L001.Solo.out/Barcodes.stats
+    - path: ./results/star/S10_L001.Aligned.sortedByCoord.out.bam
+    - path: ./results/star/S10_L001.Log.final.out
+    - path: ./results/star/S10_L001.Log.out
+    - path: ./results/star/S10_L001.Log.progress.out
+    - path: ./results/star/S10_L001.SJ.out.tab
+
+- name: subworkflow-starsolo-whitelist
+  command: nextflow run ./tests/subworkflows/local/starsolo/main.nf -entry test_starsolo_whitelist -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-starsolo
+  files:
+    - path: ./results/index/star/chrLength.txt
+    - path: ./results/index/star/chrName.txt
+    - path: ./results/index/star/chrNameLength.txt
+    - path: ./results/index/star/chrStart.txt
+    - path: ./results/index/star/exonGeTrInfo.tab
+    - path: ./results/index/star/exonInfo.tab
+    - path: ./results/index/star/geneInfo.tab
+    - path: ./results/index/star/Genome
+    - path: ./results/index/star/genomeParameters.txt
+    - path: ./results/index/star/Log.out
+    - path: ./results/index/star/SA
+    - path: ./results/index/star/SAindex
+    - path: ./results/index/star/sjdbInfo.txt
+    - path: ./results/index/star/sjdbList.fromGTF.out.tab
+    - path: ./results/index/star/sjdbList.out.tab
+    - path: ./results/index/star/transcriptInfo.tab
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/barcodes.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/features.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/filtered/matrix.mtx
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/barcodes.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/features.tsv
+    - path: ./results/star/S10_L001.Solo.out/Gene/raw/matrix.mtx
+    - path: ./results/star/S10_L001.Solo.out/Gene/Features.stats
+    - path: ./results/star/S10_L001.Solo.out/Gene/Summary.csv
+    - path: ./results/star/S10_L001.Solo.out/Gene/UMIperCellSorted.txt
+    - path: ./results/star/S10_L001.Solo.out/Barcodes.stats
+    - path: ./results/star/S10_L001.Aligned.sortedByCoord.out.bam
+    - path: ./results/star/S10_L001.Log.final.out
+    - path: ./results/star/S10_L001.Log.out
+    - path: ./results/star/S10_L001.Log.progress.out
+    - path: ./results/star/S10_L001.SJ.out.tab
