@@ -170,8 +170,8 @@
                 },
                 "star_ignore_sjdbgtf": {
                     "type": "boolean",
-                    "hidden": true,
-                    "fa_icon": "fas fa-toolbox"
+                    "fa_icon": "fas fa-ban",
+                    "description": "When using pre-built STAR indices do not re-extract and use splice junctions from the GTF file."
                 }
             }
         },
@@ -285,18 +285,25 @@
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
                 "enable_conda": {
-                    "type": "string"
+                    "type": "boolean",
+                    "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-bacon"
                 },
                 "skip_fastqc": {
-                    "type": "string",
-                    "fa_icon": "fas fa-fast-forward",
-                    "help_text": "Do not run FastQC on input."
+                    "type": "boolean",
+                    "description": "Skip FastQC.",
+                    "fa_icon": "fas fa-fast-forward"
                 },
                 "skip_multiqc": {
-                    "type": "string"
+                    "type": "boolean",
+                    "description": "Skip MultiQC.",
+                    "fa_icon": "fas fa-fast-forward"
                 },
                 "seq_center": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Sequencing center information to be added to read group of BAM files.",
+                    "fa_icon": "fas fa-synagogue"
                 },
                 "singularity_pull_docker_container": {
                     "type": "boolean",

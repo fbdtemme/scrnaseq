@@ -15,6 +15,7 @@ checkPathParamList = [
     params.genome_fasta,
     params.transcript_fasta, 
     params.gtf,
+    params.gff,
     params.salmon_index,
     params.star_index,
     params.kallisto_index,
@@ -45,16 +46,18 @@ ch_output_docs_images    = file("$projectDir/docs/images/", checkIfExists: true)
 
 
 // Don't overwrite global params.modules, create a copy instead and use that within the main script
-def modules               = params.modules.clone()
-def multiqc_options       = modules['multiqc']
-def fastqc_options        = modules['fastqc'] 
+def modules                    = params.modules.clone()
+def multiqc_options            = modules['multiqc']
+def fastqc_options             = modules['fastqc'] 
+def gffread_gff3togtf_options  = modules['gffread_gff3togtf']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
-include { GET_SOFTWARE_VERSIONS }  from '../modules/local/get_software_versions'  addParams( options: [publish_files: ['csv':'']]       )
-include { INPUT_CHECK }            from '../subworkflows/local/input_check'       addParams( options: [:] )
+include { GET_SOFTWARE_VERSIONS }        from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['tsv':'']]       )
+include { INPUT_CHECK }                  from '../subworkflows/local/input_check'               addParams( options: [:] )
+include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffread/main'         addParams( options: gffread_gff3togtf_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -116,6 +119,16 @@ workflow SCRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map { it -> it[1] }.collect())
     } 
 
+    // Convert GFF to GTF if annotation is given as GFF
+
+    if (params.gff) {
+        GFFREAD_GFF3TOGTF ( params.gff )
+        ch_gtf = GFFREAD_GFF3TOGTF.out.gtf
+        ch_software_versions = ch_software_versions.mix(GFFREAD_GFF3TOGTF.out.version.first().ifEmpty(null))
+    } else {
+        ch_gtf = Channel.fromPath(params.gtf)
+    }
+
     // Dispatch to specified tool
 
     if ("alevin" in tools) {
@@ -123,7 +136,7 @@ workflow SCRNASEQ {
             ch_fastq,
             params.genome_fasta,
             params.transcript_fasta,
-            params.gtf,
+            ch_gtf,
             params.txp2gene,
             params.salmon_index,
             params.protocol,
@@ -146,7 +159,7 @@ workflow SCRNASEQ {
         STARSOLO( 
             ch_fastq,
             params.genome_fasta,
-            params.gtf,
+            ch_gtf,
             params.star_index,
             params.protocol,
             params.barcode_whitelist
@@ -161,7 +174,7 @@ workflow SCRNASEQ {
         KALLISTO_BUSTOOLS( 
             ch_fastq,
             params.genome_fasta,
-            params.gtf,
+            ch_gtf,
             params.kallisto_gene_map,
             params.kallisto_index,
             params.protocol
