@@ -47,7 +47,6 @@ ch_output_docs_images    = file("$projectDir/docs/images/", checkIfExists: true)
 
 // Don't overwrite global params.modules, create a copy instead and use that within the main script
 def modules                    = params.modules.clone()
-
 def multiqc_options            = modules['multiqc']
 def fastqc_options             = modules['fastqc'] 
 def gffread_gff3togtf_options  = modules['gffread_gff3togtf']

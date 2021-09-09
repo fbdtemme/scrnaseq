@@ -24,6 +24,7 @@ def alevin_qc_options                   = modules['alevinqc']
 include { GFFREAD_TRANSCRIPTOME }       from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
 include { SALMON_ALEVIN }               from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
 include { ALEVINQC }                    from '../../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
+include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -108,15 +109,20 @@ workflow ALEVIN {
     // Run alevinQC
     ALEVINQC ( SALMON_ALEVIN.out.alevin_results )
     
+    // Reformat output
+    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.collect{it[1]}.ifEmpty([])
+    // TODO there is probably a cleaner way to extract these files from the Channel
+    POSTPROCESS (
+        ch_alevin_results_files.filter( 'quants_mat.mtx.gz' ).view(),
+        ch_alevin_results_files.filter( 'quants_mat_cols.txt' ).view(),
+        ch_alevin_results_files.filter( 'quants_mat_rows.txt' ).view(),
+        "Alevin"
+    )
+
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
-
-    // Collect multiqc files
-    ch_salmon_multiqc   = SALMON_ALEVIN.out.alevin_results
-    ch_multiqc_files    = Channel.empty()
-    ch_multiqc_files    = ch_multiqc_files.mix(ch_salmon_multiqc.collect{it[1]}.ifEmpty([]))
     
     emit:
     software_versions   = ch_software_versions
-    multiqc_files       = ch_multiqc_files
+    multiqc_files       = ch_alevin_results_files
 }
