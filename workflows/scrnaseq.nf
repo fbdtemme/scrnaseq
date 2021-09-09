@@ -130,7 +130,7 @@ workflow SCRNASEQ {
     }
 
     // Initialize salmon index channel
-    ch_salmon_index = params.salmon_index ? Channel.fromPath(params.salmon_index) : Channel.empty()
+    ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
 
     // Dispatch to specified tool
 

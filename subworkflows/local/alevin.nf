@@ -73,7 +73,7 @@ workflow ALEVIN {
     if (!transcript_fasta && genome_fasta && gtf) {
         GFFREAD_TRANSCRIPTOME ( genome_fasta, gtf )
         transcript_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
-        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
     
     // Build salmon index
@@ -91,7 +91,7 @@ workflow ALEVIN {
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
         // Only collect version if not already done for gffread
         if (!GFFREAD_TRANSCRIPTOME) {
-            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.ifEmpty(null))
+            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
         }
     }
     
