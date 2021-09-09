@@ -62,22 +62,25 @@ workflow ALEVIN {
 
         GUNZIP ( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
-    } else {
+    } else if (barcode_whitelist) {
          Channel.fromPath(barcode_whitelist)
         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
         .set{ ch_barcode_whitelist }
+    } else {
+        exit 1, "Barcode whitelist must be specified for given protocol: ${protocol}" 
     }
+
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
     if (!transcript_fasta && genome_fasta && gtf) {
         GFFREAD_TRANSCRIPTOME ( genome_fasta, gtf )
-        transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
+        transcript_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.ifEmpty(null))
     }
     
     // Build salmon index
     if (!salmon_index) {
-        SALMON_INDEX ( genome_fasta, transcriptome_fasta )
+        SALMON_INDEX ( genome_fasta, transcript_fasta )
         salmon_index_alevin = SALMON_INDEX.out.index
     } else {
         // Setup channel for salmon index if specified
@@ -89,7 +92,7 @@ workflow ALEVIN {
         GFFREAD_TXP2GENE ( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
         // Only collect version if not already done for gffread
-        if (!GFFREAD_TRANSCRIPTOME.out) {
+        if (!GFFREAD_TRANSCRIPTOME) {
             ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.ifEmpty(null))
         }
     }
