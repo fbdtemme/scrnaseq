@@ -18,11 +18,6 @@ salmon-alevinqc:
   - modules/local/salmon/alevinqc/**
   - tests/modules/salmon/alevinqc/**
 
-gene_map:
-  - tests/config/**
-  - modules/local/genemap/**
-  - tests/modules/genemap/**
-
 star-alignsolo:
   - tests/config/**
   - modules/local/star/alignsolo/**
