@@ -38,7 +38,6 @@ By default, the pipeline currently performs the following:
 * Quantification (`Alevin`, `Alevin-fry`, `STARSolo`, `Kallisto BUStools`, `Cellranger`)
 * Overall pipeline run summaries (`MultiQC`)
 
-
 ## Quick Start
 
 1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=21.04.0`)
