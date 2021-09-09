@@ -11,6 +11,7 @@ def kallistobustools_count_options  = modules['kallistobustools_count']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { GENE_MAP }                from '../../modules/local/genemap/main'                          addParams( options: [:] )
+include { POSTPROCESS }                 from '../../modules/local/postprocess/main'                  addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -34,6 +35,7 @@ workflow KALLISTO_BUSTOOLS {
     
     // Get the protocol parameter
     (kb_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "kallisto")
+
     // TODO make this a parameter
     kb_workflow = "standard"
 
@@ -65,14 +67,20 @@ workflow KALLISTO_BUSTOOLS {
         kb_protocol
     )
 
+    // Reformat output
+    ch_kallisto_results_files = KALLISTOBUSTOOLS_COUNT.out.count.map{it[1]}.ifEmpty([])
+    // TODO there is probably a cleaner way to extract these files from the Channel
+    POSTPROCESS (
+        ch_kallisto_results_files.filter( 'cells_x_genes.mtx' ).view(),
+        ch_kallisto_results_files.filter( 'cells_x_genes.genes.txt' ).view(),
+        ch_kallisto_results_files.filter( 'cells_x_genes.barcodes.txt' ).view(),
+        "Kallisto"
+    )
+
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
-    
-    // Collect multiqc files
-    ch_multiqc_files     = Channel.empty()
-    ch_multiqc_files     = ch_multiqc_files.mix(KALLISTOBUSTOOLS_COUNT.out.count.map{it[1]}.ifEmpty([]))
 
     emit: 
     software_versions    = ch_software_versions
-    multiqc_files        = ch_multiqc_files
+    multiqc_files        = ch_kallisto_results_files
 }
