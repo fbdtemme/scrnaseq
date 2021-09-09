@@ -1,0 +1,60 @@
+- name: subworkflow-kallistobustools-paired
+  command: nextflow run ./tests/subworkflows/local/kallistobustools/main.nf -entry test_kallistobustools -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-kallistobustools
+  files:
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.barcodes.txt
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.genes.txt
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.mtx
+    - path: ./results/kallistobustools/S10_L001.count/10x_version2_whitelist.txt
+    - path: ./results/kallistobustools/S10_L001.count/inspect.json
+    - path: ./results/kallistobustools/S10_L001.count/kb_info.json
+    - path: ./results/kallistobustools/S10_L001.count/matrix.ec
+    - path: ./results/kallistobustools/S10_L001.count/output.bus
+    - path: ./results/kallistobustools/S10_L001.count/output.unfiltered.bus
+    - path: ./results/kallistobustools/S10_L001.count/run_info.json
+    - path: ./results/kallistobustools/S10_L001.count/transcripts.txt
+    - path: ./results/kallistobustools/cdna.fa
+    - path: ./results/kallistobustools/kb_ref_out.idx
+    - path: ./results/kallistobustools/t2g.txt
+
+- name: subworkflow-kallistobustools-genemap
+  command: nextflow run ./tests/subworkflows/local/kallistobustools/main.nf -entry test_kallistobustools_genemap -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-kallistobustools
+  files:
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.barcodes.txt
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.genes.txt
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.mtx
+    - path: ./results/kallistobustools/S10_L001.count/10x_version2_whitelist.txt
+    - path: ./results/kallistobustools/S10_L001.count/inspect.json
+    - path: ./results/kallistobustools/S10_L001.count/kb_info.json
+    - path: ./results/kallistobustools/S10_L001.count/matrix.ec
+    - path: ./results/kallistobustools/S10_L001.count/output.bus
+    - path: ./results/kallistobustools/S10_L001.count/output.unfiltered.bus
+    - path: ./results/kallistobustools/S10_L001.count/run_info.json
+    - path: ./results/kallistobustools/S10_L001.count/transcripts.txt
+    - path: ./results/kallistobustools/cdna.fa
+    - path: ./results/kallistobustools/kb_ref_out.idx
+    - path: ./results/kallistobustools/t2g.txt
+
+- name: subworkflow-kallistobustools-index
+  command: nextflow run ./tests/subworkflows/local/kallistobustools/main.nf -entry test_kallistobustools_index -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-kallistobustools
+  files:
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.barcodes.txt
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.genes.txt
+    - path: ./results/kallistobustools/S10_L001.count/counts_unfiltered/cells_x_genes.mtx
+    - path: ./results/kallistobustools/S10_L001.count/10x_version2_whitelist.txt
+    - path: ./results/kallistobustools/S10_L001.count/inspect.json
+    - path: ./results/kallistobustools/S10_L001.count/kb_info.json
+    - path: ./results/kallistobustools/S10_L001.count/matrix.ec
+    - path: ./results/kallistobustools/S10_L001.count/output.bus
+    - path: ./results/kallistobustools/S10_L001.count/output.unfiltered.bus
+    - path: ./results/kallistobustools/S10_L001.count/run_info.json
+    - path: ./results/kallistobustools/S10_L001.count/transcripts.txt
+    - path: ./results/kallistobustools/cdna.fa
+    - path: ./results/kallistobustools/kb_ref_out.idx
+    - path: ./results/kallistobustools/t2g.txt

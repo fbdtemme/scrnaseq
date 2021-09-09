@@ -4,8 +4,9 @@
 
 def modules = params.modules.clone()
 
-def kallistobustools_ref_options    = modules['kallistobustools_ref']
-def kallistobustools_count_options  = modules['kallistobustools_count']
+def kallistobustools_ref_options     = modules['kallistobustools_ref']
+def kallistobustools_count_options   = modules['kallistobustools_count']
+def gffread_kallisto_genemap_options = modules['gffread_kallisto_genemap']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -16,9 +17,10 @@ include { POSTPROCESS }                 from '../../modules/local/postprocess/ma
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                  from '../../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
-include { KALLISTOBUSTOOLS_COUNT }  from '../../modules/nf-core/modules/kallistobustools/count/main' addParams( options: kallistobustools_count_options )
-include { KALLISTOBUSTOOLS_REF }    from '../../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
+include { GUNZIP }                              from '../../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
+include { KALLISTOBUSTOOLS_COUNT }              from '../../modules/nf-core/modules/kallistobustools/count/main' addParams( options: kallistobustools_count_options )
+include { KALLISTOBUSTOOLS_REF }                from '../../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
+include { GFFREAD as GFFREAD_KALLISTO_GENEMAP } from '../../modules/nf-core/modules/gffread/main'                addParams( options: gffread_kallisto_genemap_options )
 
 
 workflow KALLISTO_BUSTOOLS {
@@ -42,8 +44,11 @@ workflow KALLISTO_BUSTOOLS {
     // Generate Kallisto Gene Map if not supplied and index is given
     // If index is given, the gene map will be generated in the 'kb ref' step 
     if (!kallisto_gene_map && kallisto_index) {
-        GENE_MAP ( gtf )
-        ch_kallisto_gene_map = GENE_MAP.out.gene_map
+        GFFREAD_KALLISTO_GENEMAP ( gtf )
+        ch_kallisto_gene_map = GFFREAD_KALLISTO_GENEMAP.out.gtf
+        ch_software_versions = ch_software_versions.mix(GFFREAD_KALLISTO_GENEMAP.out.version.ifEmpty(null))
+    } else if (kallisto_gene_map) {
+        ch_kallisto_gene_map = kallisto_gene_map
     }
 
     // Generate kallisto index
@@ -54,6 +59,8 @@ workflow KALLISTO_BUSTOOLS {
         )
         ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
         ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
+    } else {
+        ch_kallisto_index = kallisto_index
     }
 
     // Quantification with kallistobustools count
@@ -78,7 +85,7 @@ workflow KALLISTO_BUSTOOLS {
     )
 
     // Collect software versions
-    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.ifEmpty(null))
 
     emit: 
     software_versions    = ch_software_versions

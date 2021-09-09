@@ -1,4 +1,4 @@
-name: local modules pytest-workflow
+name: pytest-workflow
 on:
   push:
     branches:
