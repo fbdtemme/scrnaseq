@@ -124,6 +124,7 @@ workflow SCRNASEQ {
     if (params.gff) {
         GFFREAD_GFF3TOGTF ( params.gff )
         ch_gtf = GFFREAD_GFF3TOGTF.out.gtf
+        ch_software_versions = ch_software_versions.mix(GFFREAD_GFF3TOGTF.out.version.first().ifEmpty(null))
     } else {
         ch_gtf = Channel.fromPath(params.gtf)
     }
