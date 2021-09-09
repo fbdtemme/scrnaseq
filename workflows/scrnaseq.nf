@@ -127,6 +127,9 @@ workflow SCRNASEQ {
         ch_gtf = Channel.fromPath(params.gtf)
     }
 
+    // Initialize salmon index channel
+    ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
+
     // Dispatch to specified tool
 
     if ("alevin" in tools) {
@@ -136,7 +139,7 @@ workflow SCRNASEQ {
             params.transcript_fasta,
             ch_gtf,
             params.txp2gene,
-            params.salmon_index,
+            ch_salmon_index,
             params.protocol,
             params.barcode_whitelist
         )

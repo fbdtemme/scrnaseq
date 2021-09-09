@@ -17,7 +17,8 @@ def star_align_options           = modules['star_align']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { STAR_ALIGN }           from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
-include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: [:] )
+include { POSTPROCESS }          from '../../modules/local/postprocess/main'                    addParams( options: [:] )
+
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */

@@ -1,0 +1,168 @@
+#!/usr/bin/env nextflow
+
+nextflow.enable.dsl = 2
+
+def modules              = params.modules.clone()
+def salmon_index_options = modules["salmon_index"]
+
+include { ALEVIN }              from '../../../../subworkflows/local/alevin'
+include { SALMON_INDEX }        from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
+
+
+workflow test_alevin_paired_end
+{
+    genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
+    gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
+    fastq               = [[id:"S10_L001", single_end:false], [
+                                file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
+                                file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+    protocol            = "10XV2"
+
+    transcript_fasta    = null
+    txp2gene            = null
+    salmon_index        = null
+    barcode_whitelist   = null
+    
+    ALEVIN(
+        fastq,             
+        genome_fasta,      
+        transcript_fasta,  
+        gtf,               
+        txp2gene,          
+        salmon_index,      
+        protocol,          
+        barcode_whitelist 
+    )
+}
+
+workflow test_alevin_barcode_whitelist
+{
+    genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
+    transcript_fasta    = null
+    gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
+    fastq               = [[id:"S10_L001", single_end:false], [
+                                    file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
+                                    file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+    protocol            = "10XV2"
+    txp2gene            = null
+    salmon_index        = null
+    barcode_whitelist   = file(params.test_data_scrnaseq["reference"]["tenx_V2_barcode_whitelist"], checkIfExists: true)
+    
+    ALEVIN(
+        fastq,             
+        genome_fasta,      
+        transcript_fasta,  
+        gtf,               
+        txp2gene,          
+        salmon_index,      
+        protocol,          
+        barcode_whitelist 
+    )
+}
+
+workflow test_alevin_transcript_fasta
+{
+    genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
+    transcript_fasta    = file(params.test_data_scrnaseq["reference"]["mouse_transcriptome"], checkIfExists: true)
+    gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
+    fastq               = [[id:"S10_L001", single_end:false], [
+                                    file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
+                                    file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+    protocol            = "10XV2"
+    txp2gene            = null
+    salmon_index        = null
+    barcode_whitelist   = null
+    
+    ALEVIN(
+        fastq,             
+        genome_fasta,      
+        transcript_fasta,  
+        gtf,               
+        txp2gene,          
+        salmon_index,      
+        protocol,          
+        barcode_whitelist 
+    )
+}
+
+
+workflow test_alevin_salmon_index
+{
+    genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
+    transcript_fasta    = file(params.test_data_scrnaseq["reference"]["mouse_transcriptome"], checkIfExists: true)
+    gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
+    fastq               = [[id:"S10_L001", single_end:false], [
+                                    file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
+                                    file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+    protocol            = "10XV2"
+    txp2gene            = null
+
+    SALMON_INDEX ( genome_fasta, transcript_fasta )
+    salmon_index = SALMON_INDEX.out.index
+
+    barcode_whitelist   = null
+    
+    ALEVIN(
+        fastq,             
+        genome_fasta,      
+        transcript_fasta,  
+        gtf,               
+        txp2gene,          
+        salmon_index,      
+        protocol,          
+        barcode_whitelist 
+    )
+}
+
+
+workflow test_alevin_salmon_txp2gene
+{
+    genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
+    transcript_fasta    = file(params.test_data_scrnaseq["reference"]["mouse_transcriptome"], checkIfExists: true)
+    gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
+    txp2gene            = file(params.test_data_scrnaseq["reference"]["mouse_tx2gene"], checkIfExists: true)
+    fastq               = [[id:"S10_L001", single_end:false], [
+                                    file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
+                                    file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+    protocol            = "10XV2"
+    txp2gene            = null
+    salmon_index        = null
+    barcode_whitelist   = null
+    
+    ALEVIN(
+        fastq,             
+        genome_fasta,      
+        transcript_fasta,  
+        gtf,               
+        txp2gene,          
+        salmon_index,      
+        protocol,          
+        barcode_whitelist 
+    )
+}
+
+workflow test_alevin_salmon_no_barcode_whitelist
+{
+    genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
+    transcript_fasta    = file(params.test_data_scrnaseq["reference"]["mouse_transcriptome"], checkIfExists: true)
+    gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
+    txp2gene            = file(params.test_data_scrnaseq["reference"]["mouse_tx2gene"], checkIfExists: true)
+    fastq               = [[id:"S10_L001", single_end:false], [
+                                    file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
+                                    file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
+    protocol            = "dropseq"
+    txp2gene            = null
+    salmon_index        = null
+    barcode_whitelist   = null
+    
+    ALEVIN(
+        fastq,             
+        genome_fasta,      
+        transcript_fasta,  
+        gtf,               
+        txp2gene,          
+        salmon_index,      
+        protocol,          
+        barcode_whitelist 
+    )
+}

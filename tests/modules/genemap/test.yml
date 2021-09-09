@@ -1,5 +1,0 @@
-- name: genemap
-  command: nextflow run ./tests/modules/genemap/main.nf -entry test_gene_map -c ./tests/config/nextflow.config
-  tags:
-    - genemap
-    - gene_map
