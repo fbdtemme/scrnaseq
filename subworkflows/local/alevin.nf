@@ -84,7 +84,7 @@ workflow ALEVIN {
         salmon_index_alevin = SALMON_INDEX.out.index
     } else {
         // Setup channel for salmon index if specified
-        salmon_index_alevin = Channel.fromPath(salmon_index)
+        salmon_index_alevin = salmon_index
     }
     
     // Build txp2gene map
