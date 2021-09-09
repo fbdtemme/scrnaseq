@@ -63,9 +63,7 @@ workflow ALEVIN {
         GUNZIP ( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
     } else if (barcode_whitelist) {
-         Channel.fromPath(barcode_whitelist)
-        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-        .set{ ch_barcode_whitelist }
+        ch_barcode_whitelist = barcode_whitelist
     } else {
         exit 1, "Barcode whitelist must be specified for given protocol: ${protocol}" 
     }

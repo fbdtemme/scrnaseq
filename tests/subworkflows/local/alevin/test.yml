@@ -1,0 +1,31 @@
+- name: subworkflow-alevin-paired
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_paired_end -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevin
+
+- name: subworkflow-alevin-barcode-whitelist
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_barcode_whitelist -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevin
+
+- name: subworkflow-alevin-transcript-fasta
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_transcript_fasta -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevin
+
+- name: subworkflow-alevin-salmon-index
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_salmon_index -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevin
+
+- name: subworkflow-alevin-salmon-txp2gene
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_salmon_txp2gene -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevin
+
+- name: subworkflow-alevin-salmon-no-barcode-whitelist
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_salmon_no_barcode_whitelist -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevin
+    - failing
+  exit_code: 1
