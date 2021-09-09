@@ -69,13 +69,11 @@ workflow KALLISTO_BUSTOOLS {
 
     // Reformat output
     ch_kallisto_results_files = KALLISTOBUSTOOLS_COUNT.out.count.map{it[1]}.ifEmpty([])
-    // TODO there is probably a cleaner way to extract these files from the Channel
-    POSTPROCESS (
-        ch_kallisto_results_files.filter( 'cells_x_genes.mtx' ).view(),
-        ch_kallisto_results_files.filter( 'cells_x_genes.genes.txt' ).view(),
-        ch_kallisto_results_files.filter( 'cells_x_genes.barcodes.txt' ).view(),
-        "Kallisto"
-    )
+    // TODO there may be a cleaner way of doing this
+    Channel.fromPath("$ch_kallisto_results_files/counts_filtered/cells_x_genes.mtx").set{ matrix_file }
+    Channel.fromPath("$ch_kallisto_results_files/counts_filtered/cells_x_genes.genes.txt").set{ features_file }
+    Channel.fromPath("$ch_kallisto_results_files/counts_filtered/cells_x_genes.barcodes.txt").set{ barcodes_file }
+    POSTPROCESS ( matrix_file, features_file, barcodes_file, "Kallisto" )
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))

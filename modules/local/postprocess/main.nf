@@ -27,11 +27,12 @@ process POSTPROCESS {
     val  name
 
     output:
-    path 'name', emit: outdir
+    path "$name", emit: outdir
 
     script:  // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
     """
-    pip install scipy pandas loompy
+    pip3 install --no-warn-script-location --user numba scipy loompy
+    export PYTHONPATH=\"\$(python3 -m site --user-base)/bin\"
     postprocessing.py --matrix $matrix --features $features --barcodes $barcodes --output $name
     """
 }

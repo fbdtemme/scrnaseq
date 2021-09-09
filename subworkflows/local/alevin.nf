@@ -2,10 +2,8 @@
 /* --         SALMON ALEVIN SUBWORKFLOW        -- */
 ////////////////////////////////////////////////////
 
-
 // Whitelist files for STARsolo and Kallisto
 def whitelist_folder = "$baseDir/assets/whitelist/"
-
 
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
@@ -29,9 +27,9 @@ include { POSTPROCESS }                 from '../../modules/local/postprocess/ma
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'        addParams( options: [:] )
+include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'       addParams( options: gffread_txp2gene_options )
+include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -69,7 +67,6 @@ workflow ALEVIN {
     } else {
         exit 1, "Barcode whitelist must be specified for given protocol: ${protocol}" 
     }
-
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
     if (!transcript_fasta && genome_fasta && gtf) {
@@ -113,14 +110,12 @@ workflow ALEVIN {
     ALEVINQC ( SALMON_ALEVIN.out.alevin_results )
     
     // Reformat output
-    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.collect{it[1]}.ifEmpty([])
-    // TODO there is probably a cleaner way to extract these files from the Channel
-    POSTPROCESS (
-        ch_alevin_results_files.filter( 'quants_mat.mtx.gz' ).view(),
-        ch_alevin_results_files.filter( 'quants_mat_cols.txt' ).view(),
-        ch_alevin_results_files.filter( 'quants_mat_rows.txt' ).view(),
-        "Alevin"
-    )
+    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.collect{ it[1] }.ifEmpty([])
+    // TODO there may be a cleaner way of doing this
+    Channel.fromPath("$ch_alevin_results_files/alevin/quants_mat.mtx.gz").set{ matrix_file }
+    Channel.fromPath("$ch_alevin_results_files/alevin/quants_mat_rows.txt").set{ features_file }
+    Channel.fromPath("$ch_alevin_results_files/alevin/quants_mat_cols.txt").set{ barcodes_file }
+    POSTPROCESS ( matrix_file, barcodes_file, features_file, "Alevin" )
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))

@@ -17,7 +17,7 @@ def star_align_options           = modules['star_align']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { STAR_ALIGN }           from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
-include { POSTPROCESS }                 from '../../modules/local/postprocess/main'                  addParams( options: [:] )
+include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -78,13 +78,10 @@ workflow STARSOLO {
 
     // Reformat output
     ch_star_results_files = STAR_ALIGN.out.solo_results.map{it[1]}.ifEmpty([])
-    // TODO there is probably a cleaner way to extract these files from the Channel
-    POSTPROCESS (
-        ch_star_results_files.filter( 'matrix.mtx' ).view(),
-        ch_star_results_files.filter( 'features.txt' ).view(),
-        ch_star_results_files.filter( 'barcodes.txt' ).view(),
-        "STARSolo"
-    )
+    Channel.fromPath("$ch_star_results_files/Gene/filtered/matrix.mtx").set{ matrix_file }
+    Channel.fromPath("$ch_star_results_files/Gene/filtered/features.tsv").set{ features_file }
+    Channel.fromPath("$ch_star_results_files/Gene/filtered/barcodes.tsv").set{ barcodes_file }
+    POSTPROCESS ( matrix_file, features_file, barcodes_file, "STARSolo" )
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))

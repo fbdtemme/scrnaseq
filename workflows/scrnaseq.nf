@@ -55,7 +55,7 @@ def gffread_gff3togtf_options  = modules['gffread_gff3togtf']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
-include { GET_SOFTWARE_VERSIONS }        from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['tsv':'']]       )
+include { GET_SOFTWARE_VERSIONS }        from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['tsv':'']] )
 include { INPUT_CHECK }                  from '../subworkflows/local/input_check'               addParams( options: [:] )
 include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffread/main'         addParams( options: gffread_gff3togtf_options )
 
@@ -63,8 +63,8 @@ include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffrea
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
 
-include { FASTQC  }                from '../modules/nf-core/modules/fastqc/main'  addParams( options: fastqc_options)
-include { MULTIQC }                from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
+include { FASTQC  }                      from '../modules/nf-core/modules/fastqc/main'          addParams( options: fastqc_options )
+include { MULTIQC }                      from '../modules/nf-core/modules/multiqc/main'         addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
 /*    IMPORT LOCAL MODULES/SUBWORKFLOWS           */
@@ -100,7 +100,6 @@ workflow SCRNASEQ {
     ch_software_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
-
     // Stage input files
     INPUT_CHECK ( ch_input )
     .map {
@@ -120,7 +119,6 @@ workflow SCRNASEQ {
     } 
 
     // Convert GFF to GTF if annotation is given as GFF
-
     if (params.gff) {
         GFFREAD_GFF3TOGTF ( params.gff )
         ch_gtf = GFFREAD_GFF3TOGTF.out.gtf

@@ -69,7 +69,7 @@ def main(matrix_file, features_file, barcodes_file, output):
 	    df_row_metadata.to_dict("list"), df_col_metadata.to_dict("list"))
 
     # Write mtx
-	shutil.copy(matrix_file, os.path.join(output, 'matrix.mtx.gz'))
+	shutil.copy(matrix_file, os.path.join(output, 'matrix.mtx.gz' if matrix_file.endswith('gz') else 'matrix.mtx'))
 	shutil.copy(features_file, os.path.join(output, 'features.mtx.txt'))
 	shutil.copy(barcodes_file, os.path.join(output, 'barcodes.mtx.txt'))
 
