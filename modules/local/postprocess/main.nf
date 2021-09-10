@@ -15,9 +15,12 @@ process POSTPROCESS {
 
     conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
     if (workflow.containerEngine == 'singularity' && !params.pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/python:3.8.3"
+        //container "https://depot.galaxyproject.org/singularity/python:3.8.3"
+        // TODO using the biocontainer container for now as singularity can pull
+        // from docker containers
+        container "quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0"
     } else {
-        container "quay.io/biocontainers/python:3.8.3"
+        container "quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0"
     }
 
     input:
@@ -31,8 +34,6 @@ process POSTPROCESS {
 
     script:  // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
     """
-    pip install --no-warn-script-location --user numba scipy loompy
-    export PYTHONPATH=\"\$(python -m site --user-base)/bin\"
     postprocessing.py --matrix $matrix --features $features --barcodes $barcodes --output $name
     """
 }

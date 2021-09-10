@@ -73,17 +73,17 @@ workflow KALLISTO_BUSTOOLS {
         kb_workflow,
         kb_protocol
     )
-
-    // Reformat output
-    ch_kallisto_results_files = KALLISTOBUSTOOLS_COUNT.out.count.map{it[1]}.ifEmpty([])
-    // TODO there may be a cleaner way of doing this
-    Channel.fromPath("$ch_kallisto_results_files/counts_filtered/cells_x_genes.mtx").set{ matrix_file }
-    Channel.fromPath("$ch_kallisto_results_files/counts_filtered/cells_x_genes.genes.txt").set{ features_file }
-    Channel.fromPath("$ch_kallisto_results_files/counts_filtered/cells_x_genes.barcodes.txt").set{ barcodes_file }
-    POSTPROCESS ( matrix_file, features_file, barcodes_file, "Kallisto" )
-
+    
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.ifEmpty(null))
+
+    // Reformat output
+    ch_kallisto_results_files = KALLISTOBUSTOOLS_COUNT.out.count.collect{ it[1] }
+    // TODO there may be a cleaner way of doing this
+    matrix_file   = Channel.fromPath("${ch_kallisto_results_files}/counts_filtered/cells_x_genes.mtx")
+    features_file = Channel.fromPath("${ch_kallisto_results_files}/counts_filtered/cells_x_genes.genes.txt")
+    barcodes_file = Channel.fromPath("${ch_kallisto_results_files}/counts_filtered/cells_x_genes.barcodes.txt")
+    POSTPROCESS ( matrix_file, features_file, barcodes_file, "Kallisto" )
 
     emit: 
     software_versions    = ch_software_versions

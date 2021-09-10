@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-This script parses a single cell dataset in MTX format to dataframe (tab delimited), hd5 and loom formats. 
+This script parses a single cell dataset in MTX format to dataframe (tab delimited) and hd5 formats. 
 The script will also place all the output files as well as the orignal MTX files in a output directory
 given by the user. The script is useful to parse the output of tools such as STARSolo, Kallisto bustools
 and Salmon Alevin. 
@@ -21,25 +21,24 @@ import argparse
 import scipy.io
 import shutil
 import pandas as pd
-import loompy
 
 
 def main(matrix_file, features_file, barcodes_file, output):
 
 	if not os.path.isfile(matrix_file):
-		sys.stderr.write("Error, input matrix is not a file\n")
+		sys.stderr.write("Error, input matrix {} is not a file\n".format(matrix_file))
 		sys.exit(1)
 
 	if not os.path.isfile(features_file):
-		sys.stderr.write("Error, input features is not a file\n")
+		sys.stderr.write("Error, input features {} is not a file\n".format(features_file))
 		sys.exit(1)
 
 	if not os.path.isfile(barcodes_file):
-		sys.stderr.write("Error, input barcodes is not a file\n")
+		sys.stderr.write("Error, input barcodes {} is not a file\n".format(barcodes_file))
 		sys.exit(1)
 
 	if os.path.isdir(output):
-		print("Ouput directory exists, files will be overwritten...")
+		print("Ouput directory {} exists, files will be overwritten..".format(output))
 	os.makedirs(os.path.abspath(output), exist_ok=True)
 
     # Parse the features
@@ -62,12 +61,6 @@ def main(matrix_file, features_file, barcodes_file, output):
     # Write hdf5
 	df.to_hdf(os.path.join(output, 'matrix.h5'), key='df', mode='w')
 
-    # Write loom
-	df_row_metadata = pd.DataFrame(df.index.to_numpy(), index=df.index, columns=['features'])
-	df_col_metadata = pd.DataFrame(df.columns.to_numpy(), index=df.columns, columns=['barcodes'])
-	loompy.create(os.path.join(output, 'matrix.loom'), df.to_numpy(),
-	    df_row_metadata.to_dict("list"), df_col_metadata.to_dict("list"))
-
     # Write mtx
 	shutil.copy(matrix_file, os.path.join(output, 'matrix.mtx.gz' if matrix_file.endswith('gz') else 'matrix.mtx'))
 	shutil.copy(features_file, os.path.join(output, 'features.mtx.txt'))
@@ -75,7 +68,7 @@ def main(matrix_file, features_file, barcodes_file, output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(add_help=True, 
-    	description='This tool parses a matrix of counts in mtx format to other formats (hdf5, tsv and loom)')
+    	description='This tool parses a matrix of counts in mtx format to other formats (hdf5 and tsv)')
     parser.add_argument('--matrix', 
     	metavar="[FILE]", 
     	required=True,
