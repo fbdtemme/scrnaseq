@@ -17,7 +17,12 @@ def gffread_txp2gene_options                = modules['gffread_tx2pgene']
 def gffread_transcriptome_options           = modules['gffread_transcriptome']
 def salmon_alevin_options                   = modules['salmon_alevin']
 def alevin_qc_options                       = modules['alevinqc']
+def alevinfry_index_options                 = modules['alevinfry_index']
+def alevinfry_map_options                   = modules['alevinfry_map']
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
+def alevinfry_collate_options               = modules['alevinfry_collate']
+def alevinfry_quant_options                 = modules['alevinfry_quant']
+
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -29,10 +34,10 @@ include { POSTPROCESS }                     from '../../modules/local/postproces
 include { MEAN_READ_LENGTH }                from '../../modules/local/mean_read_length/main'                addParams( options: [:] )
 include { BUILD_SPLICI_REF }                from '../../modules/local/alevinfry/build_splici_ref/main'      addParams( options: [:] )
 include { ALEVINFRY_INDEX }                 from '../../modules/local/alevinfry/alevinfry_index/main'       addParams( options: [:] )
-include { ALEVINFRY_MAP }                   from '../../modules/local/alevinfry/alevinfry_map/main'         addParams( options: [:] )
-include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/generate_permitlist/main'   addParams( options:alevinfry_generate_permitlist_options )
-include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: [:] )
-include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'               addParams( options: [:] )
+include { ALEVINFRY_MAP }                   from '../../modules/local/alevinfry/alevinfry_map/main'         addParams( options: alevinfry_map_options )
+include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/generate_permitlist/main'   addParams( options: alevinfry_generate_permitlist_options )
+include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
+include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'                 addParams( options: alevinfry_quant_options )
 
 
 
@@ -58,7 +63,7 @@ workflow ALEVINFRY {
     ch_software_versions = Channel.empty()
     ch_multiqc_files     = Channel.empty()
 
-    // Get the protocol parameter suitable for passing to alevin
+    // Get the protocol parameter suitable for passing to alevin and alevin-fry
     (alevin_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "alevin")
 
     // Flatten input for getting the mean read length
@@ -100,15 +105,16 @@ workflow ALEVINFRY {
     )
     rad_dir = ALEVINFRY_MAP.out.results
     
+
     // Build permitlist and filter index
-    ALEVINFRY_GENERATE_PERMITLIST( rad_dir )
+    def expected_orientation = "fw"
+    ALEVINFRY_GENERATE_PERMITLIST( rad_dir, expected_orientation )
     quant_dir = ALEVINFRY_GENERATE_PERMITLIST.out.quant
 
     ALEVINFRY_COLLATE ( quant_dir, rad_dir )
     quant_dir = ALEVINFRY_COLLATE.out.results
-    
 
-    // // Perform quantification with alevin-fry quant
+    // Perform quantification with alevin-fry quant
     ALEVINFRY_QUANT ( 
         quant_dir,
         BUILD_SPLICI_REF.out.txp2gene_3col,

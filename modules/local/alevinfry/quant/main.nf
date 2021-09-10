@@ -10,7 +10,7 @@ process ALEVINFRY_QUANT {
     label "process_medium"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', meta:[:], publish_by_meta:meta.id) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
 
     conda (params.enable_conda ? 'bioconda::alevin-fry=0.4.1' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -39,7 +39,8 @@ process ALEVINFRY_QUANT {
         --tg-map ${txp2gene} \\
         --output-dir ${prefix}_quant_results \\
         --resolution cr-like \\
-        --use-mtx
+        --use-mtx \\
+        ${opti}
 
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """

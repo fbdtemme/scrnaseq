@@ -12,5 +12,5 @@ workflow test_build_splici_ref {
                         file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
                         file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
 
-    BUILD_SPLICI_REF ( genome_fasta, gtf, read_length, [], [])
+    BUILD_SPLICI_REF ( genome_fasta, gtf, read_length )
 }
