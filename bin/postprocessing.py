@@ -53,7 +53,7 @@ def main(matrix_file, features_file, barcodes_file, output):
 	matrix = scipy.io.mmread(matrix_file)
 
     # Create Pandas
-	df = pd.DataFrame(matrix.toarray(), index=features, columns=barcodes)
+	df = pd.DataFrame(matrix.toarray().transpose(), index=features, columns=barcodes)
 
     # Write Pandas
 	df.to_csv(os.path.join(output, 'matrix.tsv'), sep='\t', header=True, index=True)

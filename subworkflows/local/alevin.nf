@@ -106,17 +106,17 @@ workflow ALEVIN {
 
     // Run alevinQC
     ALEVINQC ( SALMON_ALEVIN.out.alevin_results )
-    
+
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
     // Reformat output
-    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.collect{ it[1] }
+    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.map{ it[1] }
     // TODO there may be a cleaner way of doing this
-    matrix_file   = Channel.fromPath("${ch_alevin_results_files}/alevin/quants_mat.mtx.gz")
-    features_file = Channel.fromPath("${ch_alevin_results_files}/alevin/quants_mat_rows.txt")
-    barcodes_file = Channel.fromPath("${ch_alevin_results_files}/alevin/quants_mat_cols.txt")
-    POSTPROCESS ( matrix_file, barcodes_file, features_file, "Alevin" )
+    ch_matrix   = ch_alevin_results_files.map{ "${it}/alevin/quants_mat.mtx.gz" }
+    ch_barcodes = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
+    ch_features = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_rows.txt" }
+    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Alevin" )
     
     emit:
     software_versions   = ch_software_versions

@@ -81,11 +81,11 @@ workflow STARSOLO {
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
 
     // Reformat output
-    ch_star_results_files = STAR_ALIGN.out.solo_results.collect{ it[1] }
-    matrix_file   = Channel.fromPath("${ch_star_results_files}/Gene/filtered/matrix.mtx")
-    features_file = Channel.fromPath("${ch_star_results_files}/Gene/filtered/features.tsv")
-    barcodes_file = Channel.fromPath("${ch_star_results_files}/Gene/filtered/barcodes.tsv")
-    POSTPROCESS ( matrix_file, features_file, barcodes_file, "STARSolo" )
+    ch_star_results_files = STAR_ALIGN.out.solo_results.map{ it[1] }
+    ch_matrix   = ch_star_results_files.map{ "${it}/Gene/filtered/matrix.mtx" }
+    ch_features = ch_star_results_files.map{ "${it}/Gene/filtered/features.tsv" }
+    ch_barcodes = ch_star_results_files.map{ "${it}/Gene/filtered/barcodes.tsv" }
+    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "STARSolo" )
 
     // Collect multiqc files
     ch_multiqc_files     = STAR_ALIGN.out.log_final.collect{ it[1] }
