@@ -41,7 +41,6 @@ workflow ALEVINFRY {
     genome_fasta        // channel: /path/to/genome.fasta
     gtf                 // channel: /path/to/annotation.gtf
     protocol            // channel: protocol
-    barcode_whitelist   // channel: /path/to/barcode_whitelist.txt
 
     main:
     ch_software_versions = Channel.empty()
