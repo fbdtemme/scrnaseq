@@ -12,12 +12,8 @@ process MEAN_READ_LENGTH {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
 
-    conda (params.enable_conda ? "bioconda::seqkit=2.0.0" : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/seqkit:2.0.0--h9ee0642_0"
-    } else {
-        container "quay.io/biocontainers/seqkit:2.0.0--h9ee0642_0"
-    }
+    conda (params.enable_conda ? "conda-forge::python=3.8.10 conda-forge::biopython=1.79" : null)
+    container "registry.hub.docker.com/biopython/biopython"
 
     input:
     tuple val(meta), path(reads)
@@ -27,19 +23,6 @@ process MEAN_READ_LENGTH {
 
     script:
     """
-    reads=()
-    reads+=( ${reads} )
-
-    count=0;
-    sum=0;
-
-    for r in \$reads; do
-        r=\$( seqkit stats -T "\$r" |  sed -n 2p | cut -d\$'\t' -f7 | xargs echo -n );
-        r_int=\${r%.*}
-        (( sum+=r_int ))
-        (( ++count ));
-    done;
-
-    echo -n \$(( sum / count ))
+    mean_read_length.py ${reads} --threads $task.cpus
     """
 }
