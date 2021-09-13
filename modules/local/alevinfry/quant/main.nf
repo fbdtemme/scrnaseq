@@ -40,7 +40,7 @@ process ALEVINFRY_QUANT {
         --output-dir ${prefix}_quant_results \\
         --resolution cr-like \\
         --use-mtx \\
-        ${opti}
+        ${options.args}
 
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """

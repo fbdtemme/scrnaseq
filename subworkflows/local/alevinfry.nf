@@ -12,10 +12,8 @@ def whitelist_folder = "$baseDir/assets/whitelist/"
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
-def salmon_index_options                    = modules['salmon_index']
 def gffread_txp2gene_options                = modules['gffread_tx2pgene']
 def gffread_transcriptome_options           = modules['gffread_transcriptome']
-def salmon_alevin_options                   = modules['salmon_alevin']
 def alevin_qc_options                       = modules['alevinqc']
 def alevinfry_index_options                 = modules['alevinfry_index']
 def alevinfry_map_options                   = modules['alevinfry_map']
@@ -28,13 +26,12 @@ def alevinfry_quant_options                 = modules['alevinfry_quant']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { GFFREAD_TRANSCRIPTOME }           from '../../modules/local/gffread/transcriptome/main'           addParams( options: gffread_transcriptome_options )
-include { SALMON_ALEVIN }                   from '../../modules/local/salmon/alevin/main'                   addParams( options: salmon_alevin_options )
 include { ALEVINQC }                        from '../../modules/local/salmon/alevinqc/main'                 addParams( options: alevin_qc_options )
 include { POSTPROCESS }                     from '../../modules/local/postprocess/main'                     addParams( options: [:] )
 include { MEAN_READ_LENGTH }                from '../../modules/local/mean_read_length/main'                addParams( options: [:] )
 include { BUILD_SPLICI_REF }                from '../../modules/local/alevinfry/build_splici_ref/main'      addParams( options: [:] )
-include { ALEVINFRY_INDEX }                 from '../../modules/local/alevinfry/alevinfry_index/main'       addParams( options: [:] )
-include { ALEVINFRY_MAP }                   from '../../modules/local/alevinfry/alevinfry_map/main'         addParams( options: alevinfry_map_options )
+include { ALEVINFRY_INDEX }                 from '../../modules/local/alevinfry/index/main'                 addParams( options: alevinfry_index_options )
+include { ALEVINFRY_MAP }                   from '../../modules/local/alevinfry/map/main'                   addParams( options: alevinfry_map_options )
 include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/generate_permitlist/main'   addParams( options: alevinfry_generate_permitlist_options )
 include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
 include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'                 addParams( options: alevinfry_quant_options )
@@ -46,7 +43,6 @@ include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/
 ////////////////////////////////////////////////////
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
 include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -80,7 +76,7 @@ workflow ALEVINFRY {
 
     ch_all_reads = ch_all_fw.mix ( ch_all_rv )
 
-    // Get mean read length of fowards and reverse reads and select only the _2 read
+    // Get mean read length of fowards and reverse reads and select the second reads
     MEAN_READ_LENGTH ( ch_all_reads )
     ch_read_length =  MEAN_READ_LENGTH.out
         .toSortedList()
@@ -91,16 +87,19 @@ workflow ALEVINFRY {
         gtf,
         ch_read_length
     )
-    
+
+    ch_splici_ref    = BUILD_SPLICI_REF.out.reference
+    ch_txp2gene_3col = BUILD_SPLICI_REF.out.txp2gene_3col
+
     // Build salmon/alevin index
 
-    ALEVINFRY_INDEX ( BUILD_SPLICI_REF.out.reference )
+    ALEVINFRY_INDEX ( ch_splici_ref )
     index = ALEVINFRY_INDEX.out.index
 
     ALEVINFRY_MAP(
         reads,
         index,  
-        BUILD_SPLICI_REF.out.txp2gene_3col,
+        ch_txp2gene_3col,
         alevin_protocol
     )
     rad_dir = ALEVINFRY_MAP.out.results
@@ -115,10 +114,7 @@ workflow ALEVINFRY {
     quant_dir = ALEVINFRY_COLLATE.out.results
 
     // Perform quantification with alevin-fry quant
-    ALEVINFRY_QUANT ( 
-        quant_dir,
-        BUILD_SPLICI_REF.out.txp2gene_3col,
-    )
+    ALEVINFRY_QUANT ( quant_dir, ch_txp2gene_3col )
     
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINFRY_INDEX.out.version.ifEmpty(null))

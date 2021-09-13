@@ -1,5 +1,0 @@
-- name: salmon-alevin-make-splici-ref
-  command: nextflow run ./tests/modules/alevinfry/main.nf -entry test_make_splici_ref -c ./tests/config/nextflow.config
-  tags:
-    - alevin-fry
-  

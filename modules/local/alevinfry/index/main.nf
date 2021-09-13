@@ -23,18 +23,19 @@ process ALEVINFRY_INDEX {
     path splici_transcriptome
 
     output:
-    path "*.version.txt"          , emit: version
-    path "alevin_idx"             , emit: index
+    path "alevinfry"               , emit: index
+    path "*.version.txt"           , emit: version
 
     script:
     def software = getSoftwareName(task.process)
-    
+    def prefix   = options.suffix ? "${splici_transcriptome}${options.suffix}" : "${splici_transcriptome}"
+
     """
      salmon \\
         index \\
         --threads $task.cpus \\
         -t $splici_transcriptome \\
-        -i alevin_idx \\
+        -i alevinfry \\
         ${options.args} \\
 
     salmon --version | sed -e "s/salmon //g" > ${software}.version.txt

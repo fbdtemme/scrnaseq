@@ -7,10 +7,10 @@ options        = initOptions(params.options)
 
 process BUILD_SPLICI_REF {
     tag "$genome"
-    label 'process_medium'
+    label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'alevinfry', publish_id:'') }
 
     container "registry.hub.docker.com/combinelab/usefulaf:latest"
 
@@ -21,17 +21,16 @@ process BUILD_SPLICI_REF {
 
     output:
     path "*.version.txt"                          , emit: version
-    path "alevinfry_splici_ref/*.fa"              , emit: reference
-    path "alevinfry_splici_ref/*t2g.tsv"          , emit: txp2gene  
-    path "alevinfry_splici_ref/*t2g_3col.tsv"     , emit: txp2gene_3col  
-
+    path "${genome}_splici_ref/*.fa"              , emit: reference
+    path "${genome}_splici_ref/*t2g.tsv"          , emit: txp2gene
+    path "${genome}_splici_ref/*t2g_3col.tsv"     , emit: txp2gene_3col
 
     script:
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${genome}${options.suffix}" : "${genome}"
     
     """
-    build_splici_ref.R ${genome} ${gtf} ${read_length} "alevinfry_splici_ref" ${options.args}
+    build_splici_ref.R ${genome} ${gtf} ${read_length} "${prefix}_splici_ref" ${options.args}
 
     echo "unversioned" > ${software}.version.txt
     """
