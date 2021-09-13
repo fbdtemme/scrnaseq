@@ -115,6 +115,13 @@ workflow ALEVINFRY {
 
     // Perform quantification with alevin-fry quant
     ALEVINFRY_QUANT ( quant_dir, ch_txp2gene_3col )
+
+    // Reformat output
+    ch_alevin_results_files = ALEVINFRY_QUANT.out.results
+    ch_matrix   = ch_alevin_results_files.map { "${it}/alevinfry/quants_mat.mtx.gz" }
+    ch_barcodes = ch_alevin_results_files.map { "${it}/alevinfry/quants_mat_cols.txt" }
+    ch_features = ch_alevin_results_files.map { "${it}/alevinfry/quants_mat_rows.txt" }
+    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Alevin" )
     
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINFRY_INDEX.out.version.ifEmpty(null))

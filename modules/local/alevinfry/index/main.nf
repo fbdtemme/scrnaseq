@@ -38,6 +38,6 @@ process ALEVINFRY_INDEX {
         -i alevinfry \\
         ${options.args} \\
 
-    salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
+    salmon --version | sed -e "s/salmon //g" > salmon.version.txt
     """
 }
