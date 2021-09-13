@@ -43,20 +43,17 @@ def main(matrix_file, features_file, barcodes_file, transpose, output):
 	os.makedirs(os.path.abspath(output), exist_ok=True)
 
     # Parse the features
-	features = pd.read_csv(features_file, sep='\t',
-        header=None, index_col=None).values.flatten()
+	features = pd.read_csv(features_file, sep='\t', header=None, index_col=None).iloc[:,0]
 
     # Parse the barcodes
-	barcodes = pd.read_csv(barcodes_file, sep='\t',
-    	header=None, index_col=None).values.flatten()
+	barcodes = pd.read_csv(barcodes_file, sep='\t', header=None, index_col=None).iloc[:,0]
 
     # Parse the matrix of counts
 	matrix = scipy.io.mmread(matrix_file)
 
     # Create Pandas
-	df = pd.DataFrame(matrix.toarray().transpose(), index=features, columns=barcodes)
-	if transpose:
-		df = df.transpose()
+	df = pd.DataFrame(matrix.toarray().transpose() if transpose else matrix.toarray(), 
+	                  index=features, columns=barcodes)
 
     # Write Pandas
 	df.to_csv(os.path.join(output, 'matrix.tsv'), sep='\t', header=True, index=True)

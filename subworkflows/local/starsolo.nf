@@ -87,7 +87,7 @@ workflow STARSOLO {
     ch_matrix   = ch_star_results_files.map{ "${it}/Gene/filtered/matrix.mtx" }
     ch_features = ch_star_results_files.map{ "${it}/Gene/filtered/features.tsv" }
     ch_barcodes = ch_star_results_files.map{ "${it}/Gene/filtered/barcodes.tsv" }
-    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "STARSolo" )
+    POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "STARSolo" )
 
     // Collect multiqc files
     ch_multiqc_files     = STAR_ALIGN.out.log_final.collect{ it[1] }

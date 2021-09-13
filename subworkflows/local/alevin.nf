@@ -116,9 +116,9 @@ workflow ALEVIN {
     ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.map{ it[1] }
     // TODO there may be a cleaner way of doing this
     ch_matrix   = ch_alevin_results_files.map{ "${it}/alevin/quants_mat.mtx.gz" }
-    ch_barcodes = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
     ch_features = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_rows.txt" }
-    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Alevin" )
+    ch_barcodes = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
+    POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "Alevin" )
     
     emit:
     software_versions   = ch_software_versions
