@@ -1,0 +1,4 @@
+- name: subworkflow-alevinfry
+  command: nextflow run ./tests/subworkflows/local/alevinfry/main.nf -entry test_alevinfry -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevinfry

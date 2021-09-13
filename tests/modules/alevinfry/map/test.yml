@@ -1,0 +1,14 @@
+- name: alevinfry-map
+  command: nextflow run ./tests/modules/alevinfry/map/main.nf -entry test_alevinfry_map -c ./tests/config/nextflow.config
+  tags:
+    - alevinfry
+  files:
+    - path: ./results/alevinfry/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/alevinfry/S10_L001_alevin_results/aux_info
+    - path: ./results/alevinfry/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/libParams
+    - path: ./results/alevinfry/S10_L001_alevin_results/logs
+    - path: ./results/alevinfry/S10_L001_alevin_results/logs/salmon_quant.log
+    - path: ./results/alevinfry/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/map.rad
+    - path: ./results/alevinfry/S10_L001_alevin_results/unmapped_bc_count.bin
