@@ -18,7 +18,7 @@ def alevinfry_map_options                   = modules['alevinfry_map']
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 def alevinfry_quant_options                 = modules['alevinfry_quant']
-def postprocess_options                     = modules['postprocess']
+def postprocess_options                     = modules['postprocess_transpose']
 def gunzip_options                          = modules['gunzip']
 
 ////////////////////////////////////////////////////
@@ -117,8 +117,8 @@ workflow ALEVINFRY {
     ch_alevin_results_files = ALEVINFRY_QUANT.out.results
     ch_alevin_output_dir    = ch_alevin_results_files.map{ it[1] }
     ch_matrix               = ch_alevin_output_dir.map { "${it}/alevin/quants_mat.mtx" }
-    ch_features             = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_rows.txt" }
-    ch_barcodes             = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_cols.txt" }
+    ch_features             = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_cols.txt" }
+    ch_barcodes             = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_rows.txt" }
     POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "Alevinfry" )
     
     // Collect software versions

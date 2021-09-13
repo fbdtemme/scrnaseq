@@ -7,7 +7,7 @@ def modules = params.modules.clone()
 def kallistobustools_ref_options                = modules['kallistobustools_ref']
 def kallistobustools_count_options              = modules['kallistobustools_count']
 def gffread_kallisto_genemap_options            = modules['gffread_kallisto_genemap']
-def postprocess_options                         = modules['postprocess_kallisto']
+def postprocess_options                         = modules['postprocess_transpose']
 def gunzip_options                              = modules['gunzip']
 
 ////////////////////////////////////////////////////

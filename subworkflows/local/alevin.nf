@@ -15,7 +15,7 @@ def gffread_txp2gene_options            = modules['gffread_tx2pgene']
 def gffread_transcriptome_options       = modules['gffread_transcriptome']
 def salmon_alevin_options               = modules['salmon_alevin']
 def alevin_qc_options                   = modules['alevinqc']
-def postprocess_options                 = modules['postprocess']
+def postprocess_options                 = modules['postprocess_transpose']
 def gunzip_options                      = modules['gunzip']
 
 ////////////////////////////////////////////////////
@@ -116,8 +116,8 @@ workflow ALEVIN {
     ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.map{ it[1] }
     // TODO there may be a cleaner way of doing this
     ch_matrix   = ch_alevin_results_files.map{ "${it}/alevin/quants_mat.mtx.gz" }
-    ch_features = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_rows.txt" }
-    ch_barcodes = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
+    ch_features = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
+    ch_barcodes = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_rows.txt" }
     POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "Alevin" )
     
     emit:
