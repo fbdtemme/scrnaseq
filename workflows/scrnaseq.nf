@@ -147,10 +147,16 @@ workflow SCRNASEQ {
     }
 
     if ("alevinfry" in tools) {
-        //ALEVINFRY( ch_fastq )
-
-        //ch_software_versions = ch_software_versions.mix(ALEVINFRY.out.software_versions.collect())
-        //ch_multiqc_files     = ch_multiqc_files.mix(ALEVINFRY.out.multiqc_files.collect())  
+        ALEVINFRY(
+            ch_fastq,             
+            params.genome_fasta,      
+            ch_gtf,    
+            params.protocol,          
+            params.barcode_whitelist 
+        )
+        
+        ch_software_versions = ch_software_versions.mix(ALEVINFRY.out.software_versions.collect().ifEmpty([]))
+        ch_multiqc_files     = ch_multiqc_files.mix(ALEVINFRY.out.multiqc_files.collect().ifEmpty([]))  
     }
 
     // Run STARSolo pipeline
