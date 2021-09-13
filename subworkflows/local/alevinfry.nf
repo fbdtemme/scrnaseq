@@ -2,10 +2,8 @@
 /* --         SALMON ALEVIN SUBWORKFLOW        -- */
 ////////////////////////////////////////////////////
 
-
 // Whitelist files for STARsolo and Kallisto
 def whitelist_folder = "$baseDir/assets/whitelist/"
-
 
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
@@ -20,14 +18,15 @@ def alevinfry_map_options                   = modules['alevinfry_map']
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 def alevinfry_quant_options                 = modules['alevinfry_quant']
-
+def postprocess_options                     = modules['postprocess']
+def gunzip_options                          = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { GFFREAD_TRANSCRIPTOME }           from '../../modules/local/gffread/transcriptome/main'           addParams( options: gffread_transcriptome_options )
 include { ALEVINQC }                        from '../../modules/local/salmon/alevinqc/main'                 addParams( options: alevin_qc_options )
-include { POSTPROCESS }                     from '../../modules/local/postprocess/main'                     addParams( options: [:] )
+include { POSTPROCESS }                     from '../../modules/local/postprocess/main'                     addParams( options: postprocess_options )
 include { MEAN_READ_LENGTH }                from '../../modules/local/mean_read_length/main'                addParams( options: [:] )
 include { BUILD_SPLICI_REF }                from '../../modules/local/alevinfry/build_splici_ref/main'      addParams( options: [:] )
 include { ALEVINFRY_INDEX }                 from '../../modules/local/alevinfry/index/main'                 addParams( options: alevinfry_index_options )
@@ -36,14 +35,11 @@ include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/
 include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
 include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'                 addParams( options: alevinfry_quant_options )
 
-
-
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GZIP }                        from '../../modules/local/gzip/main'                   addParams( options: [:] )
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
+include { GUNZIP }                          from '../../modules/nf-core/modules/gunzip/main'               addParams( options: gunzip_options )
+include { GFFREAD as GFFREAD_TXP2GENE }     from '../../modules/nf-core/modules/gffread/main'              addParams( options: gffread_txp2gene_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -83,20 +79,20 @@ workflow ALEVINFRY {
         .toSortedList()
         .map { it[1][1] }
     
+    // Build splice reference
     BUILD_SPLICI_REF(
         genome_fasta,
         gtf,
         ch_read_length
     )
-
     ch_splici_ref    = BUILD_SPLICI_REF.out.reference
     ch_txp2gene_3col = BUILD_SPLICI_REF.out.txp2gene_3col
 
-    // Build salmon/alevin index
-
+    // Build salmon/alevin-fry index
     ALEVINFRY_INDEX ( ch_splici_ref )
     index = ALEVINFRY_INDEX.out.index
 
+    // Compute counts
     ALEVINFRY_MAP(
         reads,
         index,  
@@ -105,8 +101,8 @@ workflow ALEVINFRY {
     )
     rad_dir = ALEVINFRY_MAP.out.results
     
-
     // Build permitlist and filter index
+    // TODO make this a parameter
     def expected_orientation = "fw"
     ALEVINFRY_GENERATE_PERMITLIST( rad_dir, expected_orientation )
     quant_dir = ALEVINFRY_GENERATE_PERMITLIST.out.quant
@@ -119,15 +115,11 @@ workflow ALEVINFRY {
 
     // Reformat output
     ch_alevin_results_files = ALEVINFRY_QUANT.out.results
-    ch_alevin_output_dir = ch_alevin_results_files.map{it[1]}
-    
-    ch_matrix   = ch_alevin_output_dir.map { "${it}/alevin/quants_mat.mtx" }
-    ch_matrix_compressed = GZIP( ch_matrix ).gzip
-
-    ch_barcodes = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_cols.txt" }
-    ch_features = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_rows.txt" }
-
-    POSTPROCESS ( ch_matrix_compressed, ch_barcodes, ch_features, "Alevin" )
+    ch_alevin_output_dir    = ch_alevin_results_files.map{ it[1] }
+    ch_matrix               = ch_alevin_output_dir.map { "${it}/alevin/quants_mat.mtx" }
+    ch_features             = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_rows.txt" }
+    ch_barcodes             = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_cols.txt" }
+    POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "Alevinfry" )
     
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINFRY_INDEX.out.version.ifEmpty(null))
