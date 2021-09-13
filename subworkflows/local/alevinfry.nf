@@ -41,6 +41,7 @@ include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
+include { GZIP }                        from '../../modules/local/gzip/main'                   addParams( options: [:] )
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
 include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
 
@@ -121,9 +122,12 @@ workflow ALEVINFRY {
     ch_alevin_output_dir = ch_alevin_results_files.map{it[1]}
     
     ch_matrix   = ch_alevin_output_dir.map { "${it}/alevin/quants_mat.mtx" }
+    ch_matrix_compressed = GZIP( ch_matrix ).gzip
+
     ch_barcodes = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_cols.txt" }
     ch_features = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_rows.txt" }
-    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Alevin" )
+
+    POSTPROCESS ( ch_matrix_compressed, ch_barcodes, ch_features, "Alevin" )
     
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINFRY_INDEX.out.version.ifEmpty(null))
