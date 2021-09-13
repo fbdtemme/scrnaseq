@@ -2,10 +2,8 @@
 /* --         SALMON ALEVIN SUBWORKFLOW        -- */
 ////////////////////////////////////////////////////
 
-
 // Whitelist files for STARsolo and Kallisto
 def whitelist_folder = "$baseDir/assets/whitelist/"
-
 
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
@@ -17,6 +15,8 @@ def gffread_txp2gene_options            = modules['gffread_tx2pgene']
 def gffread_transcriptome_options       = modules['gffread_transcriptome']
 def salmon_alevin_options               = modules['salmon_alevin']
 def alevin_qc_options                   = modules['alevinqc']
+def postprocess_options                 = modules['postprocess']
+def gunzip_options                      = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -24,14 +24,14 @@ def alevin_qc_options                   = modules['alevinqc']
 include { GFFREAD_TRANSCRIPTOME }       from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
 include { SALMON_ALEVIN }               from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
 include { ALEVINQC }                    from '../../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
-include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: [:] )
+include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'      addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
+include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'       addParams( options: gffread_txp2gene_options )
+include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -67,7 +67,6 @@ workflow ALEVIN {
     } else {
         exit 1, "Barcode whitelist must be specified for given protocol: ${protocol}" 
     }
-
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
     if (!transcript_fasta && genome_fasta && gtf) {
@@ -109,19 +108,17 @@ workflow ALEVIN {
 
     // Run alevinQC
     ALEVINQC ( SALMON_ALEVIN.out.alevin_results )
-    
-    // Reformat output
-    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.collect{it[1]}.ifEmpty([])
-    // TODO there is probably a cleaner way to extract these files from the Channel
-    POSTPROCESS (
-        ch_alevin_results_files.filter( 'quants_mat.mtx.gz' ).view(),
-        ch_alevin_results_files.filter( 'quants_mat_cols.txt' ).view(),
-        ch_alevin_results_files.filter( 'quants_mat_rows.txt' ).view(),
-        "Alevin"
-    )
 
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
+
+    // Reformat output
+    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.map{ it[1] }
+    // TODO there may be a cleaner way of doing this
+    ch_matrix   = ch_alevin_results_files.map{ "${it}/alevin/quants_mat.mtx.gz" }
+    ch_barcodes = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
+    ch_features = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_rows.txt" }
+    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Alevin" )
     
     emit:
     software_versions   = ch_software_versions

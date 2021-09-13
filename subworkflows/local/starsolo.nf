@@ -12,17 +12,20 @@ def modules = params.modules.clone()
 
 def star_genomegenerate_options  = modules['star_genomegenerate']
 def star_align_options           = modules['star_align']
+def postprocess_options          = modules['postprocess']
+def gunzip_options               = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { STAR_ALIGN }           from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
-include { POSTPROCESS }          from '../../modules/local/postprocess/main'                  addParams( options: [:] )
+include { POSTPROCESS }          from '../../modules/local/postprocess/main'                    addParams( options: postprocess_options )
+
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }               from '../../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
+include { GUNZIP }               from '../../modules/nf-core/modules/gunzip/main'               addParams( options: gunzip_options )
 include { STAR_GENOMEGENERATE }  from '../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
 
 ////////////////////////////////////////////////////
@@ -76,21 +79,18 @@ workflow STARSOLO {
         star_protocol
     )
 
-    // Reformat output
-    ch_star_results_files = STAR_ALIGN.out.solo_results.map{it[1]}.ifEmpty([])
-    // TODO there is probably a cleaner way to extract these files from the Channel
-    POSTPROCESS (
-        ch_star_results_files.filter( 'matrix.mtx' ).view(),
-        ch_star_results_files.filter( 'features.txt' ).view(),
-        ch_star_results_files.filter( 'barcodes.txt' ).view(),
-        "STARSolo"
-    )
-
     // Collect software versions
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
 
+    // Reformat output
+    ch_star_results_files = STAR_ALIGN.out.solo_results.map{ it[1] }
+    ch_matrix   = ch_star_results_files.map{ "${it}/Gene/filtered/matrix.mtx" }
+    ch_features = ch_star_results_files.map{ "${it}/Gene/filtered/features.tsv" }
+    ch_barcodes = ch_star_results_files.map{ "${it}/Gene/filtered/barcodes.tsv" }
+    POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "STARSolo" )
+
     // Collect multiqc files
-    ch_multiqc_files     = STAR_ALIGN.out.log_final.collect{it[1]}.ifEmpty([])
+    ch_multiqc_files     = STAR_ALIGN.out.log_final.collect{ it[1] }
 
     emit:
     software_versions    = ch_software_versions

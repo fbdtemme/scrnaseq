@@ -54,17 +54,15 @@ def gffread_gff3togtf_options  = modules['gffread_gff3togtf']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-
-include { GET_SOFTWARE_VERSIONS }        from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['tsv':'']]       )
+include { GET_SOFTWARE_VERSIONS }        from '../modules/local/get_software_versions'          addParams( options: [publish_files: ['tsv':'']] )
 include { INPUT_CHECK }                  from '../subworkflows/local/input_check'               addParams( options: [:] )
-include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffread/main'         addParams( options: gffread_gff3togtf_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-
-include { FASTQC  }                from '../modules/nf-core/modules/fastqc/main'  addParams( options: fastqc_options)
-include { MULTIQC }                from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
+include { FASTQC  }                      from '../modules/nf-core/modules/fastqc/main'          addParams( options: fastqc_options )
+include { MULTIQC }                      from '../modules/nf-core/modules/multiqc/main'         addParams( options: multiqc_options )
+include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffread/main'         addParams( options: gffread_gff3togtf_options )
 
 ////////////////////////////////////////////////////
 /*    IMPORT LOCAL MODULES/SUBWORKFLOWS           */
@@ -100,7 +98,6 @@ workflow SCRNASEQ {
     ch_software_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
-
     // Stage input files
     INPUT_CHECK ( ch_input )
     .map {
@@ -116,11 +113,10 @@ workflow SCRNASEQ {
         FASTQC ( ch_fastq )
 
         ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map { it -> it[1] }.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ it[1] }.collect())
     } 
 
     // Convert GFF to GTF if annotation is given as GFF
-
     if (params.gff) {
         GFFREAD_GFF3TOGTF ( params.gff )
         ch_gtf = GFFREAD_GFF3TOGTF.out.gtf
@@ -146,8 +142,8 @@ workflow SCRNASEQ {
             params.barcode_whitelist
         )
 
-        ch_software_versions = ch_software_versions.mix(ALEVIN.out.software_versions.collect().ifEmpty([]))
-        ch_multiqc_files     = ch_multiqc_files.mix(ALEVIN.out.multiqc_files.collect().ifEmpty([]))  
+        ch_software_versions = ch_software_versions.mix(ALEVIN.out.software_versions.collect())
+        ch_multiqc_files     = ch_multiqc_files.mix(ALEVIN.out.multiqc_files.collect())
     }
 
     if ("alevinfry" in tools) {
@@ -174,8 +170,8 @@ workflow SCRNASEQ {
             params.barcode_whitelist
         )
 
-        ch_software_versions = ch_software_versions.mix(STARSOLO.out.software_versions.collect().ifEmpty([]))
-        ch_multiqc_files     = ch_multiqc_files.mix(STARSOLO.out.multiqc_files.collect().ifEmpty([]))    
+        ch_software_versions = ch_software_versions.mix(STARSOLO.out.software_versions.collect())
+        ch_multiqc_files     = ch_multiqc_files.mix(STARSOLO.out.multiqc_files.collect())    
     }
 
     // Run kallisto bustools pipeline
@@ -189,16 +185,16 @@ workflow SCRNASEQ {
             params.protocol
         )
 
-        ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect().ifEmpty([]))
-        ch_multiqc_files     = ch_multiqc_files.mix(KALLISTO_BUSTOOLS.out.multiqc_files.collect().ifEmpty([]))    
+        ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect())
+        ch_multiqc_files     = ch_multiqc_files.mix(KALLISTO_BUSTOOLS.out.multiqc_files.collect())    
     }
 
     // Run kallisto bustools pipeline
     if ("cellranger" in tools) {
         //CELLRANGER( ch_fastq )
 
-        //ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect().ifEmpty([]))
-        //ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect().ifEmpty()([]))    
+        //ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect())
+        //ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect())    
     }
    
     // Get software versions
