@@ -7,7 +7,7 @@ options        = initOptions(params.options)
 
 process ALEVINFRY_GENERATE_PERMITLIST {
     tag "$meta.id"
-    label "process_medium"
+    label "process_low"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
@@ -24,8 +24,8 @@ process ALEVINFRY_GENERATE_PERMITLIST {
     val expected_orientation
 
     output:
-    path "*.version.txt"                       , emit: version
-    tuple val(meta), path("*_alevin_quant")  , emit: quant
+    path "*.version.txt"                        , emit: version
+    tuple val(meta), path("*_alevinfry_quant")  , emit: quant
 
     script:
     def software = getSoftwareName(task.process)
@@ -33,7 +33,7 @@ process ALEVINFRY_GENERATE_PERMITLIST {
     
     // alevin-fry complains when not passing everything in one line
     """
-    alevin-fry generate-permit-list --knee-distance --expected-ori ${expected_orientation} --input ${map} --output-dir ${prefix}_alevin_quant ${options.args}
+    alevin-fry generate-permit-list --knee-distance --expected-ori ${expected_orientation} --input ${map} --output-dir ${prefix}_alevinfry_quant ${options.args}
 
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """
