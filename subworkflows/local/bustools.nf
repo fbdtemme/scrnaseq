@@ -82,9 +82,9 @@ workflow KALLISTO_BUSTOOLS {
     // Reformat output
     ch_kallisto_results_files = KALLISTOBUSTOOLS_COUNT.out.count.map{ it[1] }
     // TODO there may be a cleaner way of doing this
-    ch_matrix   = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.mtx" }
-    ch_features = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.barcodes.txt" }
-    ch_barcodes = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.genes.txt" }
+    ch_matrix   = ch_kallisto_results_files.map{ "${it}/counts_unfiltered/cells_x_genes.mtx" }
+    ch_features = ch_kallisto_results_files.map{ "${it}/counts_unfiltered/cells_x_genes.barcodes.txt" }
+    ch_barcodes = ch_kallisto_results_files.map{ "${it}/counts_unfiltered/cells_x_genes.genes.txt" }
     POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Kallisto" )
 
     emit: 
