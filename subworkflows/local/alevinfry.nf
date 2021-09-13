@@ -118,9 +118,11 @@ workflow ALEVINFRY {
 
     // Reformat output
     ch_alevin_results_files = ALEVINFRY_QUANT.out.results
-    ch_matrix   = ch_alevin_results_files.map { "${it}/alevinfry/quants_mat.mtx.gz" }
-    ch_barcodes = ch_alevin_results_files.map { "${it}/alevinfry/quants_mat_cols.txt" }
-    ch_features = ch_alevin_results_files.map { "${it}/alevinfry/quants_mat_rows.txt" }
+    ch_alevin_output_dir = ch_alevin_results_files.map{it[1]}
+    
+    ch_matrix   = ch_alevin_output_dir.map { "${it}/alevin/quants_mat.mtx" }
+    ch_barcodes = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_cols.txt" }
+    ch_features = ch_alevin_output_dir.map { "${it}/alevin/quants_mat_rows.txt" }
     POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Alevin" )
     
     // Collect software versions
