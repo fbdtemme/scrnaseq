@@ -23,7 +23,7 @@ import shutil
 import pandas as pd
 
 
-def main(matrix_file, features_file, barcodes_file, output):
+def main(matrix_file, features_file, barcodes_file, transpose, output):
 
 	if not os.path.isfile(matrix_file):
 		sys.stderr.write("Error, input matrix {} is not a file\n".format(matrix_file))
@@ -53,7 +53,8 @@ def main(matrix_file, features_file, barcodes_file, output):
 	matrix = scipy.io.mmread(matrix_file)
 
     # Create Pandas
-	df = pd.DataFrame(matrix.toarray().transpose(), index=features, columns=barcodes)
+	df = pd.DataFrame(matrix.toarray() if transpose else matrix.toarray().transpose(), 
+	                  index=features, columns=barcodes)
 
     # Write Pandas
 	df.to_csv(os.path.join(output, 'matrix.tsv'), sep='\t', header=True, index=True)
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument('--matrix', 
     	metavar="[FILE]", 
     	required=True,
-    	help='Path to the matrix of counts in mtx format (gzipped or not)')
+    	help='Path to the matrix of counts in mtx format (gzipped or not) where genes are rows and barcodes are columns')
     parser.add_argument('--features',
     	metavar="[FILE]",
     	required=True,
@@ -81,10 +82,14 @@ if __name__ == "__main__":
     	metavar="[FILE]",
     	required=True,
     	help='Path to the row names (barcodes) in text format')
+    parser.add_argument('--transpose',
+	    action="store_true",
+		default=False,
+    	help='Use this if the input matrix has genes as columns and barcodes as rows')
     parser.add_argument('--output',
     	metavar="[STRING]",
     	required=True,
     	help='Path to the output folder')
     
     args = parser.parse_args()
-    main(args.matrix, args.features, args.barcodes, args.output)
+    main(args.matrix, args.features, args.barcodes, args.transpose, args.output)

@@ -12,18 +12,20 @@ def modules = params.modules.clone()
 
 def star_genomegenerate_options  = modules['star_genomegenerate']
 def star_align_options           = modules['star_align']
+def postprocess_options          = modules['postprocess']
+def gunzip_options               = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { STAR_ALIGN }           from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
-include { POSTPROCESS }          from '../../modules/local/postprocess/main'                    addParams( options: [:] )
+include { POSTPROCESS }          from '../../modules/local/postprocess/main'                    addParams( options: postprocess_options )
 
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }               from '../../modules/nf-core/modules/gunzip/main'               addParams( options: [:] )
+include { GUNZIP }               from '../../modules/nf-core/modules/gunzip/main'               addParams( options: gunzip_options )
 include { STAR_GENOMEGENERATE }  from '../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
 
 ////////////////////////////////////////////////////

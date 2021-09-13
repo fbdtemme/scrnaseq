@@ -15,6 +15,8 @@ def gffread_txp2gene_options            = modules['gffread_tx2pgene']
 def gffread_transcriptome_options       = modules['gffread_transcriptome']
 def salmon_alevin_options               = modules['salmon_alevin']
 def alevin_qc_options                   = modules['alevinqc']
+def postprocess_options                 = modules['postprocess']
+def gunzip_options                      = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -22,12 +24,12 @@ def alevin_qc_options                   = modules['alevinqc']
 include { GFFREAD_TRANSCRIPTOME }       from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
 include { SALMON_ALEVIN }               from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
 include { ALEVINQC }                    from '../../modules/local/salmon/alevinqc/main'         addParams( options: alevin_qc_options )
-include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: [:] )
+include { POSTPROCESS }                 from '../../modules/local/postprocess/main'             addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'        addParams( options: [:] )
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
 include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'       addParams( options: gffread_txp2gene_options )
 include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
 

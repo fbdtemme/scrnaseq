@@ -4,20 +4,22 @@
 
 def modules = params.modules.clone()
 
-def kallistobustools_ref_options     = modules['kallistobustools_ref']
-def kallistobustools_count_options   = modules['kallistobustools_count']
-def gffread_kallisto_genemap_options = modules['gffread_kallisto_genemap']
+def kallistobustools_ref_options                = modules['kallistobustools_ref']
+def kallistobustools_count_options              = modules['kallistobustools_count']
+def gffread_kallisto_genemap_options            = modules['gffread_kallisto_genemap']
+def postprocess_options                         = modules['postprocess_kallisto']
+def gunzip_options                              = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GENE_MAP }                from '../../modules/local/genemap/main'                          addParams( options: [:] )
-include { POSTPROCESS }                 from '../../modules/local/postprocess/main'                  addParams( options: [:] )
+include { GENE_MAP }                            from '../../modules/local/genemap/main'                          addParams( options: [:] )
+include { POSTPROCESS }                         from '../../modules/local/postprocess/main'                      addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                              from '../../modules/nf-core/modules/gunzip/main'                 addParams( options: [:] )
+include { GUNZIP }                              from '../../modules/nf-core/modules/gunzip/main'                 addParams( options: gunzip_options )
 include { KALLISTOBUSTOOLS_COUNT }              from '../../modules/nf-core/modules/kallistobustools/count/main' addParams( options: kallistobustools_count_options )
 include { KALLISTOBUSTOOLS_REF }                from '../../modules/nf-core/modules/kallistobustools/ref/main'   addParams( options: kallistobustools_ref_options )
 include { GFFREAD as GFFREAD_KALLISTO_GENEMAP } from '../../modules/nf-core/modules/gffread/main'                addParams( options: gffread_kallisto_genemap_options )
@@ -81,8 +83,8 @@ workflow KALLISTO_BUSTOOLS {
     ch_kallisto_results_files = KALLISTOBUSTOOLS_COUNT.out.count.map{ it[1] }
     // TODO there may be a cleaner way of doing this
     ch_matrix   = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.mtx" }
-    ch_features = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.genes.txt" }
-    ch_barcodes = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.barcodes.txt" }
+    ch_features = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.barcodes.txt" }
+    ch_barcodes = ch_kallisto_results_files.map{ "${it}/counts_filtered/cells_x_genes.genes.txt" }
     POSTPROCESS ( ch_matrix, ch_barcodes, ch_features, "Kallisto" )
 
     emit: 
