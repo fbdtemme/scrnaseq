@@ -4,33 +4,32 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_MKREF {
-
-    label 'process_medium'
+    tag 'build_references'
+    label 'process_high'
 
     publishDir "${params.outdir}",
-        mode: 'copy',
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'cellranger_references', publish_id:'') }
 
-    container "streitlab/custom-nf-modules-cellranger:latest"
+    container "qbicpipelines/cellranger:6.0.2"                        // Docker image
 
     input:
-    path gtf
     path fasta
+    path gtf
+    val reference_name
 
     output:
-    path 'reference_genome' , emit: reference_genome
-    path '*.version.txt'    , emit: version
+    path("${params.reference_name}"), emit: reference
+    val(reference_name), emit: reference_name
+    path "*.version.txt", emit: version
 
     script:
-    def software = getSoftwareName(task.process)
-
     """
     cellranger mkref \\
-        --genome=reference_genome \\
-        --genes=${gtf} \\
+        --genome=${reference_name} \\
         --fasta=${fasta} \\
-        --nthreads=${task.cpus}
+        --genes=${gtf}
 
-    echo \$(cellranger --version 2>&1) | sed 's/^.*cellranger //; s/ .*\$//' > ${software}.version.txt
+    cellranger --version | grep -o "[0-9\\. ]\\+" > cellranger.version.txt
     """
 }

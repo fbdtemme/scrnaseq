@@ -11,8 +11,9 @@ process CELLRANGER_MKGTF {
         mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
 
-    container "streitlab/custom-nf-modules-cellranger:latest"
+    container "qbicpipelines/cellranger:6.0.2"                        // Docker image
 
+    
     input:
     path gtf
 
