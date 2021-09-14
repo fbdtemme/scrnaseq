@@ -13,7 +13,6 @@ def gunzip_options                              = modules['gunzip']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GENE_MAP }                            from '../../modules/local/genemap/main'                          addParams( options: [:] )
 include { POSTPROCESS }                         from '../../modules/local/postprocess/main'                      addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
