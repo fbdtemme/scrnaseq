@@ -24,7 +24,7 @@
 * [STAR](https://pubmed.ncbi.nlm.nih.gov/23104886/)
     > Dobin A, Davis CA, Schlesinger F, Drenkow J, Zaleski C, Jha S, Batut P, Chaisson M, Gingeras TR. STAR: ultrafast universal RNA-seq aligner Bioinformatics. 2013 Jan 1;29(1):15-21. doi: 10.1093/bioinformatics/bts635. Epub 2012 Oct 25. PubMed PMID: 23104886; PubMed Central PMCID: PMC3530905.
 
-* [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
+* [Alevin-fry](hhttps://www.biorxiv.org/content/10.1101/2021.06.29.450377v1)
 
 * [Kallisto Bustools](https://www.nature.com/articles/s41587-021-00870-2)
     > Pall Melsted, A. Sina Booeshaghi, Lauren Liu, Fan Gao, Lambda Lu, Kyung Hoi (Joseph) Min, Eduardo da Veiga Beltrame, Kristján Eldjárn Hjörleifsson, Jase Gehring & Lior Pachter† Modular and efficient pre-processing of single-cell RNA-seq, Nature Biotechnology (2021).

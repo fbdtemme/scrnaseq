@@ -25,7 +25,6 @@ checkPathParamList = [
 
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
-
 // Create a channel for input read files
 if (params.input) { 
     ch_input = file(params.input)
@@ -151,8 +150,7 @@ workflow SCRNASEQ {
             ch_fastq,             
             params.genome_fasta,      
             ch_gtf,    
-            params.protocol,          
-            params.barcode_whitelist 
+            params.protocol
         )
         
         ch_software_versions = ch_software_versions.mix(ALEVINFRY.out.software_versions.collect().ifEmpty([]))

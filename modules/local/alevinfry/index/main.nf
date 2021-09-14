@@ -23,8 +23,8 @@ process ALEVINFRY_INDEX {
     path splici_transcriptome
 
     output:
-    path "alevinfry"               , emit: index
-    path "*.version.txt"           , emit: version
+    path "alevinfry"      , emit: index
+    path "*.version.txt"  , emit: version
 
     script:
     def software = getSoftwareName(task.process)
