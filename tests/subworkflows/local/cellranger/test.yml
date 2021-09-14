@@ -1,0 +1,4 @@
+- name: subworkflow-cellranger
+  command: nextflow run ./tests/subworkflows/local/cellranger/main.nf -entry test_cellranger -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevinfry

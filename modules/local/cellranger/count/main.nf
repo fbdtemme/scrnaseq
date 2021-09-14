@@ -4,41 +4,51 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_COUNT {
-    tag "$meta.gem"
+    tag "$meta.id"
     label 'process_high'
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'meta.gem') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
 
-    container "qbicpipelines/cellranger:6.0.2"   // Docker image
+    container "litd/docker-cellranger"   // Docker image
 
     input:
     tuple val(meta), path(reads)
-    path(reference)
+    path reference
+    val protocol
 
     output:
-    path("sample-${meta.gem}/outs/*"), emit: outs
-    path "*.version.txt", emit: version
+    path "samples/outs/*"  , emit: results
+    path "*.version.txt"   , emit: version
 
     script:
-    def sample_arg = meta.samples.unique().join(",")
     def reference_name = reference.name
-    """
-    cellranger count --id='sample-${meta.gem}' \
-        --fastqs=. \
-        --transcriptome=${reference_name} \
-        --sample=${sample_arg} \
-        --localcores=${task.cpus} \
-        --localmem=${task.memory.toGiga()}
 
-    cellranger --version | grep -o "[0-9\\. ]\\+" > cellranger.version.txt
     """
+    # Make sure reads are prefixed with the meta.id
 
-    stub:
-    """
-    mkdir -p "sample-${meta.gem}/outs/"
-    touch sample-${meta.gem}/outs/fake_file.txt
+    R1="${reads[0]}"
+    R2="${reads[1]}"
+
+    if [[ ! "\$R1" =~ "^${meta.id}.*" ]]; then
+        mv "\$R1" "${meta.id}_\$R1"
+    fi
+
+    if [[ ! "\$R2" =~ "^${meta.id}.*" ]]; then
+        mv "\$R2" "${meta.id}_\$R2"
+    fi
+
+    cellranger count --id='samples' \\
+        --fastqs=. \\
+        --sample=${meta.id} \\
+        --transcriptome=${reference_name} \\
+        --localcores=${task.cpus} \\
+        --localmem=${task.memory.toGiga()} \\
+        --disable-ui \\
+        --chemistry=${protocol}
+        ${options.args}
+
     cellranger --version | grep -o "[0-9\\. ]\\+" > cellranger.version.txt
     """
 }

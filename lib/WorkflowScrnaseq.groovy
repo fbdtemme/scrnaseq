@@ -49,6 +49,13 @@ class WorkflowScrnaseq {
                 System.exit(1)
             }
         }
+
+        if ('cellranger' in tools) {
+            if (!params.cellranger_index && (!(params.gtf || params.gff) || !params.genome_fasta)) {
+                log.error "Cellranger needs either a GTF + FASTA or a precomputed index supplied."
+                System.exit(1)
+            }
+        }
     }
 
     // Exit pipeline if incorrect --genome key provided
@@ -99,9 +106,10 @@ class WorkflowScrnaseq {
     static formatProtocol(protocol, tool) {
         String new_protocol = protocol
         String chemistry = ""
+
         
         // alevin
-        if (tool == "alevin") {
+        if (tool == "alevin" || tool == "alevinfry") {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "chromium"
@@ -144,7 +152,7 @@ class WorkflowScrnaseq {
         }
 
         // kallisto bustools
-        else if (tool = "kallisto" ) {
+        else if (tool == "kallisto" ) {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "10XV1"
@@ -165,8 +173,27 @@ class WorkflowScrnaseq {
                     new_protocol = "SMARTSEQ"
             }
         }
+           
+        // cellranger
+        else if (tool == "cellranger") {
+            switch(protocol) {
+                case "10XV1":
+                    new_protocol = "SC3Pv1"
+                    chemistry = "V1"
+                    break
+                case "10XV2":
+                    new_protocol = "SC3Pv2"
+                    chemistry = "V2"
+                    break
+                case "10XV3":
+                    new_protocol = "SC3Pv3"
+                    chemistry = "V3"
+                    break
+            }
+        }
+
         else {
-        exit 1, "Tool not recognized."
+            System.exit(1)
         }
 
         return [new_protocol, chemistry]

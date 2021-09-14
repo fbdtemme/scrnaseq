@@ -4,32 +4,35 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_MKREF {
-    tag 'build_references'
+    tag "${fasta.baseName}"
     label 'process_high'
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'cellranger_references', publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', publish_id:'') }
 
-    container "qbicpipelines/cellranger:6.0.2"                        // Docker image
+    container "litd/docker-cellranger"   // Docker image
 
     input:
     path fasta
     path gtf
-    val reference_name
 
     output:
-    path("${params.reference_name}"), emit: reference
-    val(reference_name), emit: reference_name
+    path("cellranger"),   emit: reference
     path "*.version.txt", emit: version
 
     script:
+    def software = getSoftwareName(task.process)
+
     """
     cellranger mkref \\
-        --genome=${reference_name} \\
+        --genome=cellranger \\
         --fasta=${fasta} \\
-        --genes=${gtf}
+        --genes=${gtf} \\
+        --memgb ${task.memory.giga} \\
+        --nthreads ${task.cpus}
 
-    cellranger --version | grep -o "[0-9\\. ]\\+" > cellranger.version.txt
+
+    cellranger --version | grep -o "[0-9\\. ]\\+" > ${software}.version.txt
     """
 }

@@ -1,0 +1,4 @@
+- name: cellranger-mkref
+  command: nextflow run ./tests/modules/cellranger/mkref/main.nf -entry test_cellranger_mkref -c ./tests/config/nextflow.config
+  tags:
+    - cellranger
