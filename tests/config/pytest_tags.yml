@@ -33,7 +33,7 @@ alevinfry-collate:
   - modules/local/alevinfry/collate/**
   - tests/modules/alevinfry/collate/**
 
-alevinfry-generate_permitlist:
+alevinfry-generate-permitlist:
   - tests/config/**
   - modules/local/alevinfry/generate_permitlist/**
   - tests/modules/alevinfry/generate_permitlist/**
