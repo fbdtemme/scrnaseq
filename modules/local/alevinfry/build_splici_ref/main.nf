@@ -10,9 +10,9 @@ process BUILD_SPLICI_REF {
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'splici_reference', publish_id:'') }
 
-    // TODO check if this is the right container. Support for conda, singularity and docker must be provided
+    // TODO: check if this is the right container. Support for conda, singularity and docker must be provided
     container "registry.hub.docker.com/combinelab/usefulaf:latest"
 
     input:
