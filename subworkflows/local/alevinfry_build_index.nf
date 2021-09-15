@@ -8,13 +8,13 @@ def alevinfry_collate_options               = modules['alevinfry_collate']
 def alevinfry_quant_options                 = modules['alevinfry_quant']
 def postprocess_options                     = modules['postprocess_transpose']
 def gunzip_options                          = modules['gunzip']
-
+def build_splici_ref                        = modules['build_splici_ref']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
 include { MEAN_READ_LENGTH }                from '../../modules/local/mean_read_length/main'                addParams( options: [:] )
-include { BUILD_SPLICI_REF }                from '../../modules/local/alevinfry/build_splici_ref/main'      addParams( options: [:] )
+include { BUILD_SPLICI_REF }                from '../../modules/local/alevinfry/build_splici_ref/main'      addParams( options: build_splici_ref )
 include { ALEVINFRY_INDEX }                 from '../../modules/local/alevinfry/index/main'                 addParams( options: alevinfry_index_options )
 
 workflow ALEVINFRY_BUILD_INDEX {
