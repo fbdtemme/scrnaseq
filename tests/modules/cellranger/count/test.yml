@@ -1,0 +1,4 @@
+- name: cellranger-count
+  command: nextflow run ./tests/modules/cellranger/count/main.nf -entry test_cellranger_count -c ./tests/config/nextflow.config
+  tags:
+    - cellranger
