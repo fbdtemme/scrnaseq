@@ -124,12 +124,13 @@ workflow SCRNASEQ {
         ch_gtf = Channel.fromPath(params.gtf)
     }
 
-    // Initialize salmon index channel
-    ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
 
     // Dispatch to specified tool
 
     if ("alevin" in tools) {
+        // Initialize salmon index channel
+        ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
+
         ALEVIN ( 
             ch_fastq,
             params.genome_fasta,
@@ -146,11 +147,17 @@ workflow SCRNASEQ {
     }
 
     if ("alevinfry" in tools) {
+        // Initialize alevinfry index channel
+        ch_alevinfry_index = params.alevinfry_index ? file(params.alevinfry_index) : null
+
         ALEVINFRY(
             ch_fastq,             
             params.genome_fasta,      
-            ch_gtf,    
-            params.protocol
+            ch_gtf,
+            params.alevinfry_gene_map,
+            ch_alevinfry_index,
+            params.protocol,
+            params.expected_orientation
         )
         
         ch_software_versions = ch_software_versions.mix(ALEVINFRY.out.software_versions.collect().ifEmpty([]))

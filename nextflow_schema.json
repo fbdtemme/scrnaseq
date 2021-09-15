@@ -193,6 +193,34 @@
                 }
             }
         },
+        "Alevinfry options": {
+            "title": "Alevinfry options",
+            "type": "object",
+            "description": "List of options for the Allevinfry aligner",
+            "fa_icon": "fas fa-fish",
+            "properties": {
+                "alevinfry_gene_map" : {
+                    "type": "string",
+                    "description": "Specify an Alevinfry gene mapping file here. If you don't, this will be automatically created in the Alevinfry workflow when given a gtf file (--gtf).",
+                    "fa_icon": "fas fa-fish"
+                },
+                "alevinfry_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed alevinfry index.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "expected_orientation": {
+                    "type": "string",
+                    "description": "Specify the expected orientation of properly mapped reads",
+                    "default": "both",
+                    "enum": [
+                        "fw",
+                        "rc",
+                        "both"
+                    ]
+                }
+            }
+        },
         "generic_options": {
             "title": "Generic options",
             "type": "object",
