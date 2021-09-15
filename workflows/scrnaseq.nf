@@ -147,14 +147,15 @@ workflow SCRNASEQ {
     }
 
     if ("alevinfry" in tools) {
-        // Initialize alevinfry index channel
-        ch_alevinfry_index = params.alevinfry_index ? file(params.alevinfry_index) : null
+        // Initialize alevinfry index channel and genemap
+        ch_alevinfry_index    = params.alevinfry_index ? file(params.alevinfry_index) : null
+        ch_alevinfry_gene_map = params.alevinfry_gene_map ? file(params.alevinfry_gene_map) : null
 
         ALEVINFRY(
             ch_fastq,             
             params.genome_fasta,      
             ch_gtf,
-            params.alevinfry_gene_map,
+            ch_alevinfry_gene_map,
             ch_alevinfry_index,
             params.protocol,
             params.expected_orientation
