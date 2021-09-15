@@ -4,15 +4,16 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_MKGTF {
-
+    tag "$gtf.baseName"
     label 'process_low'
 
     publishDir "${params.outdir}",
-        mode: 'copy',
+        mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
 
-    container "streitlab/custom-nf-modules-cellranger:latest"
+    container "litd/docker-cellranger"   // Docker image
 
+    
     input:
     path gtf
 

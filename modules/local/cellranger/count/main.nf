@@ -4,39 +4,51 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_COUNT {
-
+    tag "$meta.id"
     label 'process_high'
 
     publishDir "${params.outdir}",
-        mode: 'copy',
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
 
-    container "streitlab/custom-nf-modules-cellranger:latest"
+    container "litd/docker-cellranger"   // Docker image
 
     input:
-    tuple val(meta), path('fastqs/*')
-    path reference_genome
+    tuple val(meta), path(reads)
+    path reference
+    val protocol
 
     output:
-    tuple val(meta), path("${prefix}_cellranger")   , emit: cellranger_out
-    tuple val(meta), path("${prefix}/*")            , emit: read_counts
-    path '*.version.txt'                            , emit: version
+    tuple val(meta), path("samples/outs")    , emit: results
+    path "*.version.txt"                     , emit: version
 
     script:
-    def prefix = meta.run ? "${meta.sample_name}_${meta.run}" : "${meta.sample_name}"
-    def software = getSoftwareName(task.process)
+    def reference_name = reference.name
 
     """
-    cellranger count \\
-        --id='${prefix}_cellranger' \\
-        --fastqs='fastqs' \\
-        --sample=${meta.sample_id} \\
-        --transcriptome=${reference_genome} \\
+    # Make sure reads are prefixed with the meta.id
+
+    R1="${reads[0]}"
+    R2="${reads[1]}"
+
+    if [[ ! "\$R1" =~ "^${meta.id}.*" ]]; then
+        mv "\$R1" "${meta.id}_\$R1"
+    fi
+
+    if [[ ! "\$R2" =~ "^${meta.id}.*" ]]; then
+        mv "\$R2" "${meta.id}_\$R2"
+    fi
+
+    cellranger count --id='samples' \\
+        --fastqs=. \\
+        --sample=${meta.id} \\
+        --transcriptome=${reference_name} \\
+        --localcores=${task.cpus} \\
+        --localmem=${task.memory.toGiga()} \\
+        --disable-ui \\
+        --chemistry=${protocol}
         ${options.args}
 
-    mkdir ${prefix}
-    cp ${prefix}_cellranger/outs/filtered_feature_bc_matrix/* ${prefix}
-
-    echo \$(cellranger --version 2>&1) | sed 's/^.*cellranger //; s/ .*\$//' > ${software}.version.txt
+    cellranger --version | grep -o "[0-9\\. ]\\+" > cellranger.version.txt
     """
 }

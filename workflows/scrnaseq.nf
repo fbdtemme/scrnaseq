@@ -49,6 +49,7 @@ def modules                    = params.modules.clone()
 def multiqc_options            = modules['multiqc']
 def fastqc_options             = modules['fastqc'] 
 def gffread_gff3togtf_options  = modules['gffread_gff3togtf']
+def cat_fastq_options          = modules['cat_fastq']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -59,6 +60,7 @@ include { INPUT_CHECK }                  from '../subworkflows/local/input_check
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
+include { CAT_FASTQ }                    from '../modules/nf-core/modules/cat/fastq/main'       addParams( options: cat_fastq_options )
 include { FASTQC  }                      from '../modules/nf-core/modules/fastqc/main'          addParams( options: fastqc_options )
 include { MULTIQC }                      from '../modules/nf-core/modules/multiqc/main'         addParams( options: multiqc_options )
 include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffread/main'         addParams( options: gffread_gff3togtf_options )
@@ -100,16 +102,29 @@ workflow SCRNASEQ {
     // Stage input files
     INPUT_CHECK ( ch_input )
     .map {
-        meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
-        [ meta, reads ]
-    }
+        meta, fastq ->
+            meta.id = meta.id.split('_')[0..-2].join('_')
+            [ meta, fastq ] }
     .groupTuple(by: [0])
-    .map { it -> [ it[0], it[1].flatten() ] }
+    .branch {
+        meta, fastq ->
+            single  : fastq.size() == 1
+                return [ meta, fastq.flatten() ]
+            multiple: fastq.size() > 1
+                return [ meta, fastq.flatten() ]
+    }
     .set { ch_fastq }
+
+    //
+    // MODULE: Concatenate FastQ files from same sample if required
+    //
+    CAT_FASTQ ( ch_fastq.multiple )
+    .mix(ch_fastq.single)
+    .set { ch_cat_fastq }
 
     // Run FastQC
     if (!params.skip_fastqc) {
-        FASTQC ( ch_fastq )
+        FASTQC ( ch_cat_fastq )
 
         ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ it[1] }.collect())
@@ -132,7 +147,7 @@ workflow SCRNASEQ {
         ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
 
         ALEVIN ( 
-            ch_fastq,
+            ch_cat_fastq,
             params.genome_fasta,
             params.transcript_fasta,
             ch_gtf,
@@ -146,13 +161,13 @@ workflow SCRNASEQ {
         ch_multiqc_files     = ch_multiqc_files.mix(ALEVIN.out.multiqc_files.collect())
     }
 
-    if ("alevinfry" in tools) {
+    if ("alevinfry" in tools) {         
         // Initialize alevinfry index channel and genemap
         ch_alevinfry_index    = params.alevinfry_index ? file(params.alevinfry_index) : null
         ch_alevinfry_gene_map = params.alevinfry_gene_map ? file(params.alevinfry_gene_map) : null
 
         ALEVINFRY(
-            ch_fastq,             
+            ch_cat_fastq,             
             params.genome_fasta,      
             ch_gtf,
             ch_alevinfry_gene_map,
@@ -167,8 +182,8 @@ workflow SCRNASEQ {
 
     // Run STARSolo pipeline
     if ("star" in tools) {
-        STARSOLO( 
-            ch_fastq,
+        STARSOLO ( 
+            ch_cat_fastq,
             params.genome_fasta,
             ch_gtf,
             params.star_index,
@@ -182,8 +197,8 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("kallisto" in tools) {
-        KALLISTO_BUSTOOLS( 
-            ch_fastq,
+        KALLISTO_BUSTOOLS ( 
+            ch_cat_fastq,
             params.genome_fasta,
             ch_gtf,
             params.kallisto_gene_map,
@@ -197,10 +212,17 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("cellranger" in tools) {
-        //CELLRANGER( ch_fastq )
-
-        //ch_software_versions = ch_software_versions.mix(KALLISTO_BUSTOOLS.out.software_versions.collect())
-        //ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect())    
+        CELLRANGER (
+            ch_cat_fastq,             
+            params.genome_fasta,
+            ch_gtf,
+            params.genome,
+            params.cellranger_index,
+            params.protocol
+        )   
+        
+        ch_software_versions = ch_software_versions.mix(CELLRANGER.out.software_versions.collect())
+        ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect())    
     }
    
     // Get software versions

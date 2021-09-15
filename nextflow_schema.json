@@ -222,6 +222,19 @@
                 }
             }
         },
+        "cellranger_options": {
+            "title": "Cellranger Options",
+            "type": "object",
+            "description": "List of options for the Cellranger aligner",
+            "fa_icon": "fas fa-virusses",
+            "properties": {
+                "cellranger_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed cellranger index.",
+                    "fa_icon": "fas fa-virusses"
+                }
+            }
+        },
         "generic_options": {
             "title": "Generic options",
             "type": "object",
