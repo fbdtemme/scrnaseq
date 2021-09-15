@@ -184,12 +184,41 @@
                 "kallisto_gene_map": {
                     "type": "string",
                     "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-map-marked-alt"
                 },
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-bezier-curve"
+                }
+            }
+        },
+        "alevinfry_options": {
+            "title": "Alevinfry options",
+            "type": "object",
+            "description": "List of options for the Allevinfry aligner",
+            "fa_icon": "fas fa-fish",
+            "properties": {
+                "alevinfry_gene_map" : {
+                    "type": "string",
+                    "description": "Specify an Alevinfry gene mapping file here. This is required when passing a prebuild index.",
+                    "fa_icon": "fas fa-map-marked-alt"
+                },
+                "alevinfry_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed alevinfry index.",
+                    "fa_icon": "fas fa-bezier-curve"
+
+                },
+                "expected_orientation": {
+                    "type": "string",
+                    "description": "Specify the expected orientation of properly mapped reads.",
+                    "default": "both",
+                    "enum": [
+                        "fw",
+                        "rc",
+                        "both"
+                    ]
                 }
             }
         },
@@ -423,6 +452,9 @@
         },
         {
             "$ref": "#/definitions/kallisto_bus_options"
+        },
+        {
+            "$ref": "#/definitions/alevinfry_options"
         },
         {
             "$ref": "#/definitions/generic_options"

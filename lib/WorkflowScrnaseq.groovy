@@ -49,6 +49,19 @@ class WorkflowScrnaseq {
                 System.exit(1)
             }
         }
+
+        if ('alevinfry' in tools) {
+            if (!params.alevinfry_index && (!(params.gtf || params.gff) || !params.genome_fasta)) {
+                log.error "Alevinfry needs either a GTF + FASTA or a precomputed index supplied."
+                System.exit(1)
+            }
+
+              // Check if gtf or TXP2Gene is provided for Alevin
+            if (params.alevinfry_index  && !params.txp2gene) {
+                log.error "Must provide a txp2gene file (--alevinfry_gene_map) when using a precomputed index."
+                System.exit(1)
+            }
+        }
     }
 
     // Exit pipeline if incorrect --genome key provided
