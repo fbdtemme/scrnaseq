@@ -63,25 +63,13 @@ workflow CELLRANGER {
 
         // Reformat output
     ch_cellranger_result_files = CELLRANGER_COUNT.out.results.map{ it[1] }
-    // TODO there may be a cleaner way of doing this
-    ch_matrix   = ch_cellranger_result_files.map{ "${it}/samples/outs/filtered_feature_bc_matrix/matrix.mtx.gz" }
-    ch_features = ch_cellranger_result_files.map{ "${it}/samples/outs/filtered_feature_bc_matrix/features.tsv.gz" }
-    ch_barcodes = ch_cellranger_result_files.map{ "${it}/samples/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" }
+
+    ch_matrix   = ch_cellranger_result_files.map { "${it}/raw_feature_bc_matrix/matrix.mtx.gz" }
+    ch_features = ch_cellranger_result_files.map { "${it}/raw_feature_bc_matrix/features.tsv.gz" }
+    ch_barcodes = ch_cellranger_result_files.map { "${it}/raw_feature_bc_matrix/barcodes.tsv.gz" }
     POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "cellranger" )
 
     emit:
     software_versions   = ch_software_versions
     multiqc_files       = ch_cellranger_result_files
-}
-
-// Functions needed by the workflow
-
-def get_meta_tabs(arr) {
-    def meta = [:]
-    meta.gem          = arr[0]
-    meta.samples      = arr[1]
-
-    def array = []
-    array = [ meta, arr[2].flatten() ]
-    return array
 }

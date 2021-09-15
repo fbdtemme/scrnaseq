@@ -19,8 +19,8 @@ process CELLRANGER_COUNT {
     val protocol
 
     output:
-    path "samples/outs/*"  , emit: results
-    path "*.version.txt"   , emit: version
+    tuple val(meta), path("samples/outs")    , emit: results
+    path "*.version.txt"                     , emit: version
 
     script:
     def reference_name = reference.name
