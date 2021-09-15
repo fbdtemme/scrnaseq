@@ -28,7 +28,6 @@ workflow test_alevinfry
         ch_fastq,             
         genome_fasta,      
         gtf,    
-        protocol,          
-        barcode_whitelist 
+        protocol
     )
 }
