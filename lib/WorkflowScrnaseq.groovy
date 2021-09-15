@@ -58,7 +58,7 @@ class WorkflowScrnaseq {
 
               // Check if gtf or TXP2Gene is provided for Alevin
             if (params.alevinfry_index  && !params.txp2gene) {
-                log.error "Must provide a txp2gene file (--alevinfry_gene_map) when using a precumputed index."
+                log.error "Must provide a txp2gene file (--alevinfry_gene_map) when using a precomputed index."
                 System.exit(1)
             }
         }
