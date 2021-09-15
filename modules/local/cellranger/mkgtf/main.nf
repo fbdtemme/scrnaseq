@@ -4,7 +4,7 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_MKGTF {
-
+    tag "$gtf.baseName"
     label 'process_low'
 
     publishDir "${params.outdir}",

@@ -9,7 +9,7 @@ process CELLRANGER_GETREFERENCES {
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'cellranger_references', publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index/cellranger', publish_id:'') }
 
     conda (params.enable_conda ? "conda-forge::sed=4.7" : null)              // Conda package
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -36,5 +36,7 @@ process CELLRANGER_GETREFERENCES {
         tar -xvzf refdata-gex-mm10-2020-A.tar.gz
         rm *.tar.gz
         """
+    } else {
+        exit 1, "Unsupported reference genome: ${genome}"
     }
 }

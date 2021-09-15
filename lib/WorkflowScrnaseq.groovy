@@ -50,9 +50,16 @@ class WorkflowScrnaseq {
             }
         }
 
+        Set cellranger_prebuild_references = [ "GRCh38", "mm10" ] 
+
         if ('cellranger' in tools) {
             if (!params.cellranger_index && (!(params.gtf || params.gff) || !params.genome_fasta)) {
                 log.error "Cellranger needs either a GTF + FASTA or a precomputed index supplied."
+                System.exit(1)
+            }
+
+            if (params.genome && !(params.genome in cellranger_prebuild_references)) {
+                log.error "Cellranger only support GRCh38 and mm10 as value of the genome option (--genome)."
                 System.exit(1)
             }
         }
