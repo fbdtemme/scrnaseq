@@ -60,6 +60,15 @@ class WorkflowScrnaseq {
 
             if (params.genome && !(params.genome in cellranger_prebuild_references)) {
                 log.error "Cellranger only support GRCh38 and mm10 as value of the genome option (--genome)."
+        if ('alevinfry' in tools) {
+            if (!params.alevinfry_index && (!(params.gtf || params.gff) || !params.genome_fasta)) {
+                log.error "Alevinfry needs either a GTF + FASTA or a precomputed index supplied."
+                System.exit(1)
+            }
+
+              // Check if gtf or TXP2Gene is provided for Alevin
+            if (params.alevinfry_index  && !params.txp2gene) {
+                log.error "Must provide a txp2gene file (--alevinfry_gene_map) when using a precomputed index."
                 System.exit(1)
             }
         }
