@@ -3,7 +3,6 @@
   tags:
     - subworkflow-alevin
   files:
-    - path: ./results/gunzip/10x_V2_barcode_whitelist.txt
     - path: ./results/index/salmon/complete_ref_lens.bin
     - path: ./results/index/salmon/ctable.bin
     - path: ./results/index/salmon/ctg_offsets.bin
@@ -94,7 +93,6 @@
   tags:
     - subworkflow-alevin
   files:
-    - path: ./results/gunzip/10x_V2_barcode_whitelist.txt
     - path: ./results/index/salmon/complete_ref_lens.bin
     - path: ./results/index/salmon/ctable.bin
     - path: ./results/index/salmon/ctg_offsets.bin
@@ -139,7 +137,6 @@
   tags:
     - subworkflow-alevin
   files:
-    - path: ./results/gunzip/10x_V2_barcode_whitelist.txt
     - path: ./results/salmon/S10_L001_alevin_results/alevin
     - path: ./results/salmon/S10_L001_alevin_results/alevin/alevin.log
     - path: ./results/salmon/S10_L001_alevin_results/alevin/featureDump.txt
@@ -169,7 +166,6 @@
   tags:
     - subworkflow-alevin
   files:
-    - path: ./results/gunzip/10x_V2_barcode_whitelist.txt
     - path: ./results/index/salmon/complete_ref_lens.bin
     - path: ./results/index/salmon/ctable.bin
     - path: ./results/index/salmon/ctg_offsets.bin

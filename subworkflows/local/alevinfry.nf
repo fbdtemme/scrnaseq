@@ -18,9 +18,7 @@ def gunzip_options                          = modules['gunzip']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { MEAN_READ_LENGTH }                from '../../modules/local/mean_read_length/main'                addParams( options: [:] )
-include { BUILD_SPLICI_REF }                from '../../modules/local/alevinfry/build_splici_ref/main'      addParams( options: [:] )
-include { ALEVINFRY_INDEX }                 from '../../modules/local/alevinfry/index/main'                 addParams( options: alevinfry_index_options )
+include { ALEVINFRY_BUILD_INDEX }           from '../../subworkflows/local/alevinfry_build_index'           addParams( options: [:] )
 include { ALEVINFRY_MAP }                   from '../../modules/local/alevinfry/map/main'                   addParams( options: alevinfry_map_options )
 include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/generate_permitlist/main'   addParams( options: alevinfry_generate_permitlist_options )
 include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
@@ -30,17 +28,20 @@ include { POSTPROCESS }                     from '../../modules/local/postproces
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                          from '../../modules/nf-core/modules/gunzip/main'                addParams( options: gunzip_options )
+include { GUNZIP }                          from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
 workflow ALEVINFRY {
     take:
-    reads               // channel: [ val(meta), [ reads ] ]
-    genome_fasta        // channel: /path/to/genome.fasta
-    gtf                 // channel: /path/to/annotation.gtf
-    protocol            // channel: protocol
+    reads                   // channel: [ val(meta), [ reads ] ]
+    genome_fasta            // channel: /path/to/genome.fasta
+    gtf                     // channel: /path/to/annotation.gtf
+    txp2gene                // channel: /path/to/txp2gene
+    alevinfry_index         // channel: /path/to/alevinfry_index
+    protocol                // channel: protocol
+    expected_orientation    // channel:  (the options are [ fw | rc | both ]
 
     main:
     ch_software_versions = Channel.empty()
@@ -49,52 +50,31 @@ workflow ALEVINFRY {
     // Get the protocol parameter suitable for passing to alevin and alevin-fry
     (alevin_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "alevin")
 
-    // Flatten input for getting the mean read length
-    reads
-        .map{ meta, reads -> [ reads[0] ] }
-        .collect()
-        .map{ reads -> [ ["id": "FW"], reads ] }
-        .set{ ch_all_fw }
-    reads
-        .map{ meta, reads -> [ reads[1] ] }
-        .collect()
-        .map{ reads -> [ ["id": "RV"], reads ] }
-        .set{ ch_all_rv }
-
-    ch_all_reads = ch_all_fw.mix( ch_all_rv )
-
-    // Get mean read length of fowards and reverse reads and select the second reads
-    MEAN_READ_LENGTH ( ch_all_reads )
-    ch_read_length = MEAN_READ_LENGTH.out
-        .toSortedList()
-        .map{ it[1][1] }
-    
-    // Build splice reference
-    BUILD_SPLICI_REF(
-        genome_fasta,
-        gtf,
-        ch_read_length
-    )
-
-    // Build alevin-fry index
-    ALEVINFRY_INDEX ( BUILD_SPLICI_REF.out.reference )
+    // Build index and txp2gene mapping if no index is provided
+    if (!alevinfry_index) { 
+        ALEVINFRY_BUILD_INDEX ( reads, genome_fasta, gtf )
+        ch_index = ALEVINFRY_BUILD_INDEX.out.index
+        ch_txp2gene = ALEVINFRY_BUILD_INDEX.out.txp2gene_3col
+        ch_software_versions.mix(ALEVINFRY_BUILD_INDEX.out.software_versions.ifEmpty(null))
+    } else {
+        ch_index = alevinfry_index
+        ch_txp2gene = txp2gene
+    }
 
     // Align reads
     ALEVINFRY_MAP(
         reads,
-        ALEVINFRY_INDEX.out.index,  
-        BUILD_SPLICI_REF.out.txp2gene_3col,
+        ch_index,  
+        ch_txp2gene,
         alevin_protocol
     )
 
     // Build permitlist and filter index
-    // TODO make this a parameter
-    def expected_orientation = "fw"
     ALEVINFRY_GENERATE_PERMITLIST( ALEVINFRY_MAP.out.results, expected_orientation )
     ALEVINFRY_COLLATE ( ALEVINFRY_GENERATE_PERMITLIST.out.quant, ALEVINFRY_MAP.out.results )
 
     // Perform quantification with alevin-fry quant
-    ALEVINFRY_QUANT ( ALEVINFRY_COLLATE.out.results, BUILD_SPLICI_REF.out.txp2gene_3col )
+    ALEVINFRY_QUANT ( ALEVINFRY_COLLATE.out.results, ch_txp2gene )
 
     // Reformat output
     ch_alevin_output_dir    = ALEVINFRY_QUANT.out.results.map{ it[1] }
@@ -104,7 +84,6 @@ workflow ALEVINFRY {
     POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "Alevinfry" )
     
     // Collect software versions
-    ch_software_versions = ch_software_versions.mix(ALEVINFRY_INDEX.out.version.ifEmpty(null))
     ch_software_versions = ch_software_versions.mix(ALEVINFRY_QUANT.out.version.ifEmpty(null))
 
     emit:

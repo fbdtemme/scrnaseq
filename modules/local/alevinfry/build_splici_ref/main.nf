@@ -12,7 +12,8 @@ process BUILD_SPLICI_REF {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', publish_id:'') }
 
-    // TODO check if this is the right container. Support for conda, singularity and docker must be provided
+    // TODO: check if this is the right container. Support for conda, singularity and docker must be provided
+    conda (params.enable_conda ? 'R-base bioconductor-eisar bioconductor-biostrings bioconductor-bsgenome r-dplyr r-stringr bioconductor-genomicfeatures r-argparser' : null)
     container "registry.hub.docker.com/combinelab/usefulaf:latest"
 
     input:
