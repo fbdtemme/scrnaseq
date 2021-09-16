@@ -22,7 +22,6 @@ workflow test_cellranger
         ch_fastq,             
         genome_fasta,      
         gtf,
-        null,
         protocol
     )
 }

@@ -17,7 +17,9 @@ input:
     - reference:
         type: directory
         description: |
-            Path to a cellranger index directory.
+            Path to a cellranger index directory or a tar.gz file
+        pattern:
+          .*{tar}.{gz}
     - protocol:
         type: value
         description: |

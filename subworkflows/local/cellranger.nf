@@ -21,6 +21,7 @@ include { CELLRANGER_GETREFERENCES }  from '../../modules/local/cellranger/get_r
 include { CELLRANGER_MKREF }          from '../../modules/local/cellranger/mkref/main.nf'         addParams( options: cellranger_mkref_options )
 include { CELLRANGER_MKGTF }          from '../../modules/local/cellranger/mkgtf/main.nf'         addParams( options: cellranger_mkgtf_options )
 include { CELLRANGER_COUNT }          from '../../modules/local/cellranger/count/main.nf'         addParams( options: cellranger_count_options )
+include { UNTAR }                     from '../../modules/nf-core/modules/untar/main.nf'          addParams( options: [:] )
 
 
 /////////////////////////////////////////////////////
@@ -31,7 +32,6 @@ workflow CELLRANGER {
     reads               // channel: [ val(meta), [ reads ] ]
     genome_fasta        // channel: /path/to/genome.fasta
     gtf                 // channel: /path/to/annotation.gtf
-    genome              // channel: name_of_prebuild_reference_genome
     cellranger_index    // channel: /path/to/cellranger/reference
     protocol            // channel: protocol
 
@@ -41,9 +41,9 @@ workflow CELLRANGER {
     // Get the protocol parameter
     (cr_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "cellranger")
     
-    if (!cellranger_index && genome) {
-        CELLRANGER_GETREFERENCES ( genome )
-        ch_reference = CELLRANGER_GETREFERENCES.out.reference
+    // Check if a tar.gz packaged index was passed such as a url to the 10x references online
+    if (cellranger_index && cellranger_index.getName().endsWith(".tar.gz")) {
+        ch_reference = UNTAR ( cellranger_index ).untar
     } else if (!cellranger_index && genome_fasta && gtf) {
         CELLRANGER_MKGTF ( gtf )
         ch_gtf_filtered = CELLRANGER_MKGTF.out.gtf

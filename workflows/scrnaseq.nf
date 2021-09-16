@@ -19,6 +19,7 @@ checkPathParamList = [
     params.salmon_index,
     params.star_index,
     params.kallisto_index,
+    params.cellranger_index,
     params.txp2gene,
     params.kallisto_gene_map
 ]
@@ -212,14 +213,15 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("cellranger" in tools) {
+        ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : null
+
         CELLRANGER (
             ch_cat_fastq,             
             params.genome_fasta,
             ch_gtf,
-            params.genome,
-            params.cellranger_index,
+            ch_cellranger_index,
             params.protocol
-        )   
+        )
         
         ch_software_versions = ch_software_versions.mix(CELLRANGER.out.software_versions.collect())
         ch_multiqc_files     = ch_multiqc_files.mix(CELLRANGER.out.multiqc_files.collect())    
