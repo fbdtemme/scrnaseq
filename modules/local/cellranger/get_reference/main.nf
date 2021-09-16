@@ -18,19 +18,20 @@ process CELLRANGER_GETREFERENCES {
         container "biocontainers/biocontainers:v1.2.0_cv1"                        // Docker image
     }
     input:
+    // TODO genome could be obtained from params.genome
     String genome
 
     output:
     path("refdata-*"), emit: reference
 
     script:
-    if ( genome == 'GRCh38') {
+    if (genome == 'GRCh38') {
         """
         wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
         tar -xvzf refdata-gex-GRCh38-2020-A.tar.gz
         rm *.tar.gz
         """
-    } else if ( genome == 'mm10' ) {
+    } else if (genome == 'mm10') {
         """
         wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-mm10-2020-A.tar.gz
         tar -xvzf refdata-gex-mm10-2020-A.tar.gz

@@ -69,7 +69,6 @@ include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffrea
 /*    IMPORT LOCAL MODULES/SUBWORKFLOWS           */
 ////////////////////////////////////////////////////
 
-
 if ("alevin" in tools) {
     include { ALEVIN }              from '../subworkflows/local/alevin'
 }
@@ -125,7 +124,6 @@ workflow SCRNASEQ {
     // Run FastQC
     if (!params.skip_fastqc) {
         FASTQC ( ch_cat_fastq )
-
         ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ it[1] }.collect())
     } 
@@ -139,9 +137,7 @@ workflow SCRNASEQ {
         ch_gtf = Channel.fromPath(params.gtf)
     }
 
-
-    // Dispatch to specified tool
-
+    // Run Alevin pipeline
     if ("alevin" in tools) {
         // Initialize salmon index channel
         ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
@@ -161,6 +157,7 @@ workflow SCRNASEQ {
         ch_multiqc_files     = ch_multiqc_files.mix(ALEVIN.out.multiqc_files.collect())
     }
 
+    // Run Alevin-fry pipeline
     if ("alevinfry" in tools) {         
         // Initialize alevinfry index channel and genemap
         ch_alevinfry_index    = params.alevinfry_index ? file(params.alevinfry_index) : null

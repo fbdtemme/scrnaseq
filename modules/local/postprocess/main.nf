@@ -14,14 +14,13 @@ process POSTPROCESS {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
 
-    conda (params.enable_conda ? "conda-forge::python=3.8.10 conda-forge::scanpy=1.7.2 scipy pandas" : null)
+    // TODO this conda recipe is probably not working
+    conda (params.enable_conda ? "conda-forge::python=3.8.10 conda-forge::scanpy" : null)
     if (workflow.containerEngine == 'singularity' && !params.pull_docker_container) {
-        //container "https://depot.galaxyproject.org/singularity/python:3.8.3"
-        // TODO using the biocontainer container for now as singularity can pull
-        // from docker containers
-        container "quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0"
+        // TODO update containers
+        container "qfbdtemme/scanpyfull"
     } else {
-        container "quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0"
+        container "fbdtemme/scanpyfull"
     }
 
     input:

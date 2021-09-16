@@ -11,9 +11,9 @@ process CELLRANGER_MKGTF {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
 
+    // TODO update containers and add conda recipe (if possible)
     container "litd/docker-cellranger"   // Docker image
 
-    
     input:
     path gtf
 

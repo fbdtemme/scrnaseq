@@ -11,6 +11,7 @@ process CELLRANGER_MKREF {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', publish_id:'') }
 
+    // TODO update containers and add conda recipe (if possible)
     container "litd/docker-cellranger"   // Docker image
 
     input:
@@ -31,7 +32,6 @@ process CELLRANGER_MKREF {
         --genes=${gtf} \\
         --memgb ${task.memory.giga} \\
         --nthreads ${task.cpus}
-
 
     cellranger --version | grep -o "[0-9\\. ]\\+" > ${software}.version.txt
     """
