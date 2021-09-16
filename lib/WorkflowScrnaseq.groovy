@@ -60,6 +60,9 @@ class WorkflowScrnaseq {
 
             if (params.genome && !(params.genome in cellranger_prebuild_references)) {
                 log.error "Cellranger only support GRCh38 and mm10 as value of the genome option (--genome)."
+            }
+        }
+
         if ('alevinfry' in tools) {
             if (!params.alevinfry_index && (!(params.gtf || params.gff) || !params.genome_fasta)) {
                 log.error "Alevinfry needs either a GTF + FASTA or a precomputed index supplied."

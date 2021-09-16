@@ -26,8 +26,8 @@ process ALEVINFRY_MAP {
     val protocol
 
     output:
-    path "*.version.txt"                               , emit: version
-    tuple val(meta), path("*_alevin_results/*.json")   , emit: results
+    path "*.version.txt"                        , emit: version
+    tuple val(meta), path("*_alevin_results")   , emit: results
 
     script:
     def software = getSoftwareName(task.process)
