@@ -18,7 +18,6 @@ def cellranger_count_options                = modules['cellranger_count']
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { POSTPROCESS }               from '../../modules/local/postprocess/main'                  addParams( options: postprocess_options )
-include { CELLRANGER_GETREFERENCES }  from '../../modules/local/cellranger/get_reference/main.nf' addParams( options: [:] )
 include { CELLRANGER_MKREF }          from '../../modules/local/cellranger/mkref/main.nf'         addParams( options: cellranger_mkref_options )
 include { CELLRANGER_MKGTF }          from '../../modules/local/cellranger/mkgtf/main.nf'         addParams( options: cellranger_mkgtf_options )
 include { CELLRANGER_COUNT }          from '../../modules/local/cellranger/count/main.nf'         addParams( options: cellranger_count_options )
