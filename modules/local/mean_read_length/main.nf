@@ -19,10 +19,13 @@ process MEAN_READ_LENGTH {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), stdout
+    tuple val(meta), stdout                  , emit: results
+    path "*.version.txt"                     , emit: version
 
     script:
     """
     mean_read_length.py ${reads} --threads $task.cpus
+
+    echo "unversioned" > mean_read_length.version.txt
     """
 }

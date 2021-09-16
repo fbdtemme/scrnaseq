@@ -24,8 +24,8 @@ process ALEVINFRY_GENERATE_PERMITLIST {
     val expected_orientation
 
     output:
-    path "*.version.txt"                        , emit: version
     tuple val(meta), path("*_alevinfry_quant")  , emit: quant
+    path "*.version.txt"                        , emit: version
 
     script:
     def software = getSoftwareName(task.process)

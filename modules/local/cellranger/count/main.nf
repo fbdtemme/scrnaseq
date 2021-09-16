@@ -25,6 +25,7 @@ process CELLRANGER_COUNT {
 
     script:
     def reference_name = reference.name
+    def software = getSoftwareName(task.process)
 
     """
     # Make sure reads are prefixed with the meta.id
@@ -50,6 +51,6 @@ process CELLRANGER_COUNT {
         --chemistry=${protocol}
         ${options.args}
 
-    cellranger --version | grep -o "[0-9\\. ]\\+" > cellranger.version.txt
+    cellranger --version | grep -o "[0-9\\. ]\\+" > ${software}.version.txt
     """
 }

@@ -1,0 +1,50 @@
+name: alevinfry_map
+description: Map the sequencing reads against an index of the reference.
+keywords:
+    - alevin
+    - salmon
+    - single cell
+    - alignment
+    - map
+    - fastq
+tools:
+    - salmon:
+        description: |
+            Alevin is a tool — integrated with the salmon software — that introduces a family of algorithms 
+            for quantification and analysis of 3’ tagged-end single-cell sequencing data. 
+            Currently alevin supports the following two major droplet based single-cell protocols:
+              Drop-seq
+              10x-Chromium v1/2/3
+        homepage: https://salmon.readthedocs.io/en/latest/alevin.html
+        documentation: https://salmon.readthedocs.io/en/latest/alevin.html
+        doi: "doi.org/10.1186/s13059-019-1670-y"
+
+input:
+    - meta:
+        type: map
+        description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+    - reads:
+        type: file
+        description: |
+            List of input FastQ files of size 2 for paired-end data.
+    - index:
+        type: file
+        description: Salmon genome index files
+        pattern: "Directory containing Salmon index *.{amb,ann,bwt,pac,sa}"
+    - txp2gene:
+        type: file
+        description: |
+          Either:
+          1) A three-column (headerless) tab-separated file where the first column contains a target name,
+            the second column contains the corresponding gene feature to which this target belongs and 
+            the third column contains either S or U, with S denoting the corresponding feature should be 
+            attributed to the spliced status of its parent gene and U denoting that it should be attributed 
+            to the unspliced status of its parent gene.
+          2) A two-column (headerless) tab-separated file where the first column contains a transcript name 
+            and the second column contains the corresponding gene name for this transcript.
+        pattern: "File containing a map of transcript to genes *.{tsv}"
+    - protocol:
+        type: value
+        description: Protocol used to generate the data

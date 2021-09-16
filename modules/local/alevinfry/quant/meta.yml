@@ -1,0 +1,34 @@
+name: alevinfry_quant
+description: Takes a collated RAD file and performs feature (e.g. gene) quantification, outputting a sparse matrix of de-duplicated counts.
+keywords: []
+
+tools:
+    - alevinfry_generate_permitlist:
+      description: |
+        alevin-fry is a suite of tools for the rapid, accurate and memory-frugal processing single-cell and single-nucleus sequencing data.
+      homepage: https://github.com/COMBINE-lab/alevinfry
+      manual: https://alevin-fry.readthedocs.io/en/latest/
+      doi: 10.1101/2021.06.29.450377v1
+
+input:
+    - meta:
+        type: map
+        description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+    - input:
+        type: directory
+        description: |
+            "Input directory containing the collated RAD file."
+    - txp2gene:
+        type: file
+        description: |
+          Either:
+          1) A three-column (headerless) tab-separated file where the first column contains a target name,
+            the second column contains the corresponding gene feature to which this target belongs and 
+            the third column contains either S or U, with S denoting the corresponding feature should be 
+            attributed to the spliced status of its parent gene and U denoting that it should be attributed 
+            to the unspliced status of its parent gene.
+          2) A two-column (headerless) tab-separated file where the first column contains a transcript name 
+            and the second column contains the corresponding gene name for this transcript.
+        pattern: "File containing a map of transcript to genes *.{tsv}"

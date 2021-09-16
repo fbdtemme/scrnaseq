@@ -17,7 +17,7 @@ input:
   - genome_fasta:
         type: file
         description: A reference genome in FASTA format.
-        patter: "*.fasta"
+        pattern: "*.fasta"
   - gff:
         type: file
         description: A reference file in either the GFF3, GFF2 or GTF format.
