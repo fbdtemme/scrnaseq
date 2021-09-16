@@ -1,0 +1,26 @@
+name: cellranger_mkgtf
+description: A simple utility to filter genes based on their key-value pairs in the GTF attribute column.
+keywords: 
+    - cellranger
+    - reference
+    - gtf
+
+tools:
+    - cellranger:
+        description: |
+            Cell Ranger is a set of analysis pipelines that process Chromium single-cell data to align reads,
+            generate feature-barcode matrices, perform clustering and other secondary analysis, and more. 
+
+output:
+    - gtf:
+        type: file
+        description: |
+            The input GTF file to filter.
+    - gtf:
+        type: file
+        description: "The filtered GTF file."
+        pattern: .*{gtf}
+    - version:
+        type: file
+        description: File containing software version
+        pattern: "*.{version.txt}"

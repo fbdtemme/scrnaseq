@@ -4,7 +4,7 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CELLRANGER_GETREFERENCES {
-    tag 'get_references'
+    tag '$genome'
     label 'process_low'
 
     publishDir "${params.outdir}",
@@ -18,7 +18,7 @@ process CELLRANGER_GETREFERENCES {
         container "biocontainers/biocontainers:v1.2.0_cv1"                        // Docker image
     }
     input:
-    String genome
+    val genome
 
     output:
     path("refdata-*"), emit: reference

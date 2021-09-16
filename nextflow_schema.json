@@ -470,6 +470,9 @@
             "$ref": "#/definitions/alevinfry_options"
         },
         {
+            "$ref": "#/definitions/cellranger_options"
+        },
+        {
             "$ref": "#/definitions/generic_options"
         },
         {

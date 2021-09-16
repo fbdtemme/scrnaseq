@@ -1,0 +1,46 @@
+name: build_splici_ref
+description: Build a splici reference of the transcriptome to be used alevinfry
+keywords:
+  - index
+  - fasta
+  - genome
+  - reference
+tools:
+  - build_splici_ref:
+      description: |
+        A script to build a spliced + intron (splici) reference for indexing and quantification with alevin-fry.
+      homepage: https://github.com/COMBINE-lab/usefulaf
+      manual: https://github.com/COMBINE-lab/usefulaf
+      doi: 10.1101/2021.06.29.450377v1
+input:
+  - genome:
+      type: file
+      description: |
+        Genome fasta file to generate the splici reference for.
+  - gtf:
+      type: file
+      description: GTF of the reference genome.
+  - read_length:
+      type: integer
+      description: Length of the reads to be mapped to the reference.
+
+output:
+  - reference:
+     type: file
+     description: The generated splici reference.
+  - txp2gene:
+    type: file
+    description: 2-column transcript to gene mapping table.
+    pattern: ".*t2g.tsv"
+  - txp2gene_3col:
+    type: file
+    description: 3-column transcript to gene mapping table with 3th column indicating if the transcript is spliced (S) or unspliced (U).
+    pattern: ".*t2g_3col.tsv"
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+
+authors:
+  - "@fbdtemme"
+  - "@jfnavarro"

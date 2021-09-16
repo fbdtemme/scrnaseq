@@ -1,0 +1,39 @@
+tools:
+    - cellranger:
+        description: |
+            Cell Ranger is a set of analysis pipelines that process Chromium single-cell data to align reads,
+            generate feature-barcode matrices, perform clustering and other secondary analysis, and more. 
+input:
+    - meta:
+        type: map
+        description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+    - reads:
+        type: file
+        description: |
+            List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+            respectively.
+    - reference:
+        type: directory
+        description: |
+            Path to a cellranger index directory.
+    - protocol:
+        type: value
+        description: |
+            Protocol used to generate the reads.
+
+output:
+    - meta:
+        type: map
+        description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+    - results:
+        type: direcory
+        description: "Directory containing output files."
+        pattern: path("samples/outs")
+    - version:
+        type: file
+        description: File containing software version
+        pattern: "*.{version.txt}"

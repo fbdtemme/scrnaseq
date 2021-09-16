@@ -40,7 +40,7 @@ workflow ALEVINFRY_BUILD_INDEX {
 
     // Get mean read length of fowards and reverse reads and select the second reads
     MEAN_READ_LENGTH ( ch_all_reads )
-    ch_read_length = MEAN_READ_LENGTH.out
+    ch_read_length = MEAN_READ_LENGTH.out.results
         .toSortedList()
         .map{ it[1][1] }
     
