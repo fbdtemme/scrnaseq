@@ -14,9 +14,10 @@ def cellranger_mkref_options                = modules['cellranger_mkref']
 def cellranger_mkgtf_options                = modules['cellranger_mkgtf']
 def cellranger_count_options                = modules['cellranger_count']
 
-
+////////////////////////////////////////////////////
+/* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
+////////////////////////////////////////////////////
 include { POSTPROCESS }               from '../../modules/local/postprocess/main'                  addParams( options: postprocess_options )
-
 include { CELLRANGER_GETREFERENCES }  from '../../modules/local/cellranger/get_reference/main.nf' addParams( options: [:] )
 include { CELLRANGER_MKREF }          from '../../modules/local/cellranger/mkref/main.nf'         addParams( options: cellranger_mkref_options )
 include { CELLRANGER_MKGTF }          from '../../modules/local/cellranger/mkgtf/main.nf'         addParams( options: cellranger_mkgtf_options )
@@ -61,9 +62,9 @@ workflow CELLRANGER {
 
     ch_software_versions = ch_software_versions.mix(CELLRANGER_COUNT.out.version.ifEmpty(null))
 
-        // Reformat output
+    // Reformat output
     ch_cellranger_result_files = CELLRANGER_COUNT.out.results.map{ it[1] }
-
+    // TODO it may be better to use the filtered matrix
     ch_matrix   = ch_cellranger_result_files.map { "${it}/raw_feature_bc_matrix/matrix.mtx.gz" }
     ch_features = ch_cellranger_result_files.map { "${it}/raw_feature_bc_matrix/features.tsv.gz" }
     ch_barcodes = ch_cellranger_result_files.map { "${it}/raw_feature_bc_matrix/barcodes.tsv.gz" }

@@ -11,6 +11,7 @@ process CELLRANGER_COUNT {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
 
+    // TODO update containers and add conda recipe (if possible)
     container "litd/docker-cellranger"   // Docker image
 
     input:
