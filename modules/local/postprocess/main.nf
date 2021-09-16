@@ -18,9 +18,9 @@ process POSTPROCESS {
     conda (params.enable_conda ? "conda-forge::python=3.8.10 conda-forge::scanpy" : null)
     if (workflow.containerEngine == 'singularity' && !params.pull_docker_container) {
         // TODO update containers
-        container "qfbdtemme/scanpyfull"
+        container "scanpyfull"
     } else {
-        container "fbdtemme/scanpyfull"
+        container "scanpyfull"
     }
 
     input:
