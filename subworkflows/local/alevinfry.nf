@@ -29,7 +29,7 @@ include { UNTAR }                           from '../../modules/nf-core/modules/
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                          from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
+include { GUNZIP }                          from '../../modules/nf-core/modules/gunzip/main'                addParams( options: gunzip_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */

@@ -21,7 +21,6 @@ def gunzip_options               = modules['gunzip']
 include { STAR_ALIGN }           from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 include { POSTPROCESS }          from '../../modules/local/postprocess/main'                    addParams( options: postprocess_options )
 
-
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
@@ -63,7 +62,7 @@ workflow STARSOLO {
     }
 
     // Build STAR index if not supplied
-     // Check if a tar.gz packaged index was passed
+    // Check if a tar.gz packaged index was passed
     if (star_index && star_index.getName().endsWith(".tar.gz")) {
         ch_star_index = UNTAR ( star_index ).untar
         ch_software_versions = ch_software_versions.mix(UNTAR.out.version.first().ifEmpty(null))
@@ -77,7 +76,7 @@ workflow STARSOLO {
         ch_star_index = star_index
     }
   
-    // Perform mapping with STAR
+    // Perform mapping and quantification with STARsolo
     STAR_ALIGN ( 
         reads,
         ch_star_index,

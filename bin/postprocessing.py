@@ -111,7 +111,7 @@ def main(matrix_file, features_file, barcodes_file, transpose, gene_names, organ
 
 	# Some basic QC plots
 	sc.settings.figdir = os.path.join(output, sc.settings.figdir)
-	sc.set_figure_params(dpi=100, color_map='viridis_r')
+	sc.set_figure_params(dpi=180, color_map='viridis_r')
 	sc.settings.authoshow = False
 	sc.settings.autosave = True
 	sc.pl.highest_expr_genes(adata, n_top=20)
@@ -121,8 +121,8 @@ def main(matrix_file, features_file, barcodes_file, transpose, gene_names, organ
 	sc.pl.scatter(adata, x='total_counts', y='pct_counts_mt', save='_mt.pdf')
 	sc.pl.scatter(adata, x='total_counts', y='n_genes_by_counts', save='_genes.pdf')
 	fig, axs = plt.subplots(1, 2, figsize=(15, 4))
-	sns.distplot(adata.obs["total_counts"], kde=False, ax=axs[0])
-	sns.distplot(adata.obs["n_genes_by_counts"], kde=False, bins=60, ax=axs[1])
+	sns.histplot(adata.obs["total_counts"], kde=False, ax=axs[0])
+	sns.histplot(adata.obs["n_genes_by_counts"], kde=False, bins=60, ax=axs[1])
 	fig.savefig(os.path.join(sc.settings.figdir, 'distplot.pdf'))
 
 if __name__ == "__main__":

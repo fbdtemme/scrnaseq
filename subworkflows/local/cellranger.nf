@@ -9,7 +9,7 @@ Set cellranger_available_references = [ "GRCh38", "mm10" ]
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
-def postprocess_options                     = modules['postprocess_transpose']
+def postprocess_options                     = modules['postprocess']
 def cellranger_mkref_options                = modules['cellranger_mkref']
 def cellranger_mkgtf_options                = modules['cellranger_mkgtf']
 def cellranger_count_options                = modules['cellranger_count']
@@ -17,7 +17,7 @@ def cellranger_count_options                = modules['cellranger_count']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { POSTPROCESS }               from '../../modules/local/postprocess/main'                  addParams( options: postprocess_options )
+include { POSTPROCESS }               from '../../modules/local/postprocess/main'                 addParams( options: postprocess_options )
 include { CELLRANGER_MKREF }          from '../../modules/local/cellranger/mkref/main.nf'         addParams( options: cellranger_mkref_options )
 include { CELLRANGER_MKGTF }          from '../../modules/local/cellranger/mkgtf/main.nf'         addParams( options: cellranger_mkgtf_options )
 include { CELLRANGER_COUNT }          from '../../modules/local/cellranger/count/main.nf'         addParams( options: cellranger_count_options )

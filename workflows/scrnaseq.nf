@@ -150,8 +150,7 @@ workflow SCRNASEQ {
             ch_gtf,
             params.txp2gene,
             ch_salmon_index,
-            params.protocol,
-            params.barcode_whitelist
+            params.protocol
         )
 
         ch_software_versions = ch_software_versions.mix(ALEVIN.out.software_versions.collect())
