@@ -24,6 +24,7 @@ include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/
 include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
 include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'                 addParams( options: alevinfry_quant_options )
 include { POSTPROCESS }                     from '../../modules/local/postprocess/main'                     addParams( options: postprocess_options )
+include { UNTAR }                           from '../../modules/nf-core/modules/untar/main.nf'              addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -56,6 +57,10 @@ workflow ALEVINFRY {
         ch_index = ALEVINFRY_BUILD_INDEX.out.index
         ch_txp2gene = ALEVINFRY_BUILD_INDEX.out.txp2gene_3col
         ch_software_versions.mix(ALEVINFRY_BUILD_INDEX.out.software_versions.ifEmpty(null))
+    } else if (alevinfry_index && alevinfry_index.getName().endsWith(".tar.gz")) {
+        ch_index = UNTAR ( alevinfry_index ).untar
+        ch_txp2gene = txp2gene
+        ch_software_versions.mix(UNTAR.out.version.ifEmpty(null))
     } else {
         ch_index = alevinfry_index
         ch_txp2gene = txp2gene
