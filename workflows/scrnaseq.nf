@@ -180,11 +180,13 @@ workflow SCRNASEQ {
 
     // Run STARSolo pipeline
     if ("star" in tools) {
+        ch_star_index = params.star_index ? file(params.star_index) : null
+
         STARSOLO ( 
             ch_cat_fastq,
             params.genome_fasta,
             ch_gtf,
-            params.star_index,
+            ch_star_index,
             params.protocol,
             params.barcode_whitelist
         )
@@ -195,12 +197,14 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("kallisto" in tools) {
+        ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : null
+
         KALLISTO_BUSTOOLS ( 
             ch_cat_fastq,
             params.genome_fasta,
             ch_gtf,
             params.kallisto_gene_map,
-            params.kallisto_index,
+            ch_kallisto_index,
             params.protocol
         )
 

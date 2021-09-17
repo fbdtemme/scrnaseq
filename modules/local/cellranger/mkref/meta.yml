@@ -1,6 +1,6 @@
 name: cellranger_mkref
 description: Create custom references for cellranger.
-keywords: 
+keywords:
     - cellranger
     - reference
     - genome
@@ -9,13 +9,13 @@ tools:
     - cellranger:
         description: |
             Cell Ranger is a set of analysis pipelines that process Chromium single-cell data to align reads,
-            generate feature-barcode matrices, perform clustering and other secondary analysis, and more. 
+            generate feature-barcode matrices, perform clustering and other secondary analysis, and more.
 
 input:
-    - fasta: 
+    - fasta:
         type: file
         description: "Genome fasta to generate a reference of."
-    - gtf: 
+    - gtf:
         type: file
         description: "Annotation GTF of the genome to generate a reference of."
 

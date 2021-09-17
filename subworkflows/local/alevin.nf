@@ -32,6 +32,7 @@ include { POSTPROCESS }                 from '../../modules/local/postprocess/ma
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
 include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'       addParams( options: gffread_txp2gene_options )
 include { SALMON_INDEX }                from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
+include { UNTAR }                       from '../../modules/nf-core/modules/untar/main.nf'              addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -75,13 +76,14 @@ workflow ALEVIN {
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
     
-    // Build salmon index
-    if (!salmon_index) {
+    // Set up salmon index
+    if (salmon_index && salmon_index.getName().endsWith(".tar.gz")) {
+        ch_salmon_alevin_index = UNTAR ( salmon_index ).untar
+    } else if (!salmon_index) {
         SALMON_INDEX ( genome_fasta, transcript_fasta )
-        salmon_index_alevin = SALMON_INDEX.out.index
+        ch_salmon_alevin_index = SALMON_INDEX.out.index
     } else {
-        // Setup channel for salmon index if specified
-        salmon_index_alevin = salmon_index
+        ch_salmon_alevin_index = salmon_index
     }
     
     // Build txp2gene map
@@ -97,7 +99,7 @@ workflow ALEVIN {
     // Perform quantification with salmon alevin
     SALMON_ALEVIN ( 
         reads, 
-        salmon_index_alevin, 
+        ch_salmon_alevin_index, 
         ch_txp2gene, 
         alevin_protocol, 
         ch_barcode_whitelist 

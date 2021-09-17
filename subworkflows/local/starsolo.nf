@@ -27,6 +27,7 @@ include { POSTPROCESS }          from '../../modules/local/postprocess/main'    
 ////////////////////////////////////////////////////
 include { GUNZIP }               from '../../modules/nf-core/modules/gunzip/main'               addParams( options: gunzip_options )
 include { STAR_GENOMEGENERATE }  from '../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
+include { UNTAR }                from '../../modules/nf-core/modules/untar/main.nf'             addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -62,18 +63,24 @@ workflow STARSOLO {
     }
 
     // Build STAR index if not supplied
-    if (!star_index) {
+     // Check if a tar.gz packaged index was passed
+    if (star_index && star_index.getName().endsWith(".tar.gz")) {
+        ch_star_index = UNTAR ( star_index ).untar
+        ch_software_versions = ch_software_versions.mix(UNTAR.out.version.first().ifEmpty(null))
+    } else if (!star_index) {
         STAR_GENOMEGENERATE ( 
             genome_fasta, 
             gtf 
         )
-        star_index = STAR_GENOMEGENERATE.out.index
-    } 
+        ch_star_index = STAR_GENOMEGENERATE.out.index
+    } else {
+        ch_star_index = star_index
+    }
   
     // Perform mapping with STAR
     STAR_ALIGN ( 
         reads,
-        star_index,
+        ch_star_index,
         gtf,
         ch_barcode_whitelist,
         star_protocol

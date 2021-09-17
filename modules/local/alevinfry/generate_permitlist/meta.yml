@@ -1,17 +1,17 @@
 name: generate_permitlist
 description:  Determines what cell barcodes should be associated with “true” cells, which should be corrected, and which should be ignored.
 keywords:
-  - index
-  - fasta
-  - genome
-  - reference
+    - index
+    - fasta
+    - genome
+    - reference
 tools:
-  - alevinfry_generate_permitlist:
-        description: |
-            alevin-fry is a suite of tools for the rapid, accurate and memory-frugal processing single-cell and single-nucleus sequencing data.
-        homepage: https://github.com/COMBINE-lab/alevinfry
-        manual: https://alevin-fry.readthedocs.io/en/latest/
-        doi: 10.1101/2021.06.29.450377v1
+    - alevinfry_generate_permitlist:
+          description: |
+              alevin-fry is a suite of tools for the rapid, accurate and memory-frugal processing single-cell and single-nucleus sequencing data.
+          homepage: https://github.com/COMBINE-lab/alevinfry
+          manual: https://alevin-fry.readthedocs.io/en/latest/
+          doi: 10.1101/2021.06.29.450377v1
 input:
     - meta:
         type: map
