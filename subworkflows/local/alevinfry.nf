@@ -12,24 +12,26 @@ def alevinfry_map_options                   = modules['alevinfry_map']
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 def alevinfry_quant_options                 = modules['alevinfry_quant']
-def postprocess_options                     = modules['postprocess_transpose']
+def postprocess_options                     = modules['postprocess']
+postprocess_options.publish_dir             = 'salmon/alevinfry'
+postprocess_options.args                    += '--transpose'
 def gunzip_options                          = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { ALEVINFRY_BUILD_INDEX }           from '../../subworkflows/local/alevinfry_build_index'           addParams( options: [:] )
+include { ALEVINFRY_BUILD_INDEX }           from '../../subworkflows/local/alevinfry_build_index'           addParams( options: alevinfry_index_options )
 include { ALEVINFRY_MAP }                   from '../../modules/local/alevinfry/map/main'                   addParams( options: alevinfry_map_options )
 include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/generate_permitlist/main'   addParams( options: alevinfry_generate_permitlist_options )
 include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
 include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'                 addParams( options: alevinfry_quant_options )
 include { POSTPROCESS }                     from '../../modules/local/postprocess/main'                     addParams( options: postprocess_options )
-include { UNTAR }                           from '../../modules/nf-core/modules/untar/main.nf'              addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
 include { GUNZIP }                          from '../../modules/nf-core/modules/gunzip/main'                addParams( options: gunzip_options )
+include { UNTAR }                           from '../../modules/nf-core/modules/untar/main.nf'              addParams( options: [:] )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -80,6 +82,9 @@ workflow ALEVINFRY {
 
     // Perform quantification with alevin-fry quant
     ALEVINFRY_QUANT ( ALEVINFRY_COLLATE.out.results, ch_txp2gene )
+    
+    // Collect software versions
+    ch_software_versions = ch_software_versions.mix(ALEVINFRY_QUANT.out.version.ifEmpty(null))
 
     // Reformat output
     ch_alevin_output_dir    = ALEVINFRY_QUANT.out.results.map{ it[1] }
@@ -87,9 +92,6 @@ workflow ALEVINFRY {
     ch_features             = ch_alevin_output_dir.map{ "${it}/alevin/quants_mat_cols.txt" }
     ch_barcodes             = ch_alevin_output_dir.map{ "${it}/alevin/quants_mat_rows.txt" }
     POSTPROCESS ( ch_matrix, ch_features, ch_barcodes, "Alevinfry" )
-    
-    // Collect software versions
-    ch_software_versions = ch_software_versions.mix(ALEVINFRY_QUANT.out.version.ifEmpty(null))
 
     emit:
     software_versions   = ch_software_versions
