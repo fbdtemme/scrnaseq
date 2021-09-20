@@ -24,6 +24,7 @@ process SALMON_ALEVIN {
     path index
     path txp2gene
     val protocol
+    val lib_type
 
     output:
     tuple val(meta), path("*_alevin_results"), emit: results
@@ -33,9 +34,32 @@ process SALMON_ALEVIN {
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
 
+    def strandedness_opts = [
+        'A', 'U', 'SF', 'SR',
+        'IS', 'IU' , 'ISF', 'ISR',
+        'OS', 'OU' , 'OSF', 'OSR',
+        'MS', 'MU' , 'MSF', 'MSR'
+    ]
+    def strandedness =  'A'
+    if (lib_type) {
+        if (strandedness_opts.contains(lib_type)) {
+            strandedness = lib_type
+        } else {
+            log.info "[Salmon Alevin] Invalid library type specified '--libType=${lib_type}', defaulting to auto-detection with '--libType=A'."
+        }
+    } else {
+        strandedness = meta.single_end ? 'U' : 'IU'
+        if (meta.strandedness == 'forward') {
+            strandedness = meta.single_end ? 'SF' : 'ISF'
+        } else if (meta.strandedness == 'reverse') {
+            strandedness = meta.single_end ? 'SR' : 'ISR'
+        }
+    }
+
     """
     salmon alevin \\
         -p $task.cpus \\
+        --libType $strandedness \\
         -1 ${reads[0]} \\
         -2 ${reads[1]} \\
         --${protocol} \\
