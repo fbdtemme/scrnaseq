@@ -138,17 +138,21 @@ workflow SCRNASEQ {
         ch_gtf = Channel.fromPath(params.gtf)
     }
 
+    ch_genome_fasta =  params.genome_fasta ? file(params.genome_fasta) : null
+
     // Run Alevin pipeline
     if ("alevin" in tools) {
         // Initialize salmon index channel
         ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
+        ch_txp2gene = params.txp2gene ? file(params.txp2gene) : null
+        ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta) : null
 
         ALEVIN ( 
             ch_cat_fastq,
-            params.genome_fasta,
-            params.transcript_fasta,
+            ch_genome_fasta,
+            ch_transcript_fasta,
             ch_gtf,
-            params.txp2gene,
+            ch_txp2gene,
             ch_salmon_index,
             params.protocol
         )
@@ -165,7 +169,7 @@ workflow SCRNASEQ {
 
         ALEVINFRY(
             ch_cat_fastq,             
-            params.genome_fasta,      
+            ch_genome_fasta,      
             ch_gtf,
             ch_alevinfry_gene_map,
             ch_alevinfry_index,
@@ -180,14 +184,15 @@ workflow SCRNASEQ {
     // Run STARSolo pipeline
     if ("star" in tools) {
         ch_star_index = params.star_index ? file(params.star_index) : null
+        ch_barcode_whitelist = params.barcode_whitelist ? file(params.barcode_whitelist) : null
 
-        STARSOLO ( 
+        STARSOLO (
             ch_cat_fastq,
-            params.genome_fasta,
+            ch_genome_fasta,
             ch_gtf,
             ch_star_index,
             params.protocol,
-            params.barcode_whitelist
+            ch_barcode_whitelist
         )
 
         ch_software_versions = ch_software_versions.mix(STARSOLO.out.software_versions.collect())
@@ -197,12 +202,13 @@ workflow SCRNASEQ {
     // Run kallisto bustools pipeline
     if ("kallisto" in tools) {
         ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : null
+        ch_kallisto_gene_map = params.kallisto_gene_map ? file(params.kallisto_gene_map) : null
 
         KALLISTO_BUSTOOLS ( 
             ch_cat_fastq,
-            params.genome_fasta,
+            ch_genome_fasta,
             ch_gtf,
-            params.kallisto_gene_map,
+            ch_kallisto_gene_map,
             ch_kallisto_index,
             params.protocol
         )
@@ -217,7 +223,7 @@ workflow SCRNASEQ {
 
         CELLRANGER (
             ch_cat_fastq,             
-            params.genome_fasta,
+            ch_genome_fasta,
             ch_gtf,
             ch_cellranger_index,
             params.protocol
