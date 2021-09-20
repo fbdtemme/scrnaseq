@@ -14,10 +14,11 @@ def gffread_txp2gene_options            = modules['gffread_tx2pgene']
 def gffread_transcriptome_options       = modules['gffread_transcriptome']
 def salmon_index_options                = modules['salmon_index']
 def salmon_alevin_options               = modules['salmon_alevin']
+salmon_alevin_options.args             += ' -l ISR --dumpFeatures --dumpMtx'
 def salmon_alevinqc_options             = modules['salmon_alevinqc']
 def postprocess_options                 = modules['postprocess']
 postprocess_options.publish_dir         = 'salmon/alevin'
-postprocess_options.args               += '--transpose'
+postprocess_options.args               += ' --transpose'
 def gunzip_options                      = modules['gunzip']
 
 ////////////////////////////////////////////////////
@@ -26,7 +27,7 @@ def gunzip_options                      = modules['gunzip']
 include { GFFREAD_TRANSCRIPTOME }            from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
 include { SALMON_ALEVIN }                    from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
 include { SALMON_ALEVINQC }                  from '../../modules/local/salmon/alevinqc/main'         addParams( options: salmon_alevinqc_options )
-include { POSTPROCESS as SALMON_POSTPROCESS} from '../../modules/local/postprocess/main'             addParams( options: postprocess_options )
+include { POSTPROCESS }                      from '../../modules/local/postprocess/main'             addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -36,9 +37,6 @@ include { GFFREAD as GFFREAD_TXP2GENE }      from '../../modules/nf-core/modules
 include { SALMON_INDEX }                     from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
 include { UNTAR }                            from '../../modules/nf-core/modules/untar/main.nf'      addParams( options: [:] )
 
-////////////////////////////////////////////////////
-/* --           RUN MAIN WORKFLOW              -- */
-////////////////////////////////////////////////////
 workflow ALEVIN {
     take:
     reads               // channel: [ val(meta), [ reads ] ]
@@ -94,7 +92,7 @@ workflow ALEVIN {
     ch_software_versions    = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
 
     // Run alevinQC
-    SALMON_ALEVINQC ( SALMON_ALEVIN.out.alevin_results )
+    SALMON_ALEVINQC ( SALMON_ALEVIN.out.results )
 
     // Collect software versions
     ch_software_versions    = ch_software_versions.mix(SALMON_ALEVINQC.out.version.first().ifEmpty(null))
@@ -103,15 +101,15 @@ workflow ALEVIN {
     // TODO there may be a cleaner way of doing this
     // Meta and result could be set in one command and the matrix, barcodes and features could
     // be mixed into one channel
-    ch_alevin_results_files = SALMON_ALEVIN.out.alevin_results.map{ it[1] }
-    ch_meta                 = SALMON_ALEVIN.out.alevin_results.map{ it[0] }
+    ch_alevin_results_files = SALMON_ALEVIN.out.results.map{ it[1] }
+    ch_meta                 = SALMON_ALEVIN.out.results.map{ it[0] }
     ch_matrix               = ch_alevin_results_files.map{ "${it}/alevin/quants_mat.mtx.gz" }
     ch_features             = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_cols.txt" }
     ch_barcodes             = ch_alevin_results_files.map{ "${it}/alevin/quants_mat_rows.txt" }
-    SALMON_POSTPROCESS ( ch_meta, ch_matrix, ch_features, ch_barcodes )
+    POSTPROCESS ( ch_meta, ch_matrix, ch_features, ch_barcodes )
     
     // Collect software versions
-    ch_software_versions    = ch_software_versions.mix(SALMON_POSTPROCESS.out.version.first().ifEmpty(null))
+    ch_software_versions    = ch_software_versions.mix(POSTPROCESS.out.version.first().ifEmpty(null))
     
     emit:
     software_versions       = ch_software_versions

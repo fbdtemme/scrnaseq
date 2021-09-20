@@ -5,7 +5,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 options        = initOptions(params.options)
 
-process ALEVINFRY_INDEX {
+process SALMON_ALEVINFRY_INDEX {
     tag "$splici_transcriptome"
     label "process_medium"
     publishDir "${params.outdir}",
@@ -28,16 +28,14 @@ process ALEVINFRY_INDEX {
 
     script:
     def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${splici_transcriptome}${options.suffix}" : "${splici_transcriptome}"
-
     """
      salmon \\
         index \\
         --threads $task.cpus \\
         -t $splici_transcriptome \\
         -i alevinfry \\
-        ${options.args} \\
+        $options.args
 
-    salmon --version | sed -e "s/salmon //g" > salmon.version.txt
+    salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
     """
 }

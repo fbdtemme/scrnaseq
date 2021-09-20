@@ -19,13 +19,15 @@ process MEAN_READ_LENGTH {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), stdout                  , emit: results
-    path "*.version.txt"                     , emit: version
+    tuple val(meta), stdout    , emit: results
+    path "*.version.txt"       , emit: version
 
-    script:
+    script:  // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
+    def software = "mean_read_length"
+
     """
-    mean_read_length.py ${reads} --threads $task.cpus
+    mean_read_length.py $reads --threads $task.cpus
 
-    echo "unversioned" > mean_read_length.version.txt
+    echo "unversioned" > ${software}.version.txt
     """
 }

@@ -24,8 +24,8 @@ process ALEVINFRY_QUANT {
     path txp2gene
 
     output:
-    path "*.version.txt"                      , emit: version
-    tuple val(meta), path("*_quant_results")  , emit: results
+    tuple val(meta), path("*_quant_results")    , emit: results
+    path "*.version.txt"                        , emit: version
 
     script:
     def software = getSoftwareName(task.process)
@@ -34,13 +34,13 @@ process ALEVINFRY_QUANT {
     // alevin-fry complains when passing empty options.args
     """
     alevin-fry quant \\
-        --threads ${task.cpus} \\
-        --input-dir ${input} \\
-        --tg-map ${txp2gene} \\
+        --threads $task.cpus \\
+        --input-dir $input \\
+        --tg-map $txp2gene \\
         --output-dir ${prefix}_quant_results \\
         --resolution cr-like \\
-        --use-mtx \\
-        ${options.args}
+        $options.args \\
+        --use-mtx
 
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """

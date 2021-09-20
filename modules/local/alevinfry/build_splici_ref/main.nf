@@ -32,7 +32,7 @@ process BUILD_SPLICI_REF {
     def prefix   = options.suffix ? "${genome}${options.suffix}" : "${genome}"
     
     """
-    build_splici_ref.R ${genome} ${gtf} ${read_length} "${prefix}_splici_ref" ${options.args}
+    build_splici_ref.R $genome $gtf $read_length ${prefix}_splici_ref $options.args
 
     echo "unversioned" > ${software}.version.txt
     """

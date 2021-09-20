@@ -26,9 +26,9 @@ process CELLRANGER_MKGTF {
 
     """
     cellranger mkgtf \\
-        ${gtf} \\
+        $gtf \\
         ${gtf.baseName}_mkgtf.gtf \\
-        ${options.args}
+        $options.args
 
     echo \$(cellranger --version 2>&1) | sed 's/^.*cellranger //; s/ .*\$//' > ${software}.version.txt
     """

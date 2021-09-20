@@ -36,8 +36,13 @@ process POSTPROCESS {
     script:  // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
     def software = "Postprocess"
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    
     """
-    postprocessing.py --matrix $matrix --features $features --barcodes $barcodes --output ${prefix}_matrices $options.args
+    postprocessing.py --matrix $matrix \\
+      --features $features \\
+      --barcodes $barcodes \\
+      --output ${prefix}_matrices \\
+      $options.args
 
     echo "unversioned" > ${software}.version.txt
     """

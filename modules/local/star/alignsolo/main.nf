@@ -27,18 +27,18 @@ process STAR_ALIGN {
     val protocol
 
     output:
-    tuple val(meta), path('*d.out.bam')       , emit: bam
-    tuple val(meta), path('*Log.final.out')   , emit: log_final
-    tuple val(meta), path('*Log.out')         , emit: log_out
-    tuple val(meta), path('*Log.progress.out'), emit: log_progress
-    tuple val(meta), path('*Solo.out')        , emit: solo_results
-    path  '*.version.txt'                     , emit: version
+    tuple val(meta), path('*d.out.bam')               , emit: bam
+    tuple val(meta), path('*Log.final.out')           , emit: log_final
+    tuple val(meta), path('*Log.out')                 , emit: log_out
+    tuple val(meta), path('*Log.progress.out')        , emit: log_progress
+    tuple val(meta), path('*Solo.out')                , emit: solo_results
+    path  '*.version.txt'                             , emit: version
 
-    tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
-    tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript
-    tuple val(meta), path('*Aligned.unsort.out.bam') , optional:true, emit: bam_unsorted
-    tuple val(meta), path('*fastq.gz')               , optional:true, emit: fastq
-    tuple val(meta), path('*.tab')                   , optional:true, emit: tab
+    tuple val(meta), path('*sortedByCoord.out.bam')   , optional:true , emit: bam_sorted
+    tuple val(meta), path('*toTranscriptome.out.bam') , optional:true , emit: bam_transcript
+    tuple val(meta), path('*Aligned.unsort.out.bam')  , optional:true , emit: bam_unsorted
+    tuple val(meta), path('*fastq.gz')                , optional:true , emit: fastq
+    tuple val(meta), path('*.tab')                    , optional:true , emit: tab
 
     script:
     def software        = getSoftwareName(task.process)
@@ -48,6 +48,7 @@ process STAR_ALIGN {
     def out_sam_type    = (options.args.contains('--outSAMtype')) ? '' : '--outSAMtype BAM Unsorted'
     def mv_unsorted_bam = (options.args.contains('--outSAMtype BAM Unsorted SortedByCoordinate')) ? "mv ${prefix}.Aligned.out.bam ${prefix}.Aligned.unsort.out.bam" : ''
     def read_pair       = params.protocol.contains("chromium") ? "${reads[1]} ${reads[0]}" : "${reads[0]} ${reads[1]}" 
+
     """
     STAR \\
         --genomeDir $index \\
@@ -59,7 +60,7 @@ process STAR_ALIGN {
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\
-        $options.args \\
+        $options.args
 
     $mv_unsorted_bam
 

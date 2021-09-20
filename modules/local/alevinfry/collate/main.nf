@@ -24,17 +24,18 @@ process ALEVINFRY_COLLATE {
     tuple val(meta), path(raddir)
 
     output:
-    tuple val(meta), path(input)  , emit: results
-    path "*.version.txt"          , emit: version
+    tuple val(meta), path(input)    , emit: results
+    path "*.version.txt"            , emit: version
 
     script:
     def software = getSoftwareName(task.process)
+    
     """
     alevin-fry collate \\
-        --threads ${task.cpus} \\
-        --input-dir ${input} \\
-        --rad-dir ${raddir} \\
-        ${options.args}
+        --threads $task.cpus \\
+        --input-dir $input \\
+        --rad-dir $raddir \\
+        $options.args
 
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """

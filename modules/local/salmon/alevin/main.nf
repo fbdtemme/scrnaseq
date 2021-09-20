@@ -26,22 +26,21 @@ process SALMON_ALEVIN {
     val protocol
 
     output:
-    tuple val(meta), path("*_alevin_results"), emit: alevin_results
+    tuple val(meta), path("*_alevin_results"), emit: results
     path "*.version.txt"                     , emit: version
 
     script:
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+
     """
     salmon alevin \\
-        -l ISR \\
         -p $task.cpus \\
         -1 ${reads[0]} \\
         -2 ${reads[1]} \\
         --${protocol} \\
         -i $index \\
         --tgMap $txp2gene \\
-        --dumpFeatures --dumpMtx \\
         $options.args \\
         -o ${prefix}_alevin_results
     

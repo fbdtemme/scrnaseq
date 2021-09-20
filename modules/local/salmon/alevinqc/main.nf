@@ -22,12 +22,13 @@ process SALMON_ALEVINQC {
     tuple val(meta), path(alevin_results)
 
     output:
-    tuple val(meta), path("*alevinqQCReport.html"), emit: report
-    path "*.version.txt"                         , emit: version
+    tuple val(meta), path("*alevinqQCReport.html")    , emit: report
+    path "*.version.txt"                              , emit: version
 
     script:
     def software = "AlevinQC"
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+
     """
     #!/usr/bin/env Rscript
     require(alevinQC)

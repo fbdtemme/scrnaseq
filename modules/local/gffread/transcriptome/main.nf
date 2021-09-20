@@ -23,12 +23,11 @@ process GFFREAD_TRANSCRIPTOME {
     path gtf
 
     output:
-    path "${genome_fasta}.transcriptome.fa" , emit: transcriptome_extracted
-    path "*.version.txt"                    , emit: version
+    path "${genome_fasta}.transcriptome.fa"    , emit: transcriptome_extracted
+    path "*.version.txt"                       , emit: version
 
     script:
     def software = getSoftwareName(task.process)
-
     """
     gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
 
