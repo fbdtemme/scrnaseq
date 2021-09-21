@@ -4,4 +4,4 @@
     - alevinqc
     - salmon-alevinqc
   files:
-    - path: ./results/alevinqc/alevinReport.html
+    - path: ./results/salmon/S10_L001_alevinqQCReport.html

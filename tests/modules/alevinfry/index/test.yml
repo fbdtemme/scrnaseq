@@ -2,19 +2,3 @@
   command: nextflow run ./tests/modules/alevinfry/index/main.nf -entry test_alevinfry_index -c ./tests/config/nextflow.config
   tags:
     - alevinfry
-  files:
-   - path: ./results/index/alevinfry/complete_ref_lens.bin
-   - path: ./results/index/alevinfry/ctable.bin
-   - path: ./results/index/alevinfry/ctg_offsets.bin
-   - path: ./results/index/alevinfry/duplicate_clusters.tsv
-   - path: ./results/index/alevinfry/info.json
-   - path: ./results/index/alevinfry/mphf.bin
-   - path: ./results/index/alevinfry/pos.bin
-   - path: ./results/index/alevinfry/pre_indexing.log
-   - path: ./results/index/alevinfry/rank.bin
-   - path: ./results/index/alevinfry/ref_indexing.log
-   - path: ./results/index/alevinfry/refAccumLengths.bin
-   - path: ./results/index/alevinfry/reflengths.bin
-   - path: ./results/index/alevinfry/refseq.bin
-   - path: ./results/index/alevinfry/seq.bin
-   - path: ./results/index/alevinfry/versionInfo.json

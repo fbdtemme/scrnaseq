@@ -2,9 +2,9 @@
 
 nextflow.enable.dsl = 2
 
-include { GUNZIP }          from '../../../../modules/nf-core/modules/gunzip/main.nf'       addParams( options: [:] )
-include { SALMON_INDEX }    from '../../../../modules/nf-core/modules/salmon/index/main.nf' addParams( options: [:] )
-include { SALMON_ALEVIN }   from '../../../../modules/local/salmon/alevin/main.nf'          addParams( options: [:] )
+include { GUNZIP }          from '../../../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
+include { SALMON_INDEX }    from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: [:] )
+include { SALMON_ALEVIN }   from '../../../../modules/local/salmon/alevin/main'          addParams( options: [:] )
 
 workflow test_salmon_alevin {
     genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
@@ -17,6 +17,7 @@ workflow test_salmon_alevin {
     protocol            = "chromium"
     chemistry           = "V2"
     barcode_whitelist   = file(params.test_data_scrnaseq["reference"]["tenx_V2_barcode_whitelist"], checkIfExists: true)
+    lib_type = "ISR"
 
     SALMON_INDEX ( genome_fasta, transcriptome_fasta )
     salmon_index = SALMON_INDEX.out.index
@@ -25,7 +26,7 @@ workflow test_salmon_alevin {
         fastq, 
         salmon_index,
         tx2gene, 
-        protocol, 
-        barcode_whitelist
+        protocol,
+        lib_type
     )
 }
