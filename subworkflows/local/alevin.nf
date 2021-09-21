@@ -10,16 +10,16 @@ def whitelist_folder = "$baseDir/assets/whitelist/"
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
-def gffread_txp2gene_options              = modules['gffread_tx2pgene']
-def gffread_transcriptome_options         = modules['gffread_transcriptome']
-def salmon_index_options                  = modules['salmon_index']
-def salmon_alevin_options                 = modules['salmon_alevin']
-salmon_alevin_options.args               += ' -l ISR --dumpFeatures --dumpMtx'
-def salmon_alevinqc_options               = modules['salmon_alevinqc']
-def postprocess_options                   = modules['postprocess']
-postprocess_options.publish_dir           = 'salmon/alevin'
-postprocess_options.args                 += ' --transpose'
-def gunzip_options                        = modules['gunzip']
+def gffread_txp2gene_options            = modules['gffread_tx2pgene']
+def gffread_transcriptome_options       = modules['gffread_transcriptome']
+def salmon_index_options                = modules['salmon_index']
+def salmon_alevin_options               = modules['salmon_alevin']
+salmon_alevin_options.args             += ' --dumpFeatures --dumpMtx'
+def salmon_alevinqc_options             = modules['salmon_alevinqc']
+def postprocess_options                 = modules['postprocess']
+postprocess_options.publish_dir         = 'salmon/alevin'
+postprocess_options.args               += ' --transpose'
+def gunzip_options                      = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -81,11 +81,16 @@ workflow ALEVIN {
     }
     
     // Perform quantification with salmon alevin
+    // TODO: Verify the correct library type:
+    // https://salmon.readthedocs.io/en/latest/library_type.html 
+    // for different types of chemistry and protocol
+    def lib_type = "ISR"
     SALMON_ALEVIN ( 
         reads, 
         ch_salmon_alevin_index, 
         ch_txp2gene, 
-        alevin_protocol
+        alevin_protocol,
+        lib_type
     )
     
     // Collect software versions

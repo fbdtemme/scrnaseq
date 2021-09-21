@@ -8,10 +8,10 @@
 def modules = params.modules.clone()
 
 def alevinfry_index_options                 = modules['alevinfry_index']
-def salmon_alevin_options                   = modules['salmon_alevin']
-salmon_alevin_options.args                  += ' -l IU --sketch'
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
+def salmon_alevin_options                   = modules['salmon_alevin']
+salmon_alevin_options.args                  += ' --sketch'
 def alevinfry_quant_options                 = modules['alevinfry_quant']
 def postprocess_options                     = modules['postprocess']
 postprocess_options.publish_dir             = 'salmon/alevinfry'
@@ -66,11 +66,13 @@ workflow ALEVINFRY {
     }
 
     // Align reads with alevin
+    def lib_type = "IU" 
     SALMON_ALEVIN (
         reads,
         ch_index,  
         ch_txp2gene,
-        alevin_protocol
+        alevin_protocol,
+        lib_type
     )
 
     // Build permitlist and filter index
