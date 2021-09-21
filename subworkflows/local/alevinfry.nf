@@ -45,11 +45,12 @@ workflow ALEVINFRY {
     expected_orientation    // channel:  (the options are [ fw | rc | both ]
 
     main:
-    ch_software_versions = Channel.empty()
 
     // Get the protocol parameter suitable for passing to alevin and alevin-fry
     (alevin_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "alevin")
 
+    ch_software_versions = Channel.empty()
+    
     // Build index and txp2gene mapping if no index is provided
     if (!alevinfry_index) { 
         ALEVINFRY_BUILD_INDEX ( reads, genome_fasta, gtf )

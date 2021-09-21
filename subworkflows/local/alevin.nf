@@ -48,10 +48,11 @@ workflow ALEVIN {
     protocol            // channel: protocol
 
     main:
-    ch_software_versions = Channel.empty()
 
     // Get the protocol parameter suitable for passing to alevin
     (alevin_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "alevin")
+
+    ch_software_versions = Channel.empty()
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
     if (!transcript_fasta && genome_fasta && gtf) {
