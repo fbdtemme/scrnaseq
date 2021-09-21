@@ -19,9 +19,11 @@ checkPathParamList = [
     params.salmon_index,
     params.star_index,
     params.kallisto_index,
+    params.kallisto_gene_map,
     params.cellranger_index,
-    params.txp2gene,
-    params.kallisto_gene_map
+    params.alevinfry_index,
+    params.alevinfry_gene_map,
+    params.txp2gene
 ]
 
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -70,23 +72,23 @@ include { GFFREAD as GFFREAD_GFF3TOGTF } from '../modules/nf-core/modules/gffrea
 ////////////////////////////////////////////////////
 
 if ("alevin" in tools) {
-    include { ALEVIN }              from '../subworkflows/local/alevin'
+    include { ALEVIN }                   from '../subworkflows/local/alevin'
 }
 
 if ("alevinfry" in tools) {
-    include { ALEVINFRY }           from '../subworkflows/local/alevinfry'
+    include { ALEVINFRY }                from '../subworkflows/local/alevinfry'
 }
 
 if ("star" in tools) {
-    include { STARSOLO }            from '../subworkflows/local/starsolo'
+    include { STARSOLO }                 from '../subworkflows/local/starsolo'
 }
 
 if ("kallisto" in tools) {
-    include { KALLISTO_BUSTOOLS }   from '../subworkflows/local/bustools'
+    include { KALLISTO_BUSTOOLS }        from '../subworkflows/local/bustools'
 }
 
 if ("cellranger" in tools) {
-    include { CELLRANGER }          from '../subworkflows/local/cellranger'
+    include { CELLRANGER }               from '../subworkflows/local/cellranger'
 }
 
 ////////////////////////////////////////////////////
@@ -94,9 +96,6 @@ if ("cellranger" in tools) {
 ////////////////////////////////////////////////////
 
 workflow SCRNASEQ {
-
-    ch_software_versions = Channel.empty()
-    ch_multiqc_files = Channel.empty()
 
     // Stage input files
     INPUT_CHECK ( ch_input )
@@ -111,15 +110,15 @@ workflow SCRNASEQ {
                 return [ meta, fastq.flatten() ]
             multiple: fastq.size() > 1
                 return [ meta, fastq.flatten() ]
-    }
-    .set { ch_fastq }
+    }.set { ch_fastq }
 
-    //
-    // MODULE: Concatenate FastQ files from same sample if required
-    //
+    // Concatenate FastQ files from same sample if required
     CAT_FASTQ ( ch_fastq.multiple )
     .mix(ch_fastq.single)
     .set { ch_cat_fastq }
+
+    ch_software_versions = Channel.empty()
+    ch_multiqc_files = Channel.empty()
 
     // Run FastQC
     if (!params.skip_fastqc) {
