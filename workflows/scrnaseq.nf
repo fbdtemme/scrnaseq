@@ -39,18 +39,17 @@ def tools = params.tools ? params.tools.split(',').collect{ it.trim().toLowerCas
 ////////////////////////////////////////////////////
 
 // Stage config files
-ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
-ch_output_docs           = file("$projectDir/docs/output.md", checkIfExists: true)
-ch_output_docs_images    = file("$projectDir/docs/images/", checkIfExists: true)
-
+ch_multiqc_config                        = Channel.fromPath("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
+ch_multiqc_custom_config                 = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+ch_output_docs                           = file("$projectDir/docs/output.md", checkIfExists: true)
+ch_output_docs_images                    = file("$projectDir/docs/images/", checkIfExists: true)
 
 // Don't overwrite global params.modules, create a copy instead and use that within the main script
-def modules                    = params.modules.clone()
-def multiqc_options            = modules['multiqc']
-def fastqc_options             = modules['fastqc'] 
-def gffread_gff3togtf_options  = modules['gffread_gff3togtf']
-def cat_fastq_options          = modules['cat_fastq']
+def modules                              = params.modules.clone()
+def multiqc_options                      = modules['multiqc']
+def fastqc_options                       = modules['fastqc'] 
+def gffread_gff3togtf_options            = modules['gffread_gff3togtf']
+def cat_fastq_options                    = modules['cat_fastq']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -126,7 +125,7 @@ workflow SCRNASEQ {
     if (!params.skip_fastqc) {
         FASTQC ( ch_cat_fastq )
         ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ it[1] }.collect())
+        ch_multiqc_files     = ch_multiqc_files.mix(FASTQC.out.zip.map{ it[1] }.collect())
     } 
 
     // Convert GFF to GTF if annotation is given as GFF
@@ -143,8 +142,8 @@ workflow SCRNASEQ {
     // Run Alevin pipeline
     if ("alevin" in tools) {
         // Initialize salmon index channel
-        ch_salmon_index = params.salmon_index ? file(params.salmon_index) : null
-        ch_txp2gene = params.txp2gene ? file(params.txp2gene) : null
+        ch_salmon_index     = params.salmon_index ? file(params.salmon_index) : null
+        ch_txp2gene         = params.txp2gene ? file(params.txp2gene) : null
         ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta) : null
 
         ALEVIN ( 
@@ -183,7 +182,7 @@ workflow SCRNASEQ {
 
     // Run STARSolo pipeline
     if ("star" in tools) {
-        ch_star_index = params.star_index ? file(params.star_index) : null
+        ch_star_index        = params.star_index ? file(params.star_index) : null
         ch_barcode_whitelist = params.barcode_whitelist ? file(params.barcode_whitelist) : null
 
         STARSOLO (
@@ -201,7 +200,7 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if ("kallisto" in tools) {
-        ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : null
+        ch_kallisto_index    = params.kallisto_index ? file(params.kallisto_index) : null
         ch_kallisto_gene_map = params.kallisto_gene_map ? file(params.kallisto_gene_map) : null
 
         KALLISTO_BUSTOOLS ( 
