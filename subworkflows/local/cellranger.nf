@@ -40,10 +40,7 @@ workflow CELLRANGER {
     (cr_protocol, chemistry) = WorkflowScrnaseq.formatProtocol(protocol, "cellranger")
     
     // Check if a tar.gz packaged index was passed such as a url to the 10x references online
-    if (cellranger_index && cellranger_index.getName().endsWith(".tar.gz")) {
-        ch_reference = UNTAR ( cellranger_index ).untar
-        ch_software_versions = ch_software_versions.mix(UNTAR.out.version.first().ifEmpty(null))
-    } else if (!cellranger_index && genome_fasta && gtf) {
+    if (!cellranger_index && genome_fasta && gtf) {
         CELLRANGER_MKGTF ( gtf )
         ch_gtf_filtered = CELLRANGER_MKGTF.out.gtf
         CELLRANGER_MKREF ( genome_fasta, ch_gtf_filtered )

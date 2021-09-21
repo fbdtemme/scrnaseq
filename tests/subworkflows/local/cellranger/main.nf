@@ -17,11 +17,13 @@ workflow test_cellranger
     protocol            = "10XV2"
 
     ch_fastq = Channel.from([fastq])
+    index = null
 
     CELLRANGER(
         ch_fastq,             
         genome_fasta,      
         gtf,
+        index,
         protocol
     )
 }

@@ -62,9 +62,7 @@ workflow ALEVIN {
     }
     
     // Set up salmon index
-    if (salmon_index && salmon_index.getName().endsWith(".tar.gz")) {
-        ch_salmon_alevin_index = UNTAR ( salmon_index ).untar
-    } else if (!salmon_index) {
+    if (!salmon_index) {
         SALMON_INDEX ( genome_fasta, transcript_fasta )
         ch_salmon_alevin_index = SALMON_INDEX.out.index
     } else {

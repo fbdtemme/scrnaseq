@@ -2,8 +2,3 @@
   command: nextflow run ./tests/modules/alevinfry/generate_permitlist/main.nf -entry test_alevinfry_generate_permitlist -c ./tests/config/nextflow.config
   tags:
     - alevinfry
-  files:
-    - path: ./results/alevinfry/S10_L001_alevinfry_quant/all_freq.tsv
-    - path: ./results/alevinfry/S10_L001_alevinfry_quant/generate_permit_list.json
-    - path: ./results/alevinfry/S10_L001_alevinfry_quant/permit_freq.tsv
-    - path: ./results/alevinfry/S10_L001_alevinfry_quant/permit_map.bin

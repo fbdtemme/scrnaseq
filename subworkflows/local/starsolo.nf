@@ -59,11 +59,7 @@ workflow STARSOLO {
     }
 
     // Build STAR index if not supplied
-    // Check if a tar.gz packaged index was passed
-    if (star_index && star_index.getName().endsWith(".tar.gz")) {
-        ch_star_index = UNTAR ( star_index ).untar
-        ch_software_versions = ch_software_versions.mix(UNTAR.out.version.first().ifEmpty(null))
-    } else if (!star_index) {
+    if (!star_index) {
         STAR_GENOMEGENERATE ( 
             genome_fasta, 
             gtf 

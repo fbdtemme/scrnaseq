@@ -57,10 +57,6 @@ workflow ALEVINFRY {
         ch_index = ALEVINFRY_BUILD_INDEX.out.index
         ch_txp2gene = ALEVINFRY_BUILD_INDEX.out.txp2gene_3col
         ch_software_versions.mix(ALEVINFRY_BUILD_INDEX.out.software_versions.ifEmpty(null))
-    } else if (alevinfry_index && alevinfry_index.getName().endsWith(".tar.gz")) {
-        ch_index = UNTAR ( alevinfry_index ).untar
-        ch_txp2gene = txp2gene
-        ch_software_versions.mix(UNTAR.out.version.ifEmpty(null))
     } else {
         ch_index = alevinfry_index
         ch_txp2gene = txp2gene
