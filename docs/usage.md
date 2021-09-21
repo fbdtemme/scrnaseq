@@ -41,13 +41,11 @@ First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scr
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
-
 ## Samplesheet input
 
 Multiple runs of the same sample
 
 The sample identifiers and replicate id have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
-
 
 ## Core Nextflow arguments
 

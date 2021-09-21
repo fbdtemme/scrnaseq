@@ -24,7 +24,7 @@ jobs:
             "test,docker --tools alevin",
             "test,docker --tools kallisto",
             "test,docker --tools star",
-            "test,docker --tools alevinfry"
+            "test,docker --tools alevinfry",
             "test,docker --tools cellranger"
           ]
         # Nextflow versions: check pipeline minimum and current latest

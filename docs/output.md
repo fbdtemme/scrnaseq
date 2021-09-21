@@ -32,7 +32,7 @@ and processes data using the following steps:
     * `*_fastqc.html`: FastQC report containing quality metrics.
     * `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
 
-> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality. 
+> **NB:** The FastQC plots in this directory are generated relative to the raw, input reads. They may contain adapter sequence and regions of low quality.
 
 </details>
 
