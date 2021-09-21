@@ -35,5 +35,4 @@ workflow test_mean_read_length {
     ch_all_reads = ch_all_fw.mix ( ch_all_rv )
 
     MEAN_READ_LENGTH ( ch_all_reads )
-    MEAN_READ_LENGTH.out.view()
 }

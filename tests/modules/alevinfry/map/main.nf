@@ -2,8 +2,13 @@
 
 nextflow.enable.dsl = 2
 
-include { ALEVINFRY_INDEX } from '../../../../modules/local/alevinfry/index/main' addParams( options: [:] )
-include { ALEVINFRY_MAP } from '../../../../modules/local/alevinfry/map/main' addParams( options: [:] )
+def modules = params.modules.clone()
+
+def salmon_alevin_options                   = modules['salmon_alevin']
+salmon_alevin_options.args                  += ' --sketch'
+
+include { SALMON_ALEVINFRY_INDEX } from '../../../../modules/local/salmon/alevinfry/index/main' addParams( options: [:] )
+include { SALMON_ALEVIN }          from '../../../../modules/local/salmon/alevin/main' addParams( options: salmon_alevin_options )
 
 workflow test_alevinfry_map{
     splici_ref    = params.test_data_scrnaseq["reference"]["alevinfry"]["splici_ref"]
@@ -13,7 +18,7 @@ workflow test_alevinfry_map{
                         file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
     alevin_protocol = "chromium"
 
-    ch_index = ALEVINFRY_INDEX ( splici_ref ).index
+    ch_index = SALMON_ALEVINFRY_INDEX ( splici_ref ).index
 
-    ALEVINFRY_MAP ( fastq, ch_index, txp2gene_3col, alevin_protocol )
+    SALMON_ALEVIN ( fastq, ch_index, txp2gene_3col, alevin_protocol, "IU" )
 }
