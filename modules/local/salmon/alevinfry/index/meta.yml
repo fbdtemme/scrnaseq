@@ -18,10 +18,10 @@ input:
           Fasta file of the splici (Spliced + Intron) transcriptome.
 
 output:
-     - index:
-        type: directory
-        description: Directory containing the alevinfry index
-        pattern: "alevinfry"
+    - index:
+      type: directory
+      description: Directory containing the alevinfry index
+      pattern: "alevinfry"
     - version:
         type: file
         description: File containing software version
