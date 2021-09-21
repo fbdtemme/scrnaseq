@@ -30,7 +30,7 @@
     > Pall Melsted, A. Sina Booeshaghi, Lauren Liu, Fan Gao, Lambda Lu, Kyung Hoi (Joseph) Min, Eduardo da Veiga Beltrame, Kristján Eldjárn Hjörleifsson, Jase Gehring & Lior Pachter† Modular and efficient pre-processing of single-cell RNA-seq, Nature Biotechnology (2021).
 
 * [CellRanger](https://www.nature.com/articles/ncomms14049)
-    > Zheng, Grace X.Y., Terry, Jessica M., [...] Bielas, Jason H. (2017). Massively parallel digital transcriptional profiling of single cells. Nature Communications. 8: 1-12, doi:10.1038/ncomms14049.
+    > Zheng, Grace X.Y., Terry, Jessica M., ... Bielas, Jason H. (2017). Massively parallel digital transcriptional profiling of single cells. Nature Communications. 8: 1-12, doi:10.1038/ncomms14049.
 
 ## R packages
 
