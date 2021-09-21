@@ -3,3 +3,4 @@ lint:
     - assets/nf-core-scrnaseq_logo.png
     - docs/images/nf-core-scrnaseq_logo.png
     - lib/NfcoreTemplate.groovy
+    - LICENSE
