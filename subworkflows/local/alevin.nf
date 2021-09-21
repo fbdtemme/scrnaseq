@@ -10,32 +10,32 @@ def whitelist_folder = "$baseDir/assets/whitelist/"
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
-def gffread_txp2gene_options            = modules['gffread_tx2pgene']
-def gffread_transcriptome_options       = modules['gffread_transcriptome']
-def salmon_index_options                = modules['salmon_index']
-def salmon_alevin_options               = modules['salmon_alevin']
-salmon_alevin_options.args             += ' -l ISR --dumpFeatures --dumpMtx'
-def salmon_alevinqc_options             = modules['salmon_alevinqc']
-def postprocess_options                 = modules['postprocess']
-postprocess_options.publish_dir         = 'salmon/alevin'
-postprocess_options.args               += ' --transpose'
-def gunzip_options                      = modules['gunzip']
+def gffread_txp2gene_options              = modules['gffread_tx2pgene']
+def gffread_transcriptome_options         = modules['gffread_transcriptome']
+def salmon_index_options                  = modules['salmon_index']
+def salmon_alevin_options                 = modules['salmon_alevin']
+salmon_alevin_options.args               += ' -l ISR --dumpFeatures --dumpMtx'
+def salmon_alevinqc_options               = modules['salmon_alevinqc']
+def postprocess_options                   = modules['postprocess']
+postprocess_options.publish_dir           = 'salmon/alevin'
+postprocess_options.args                 += ' --transpose'
+def gunzip_options                        = modules['gunzip']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GFFREAD_TRANSCRIPTOME }            from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
-include { SALMON_ALEVIN }                    from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
-include { SALMON_ALEVINQC }                  from '../../modules/local/salmon/alevinqc/main'         addParams( options: salmon_alevinqc_options )
-include { POSTPROCESS }                      from '../../modules/local/postprocess/main'             addParams( options: postprocess_options )
+include { GFFREAD_TRANSCRIPTOME }         from '../../modules/local/gffread/transcriptome/main'   addParams( options: gffread_transcriptome_options )
+include { SALMON_ALEVIN }                 from '../../modules/local/salmon/alevin/main'           addParams( options: salmon_alevin_options )
+include { SALMON_ALEVINQC }               from '../../modules/local/salmon/alevinqc/main'         addParams( options: salmon_alevinqc_options )
+include { POSTPROCESS }                   from '../../modules/local/postprocess/main'             addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                           from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
-include { GFFREAD as GFFREAD_TXP2GENE }      from '../../modules/nf-core/modules/gffread/main'       addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                     from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
-include { UNTAR }                            from '../../modules/nf-core/modules/untar/main.nf'      addParams( options: [:] )
+include { GUNZIP }                        from '../../modules/nf-core/modules/gunzip/main'        addParams( options: gunzip_options )
+include { GFFREAD as GFFREAD_TXP2GENE }   from '../../modules/nf-core/modules/gffread/main'       addParams( options: gffread_txp2gene_options )
+include { SALMON_INDEX }                  from '../../modules/nf-core/modules/salmon/index/main'  addParams( options: salmon_index_options )
+include { UNTAR }                         from '../../modules/nf-core/modules/untar/main.nf'      addParams( options: [:] )
 
 workflow ALEVIN {
     take:

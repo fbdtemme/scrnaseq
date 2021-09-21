@@ -15,7 +15,7 @@ def alevinfry_collate_options               = modules['alevinfry_collate']
 def alevinfry_quant_options                 = modules['alevinfry_quant']
 def postprocess_options                     = modules['postprocess']
 postprocess_options.publish_dir             = 'salmon/alevinfry'
-postprocess_options.args                    += '--transpose'
+postprocess_options.args                    += ' --transpose'
 def gunzip_options                          = modules['gunzip']
 
 ////////////////////////////////////////////////////
