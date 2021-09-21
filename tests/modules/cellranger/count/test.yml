@@ -2,3 +2,15 @@
   command: nextflow run ./tests/modules/cellranger/count/main.nf -entry test_cellranger_count -c ./tests/config/nextflow.config
   tags:
     - cellranger
+  files:
+    - path: ./results/cellranger/S10_L001/outs/raw_feature_bc_matrix/barcodes.tsv.gz
+    - path: ./results/cellranger/S10_L001/outs/raw_feature_bc_matrix/features.tsv.gz
+    - path: ./results/cellranger/S10_L001/outs/raw_feature_bc_matrix/matrix.mtx.gz
+    - path: ./results/cellranger/S10_L001/outs/filtered_feature_bc_matrix/barcodes.tsv.gz
+    - path: ./results/cellranger/S10_L001/outs/filtered_feature_bc_matrix/features.tsv.gz
+    - path: ./results/cellranger/S10_L001/outs/filtered_feature_bc_matrix/matrix.mtx.gz
+    - path: ./results/cellranger/S10_L001/outs/web_summary.html
+    - path: ./results/cellranger/S10_L001/outs/cloupe.cloupe
+    - path: ./results/cellranger/S10_L001/outs/metrics_summary.csv
+    - path: ./results/cellranger/S10_L001/outs/filtered_feature_bc_matrix.h5
+    - path: ./results/cellranger/S10_L001/outs/raw_feature_bc_matrix.h5

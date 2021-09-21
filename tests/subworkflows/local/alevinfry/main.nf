@@ -27,7 +27,7 @@ workflow test_alevinfry
 
     ch_fastq = Channel.from([fastq])
 
-    ALEVINFRY(
+    ALEVINFRY (
         ch_fastq,             
         genome_fasta,      
         gtf,
@@ -60,7 +60,7 @@ workflow test_alevinfry_index_and_txp2gene
     ch_index = ALEVINFRY_BUILD_INDEX.out.index
     ch_txp2gene = ALEVINFRY_BUILD_INDEX.out.txp2gene_3col
     
-    ALEVINFRY(
+    ALEVINFRY (
         ch_fastq,             
         genome_fasta,      
         gtf,

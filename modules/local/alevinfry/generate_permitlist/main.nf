@@ -24,21 +24,20 @@ process ALEVINFRY_GENERATE_PERMITLIST {
     val expected_orientation
 
     output:
-    tuple val(meta), path("*_alevinfry_quant")    , emit: quant
+    tuple val(meta), path("*_permitlist")    , emit: quant
     path "*.version.txt"                          , emit: version
 
     script:
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     
-    // alevin-fry complains when not passing everything in one line
     """
     alevin-fry generate-permit-list \\
       --knee-distance \\
       --expected-ori $expected_orientation \\
       --input $map \\
       $options.args \\
-      --output-dir ${prefix}_alevinfry_quant 
+      --output-dir ${prefix}_permitlist 
 
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """

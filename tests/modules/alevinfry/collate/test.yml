@@ -2,3 +2,11 @@
   command: nextflow run ./tests/modules/alevinfry/collate/main.nf -entry test_alevinfry_collate -c ./tests/config/nextflow.config
   tags:
     - alevinfry
+  files:
+    - path: ./results/alevinfry/S10_L001_alevin_results/all_freq.tsv
+    - path: ./results/alevinfry/S10_L001_alevin_results/collate.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/generate_permit_list.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/map.collated.rad
+    - path: ./results/alevinfry/S10_L001_alevin_results/permit_freq.tsv
+    - path: ./results/alevinfry/S10_L001_alevin_results/permit_map.bin
+    - path: ./results/alevinfry/S10_L001_alevin_results/unmapped_bc_count_collated.bin

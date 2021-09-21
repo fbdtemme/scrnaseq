@@ -9,7 +9,7 @@ include { ALEVIN }              from '../../../../subworkflows/local/alevin'
 include { SALMON_INDEX }        from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
 
 
-workflow test_alevin_paired_end
+workflow test_alevin
 {
     genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
     gtf                 = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
@@ -22,7 +22,7 @@ workflow test_alevin_paired_end
     txp2gene            = null
     salmon_index        = null
 
-    ALEVIN(
+    ALEVIN (
         fastq,
         genome_fasta,
         transcript_fasta,
@@ -46,7 +46,7 @@ workflow test_alevin_transcript_fasta
     txp2gene            = null
     salmon_index        = null
 
-    ALEVIN(
+    ALEVIN (
         fastq,
         genome_fasta,
         transcript_fasta,
@@ -98,7 +98,7 @@ workflow test_alevin_salmon_txp2gene
     salmon_index        = null
     barcode_whitelist   = null
 
-    ALEVIN(
+    ALEVIN (
         fastq,
         genome_fasta,
         transcript_fasta,

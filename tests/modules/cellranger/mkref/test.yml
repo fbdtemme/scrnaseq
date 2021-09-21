@@ -2,3 +2,8 @@
   command: nextflow run ./tests/modules/cellranger/mkref/main.nf -entry test_cellranger_mkref -c ./tests/config/nextflow.config
   tags:
     - cellranger
+  files:
+    - path: ./results/index/cellranger/fasta
+    - path: ./results/index/cellranger/genes
+    - path: ./results/index/cellranger/star
+    - path: ./results/index/cellranger/reference.json

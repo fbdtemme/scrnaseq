@@ -11,6 +11,7 @@ def alevinfry_index_options                 = modules['alevinfry_index']
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 def salmon_alevin_options                   = modules['salmon_alevin']
+salmon_alevin_options.publish_dir           = 'alevinfry'
 salmon_alevin_options.args                  += ' --sketch'
 def alevinfry_quant_options                 = modules['alevinfry_quant']
 def postprocess_options                     = modules['postprocess']

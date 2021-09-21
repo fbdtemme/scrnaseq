@@ -1,23 +1,161 @@
-- name: subworkflow-alevin-paired
-  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_paired_end -c ./tests/config/nextflow.config
+- name: subworkflow-alevin
+  command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin -c ./tests/config/nextflow.config
   tags:
     - subworkflow-alevin
-
+  files:
+    - path: ./results/index/salmon/complete_ref_lens.bin
+    - path: ./results/index/salmon/ctable.bin
+    - path: ./results/index/salmon/ctg_offsets.bin
+    - path: ./results/index/salmon/duplicate_clusters.tsv
+    - path: ./results/index/salmon/info.json
+    - path: ./results/index/salmon/mphf.bin
+    - path: ./results/index/salmon/pos.bin
+    - path: ./results/index/salmon/pre_indexing.log
+    - path: ./results/index/salmon/rank.bin
+    - path: ./results/index/salmon/ref_indexing.log
+    - path: ./results/index/salmon/refAccumLengths.bin
+    - path: ./results/index/salmon/reflengths.bin
+    - path: ./results/index/salmon/refseq.bin
+    - path: ./results/index/salmon/seq.bin
+    - path: ./results/index/salmon/versionInfo.json
+    - path: ./results/alevinqc/alevinReport.html
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/featureDump.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_cols.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_rows.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.mtx.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_tier_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/raw_cb_frequency.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/whitelist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/alevin_meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/ambig_info.tsv
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/expected_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/fld.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias_3p.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams/flenDist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/logs
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/lib_format_counts.json
 
 - name: subworkflow-alevin-transcript-fasta
   command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_transcript_fasta -c ./tests/config/nextflow.config
   tags:
     - subworkflow-alevin
-
+  files:
+    - path: ./results/index/salmon/complete_ref_lens.bin
+    - path: ./results/index/salmon/ctable.bin
+    - path: ./results/index/salmon/ctg_offsets.bin
+    - path: ./results/index/salmon/duplicate_clusters.tsv
+    - path: ./results/index/salmon/info.json
+    - path: ./results/index/salmon/mphf.bin
+    - path: ./results/index/salmon/pos.bin
+    - path: ./results/index/salmon/pre_indexing.log
+    - path: ./results/index/salmon/rank.bin
+    - path: ./results/index/salmon/ref_indexing.log
+    - path: ./results/index/salmon/refAccumLengths.bin
+    - path: ./results/index/salmon/reflengths.bin
+    - path: ./results/index/salmon/refseq.bin
+    - path: ./results/index/salmon/seq.bin
+    - path: ./results/index/salmon/versionInfo.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/featureDump.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_cols.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_rows.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.mtx.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_tier_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/raw_cb_frequency.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/whitelist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/alevin_meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/ambig_info.tsv
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/expected_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/fld.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias_3p.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams/flenDist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/logs
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/lib_format_counts.json
 
 - name: subworkflow-alevin-salmon-index
   command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_salmon_index -c ./tests/config/nextflow.config
   tags:
     - subworkflow-alevin
-
+  files:
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/featureDump.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_cols.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_rows.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.mtx.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_tier_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/raw_cb_frequency.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/whitelist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/alevin_meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/ambig_info.tsv
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/expected_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/fld.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias_3p.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams/flenDist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/logs
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/lib_format_counts.json
 
 - name: subworkflow-alevin-salmon-txp2gene
   command: nextflow run ./tests/subworkflows/local/alevin/main.nf -entry test_alevin_salmon_txp2gene -c ./tests/config/nextflow.config
   tags:
     - subworkflow-alevin
-  
+  files:
+    - path: ./results/index/salmon/complete_ref_lens.bin
+    - path: ./results/index/salmon/ctable.bin
+    - path: ./results/index/salmon/ctg_offsets.bin
+    - path: ./results/index/salmon/duplicate_clusters.tsv
+    - path: ./results/index/salmon/info.json
+    - path: ./results/index/salmon/mphf.bin
+    - path: ./results/index/salmon/pos.bin
+    - path: ./results/index/salmon/pre_indexing.log
+    - path: ./results/index/salmon/rank.bin
+    - path: ./results/index/salmon/ref_indexing.log
+    - path: ./results/index/salmon/refAccumLengths.bin
+    - path: ./results/index/salmon/reflengths.bin
+    - path: ./results/index/salmon/refseq.bin
+    - path: ./results/index/salmon/seq.bin
+    - path: ./results/index/salmon/versionInfo.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/featureDump.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_cols.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_rows.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat.mtx.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_tier_mat.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/raw_cb_frequency.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/whitelist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/alevin_meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/ambig_info.tsv
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/expected_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/fld.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias_3p.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/observed_bias.gz
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/libParams/flenDist.txt
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/logs
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/salmon/alevin/S10_L001_alevin_results/lib_format_counts.json

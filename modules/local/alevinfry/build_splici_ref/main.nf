@@ -22,17 +22,17 @@ process BUILD_SPLICI_REF {
     val read_length
 
     output:
-    path "*.version.txt"                          , emit: version
-    path "${genome}_splici_ref/*.fa"              , emit: reference
-    path "${genome}_splici_ref/*t2g.tsv"          , emit: txp2gene
-    path "${genome}_splici_ref/*t2g_3col.tsv"     , emit: txp2gene_3col
+    path "*.version.txt"               , emit: version
+    path "spliciref/*.fa"              , emit: reference
+    path "spliciref/*t2g.tsv"          , emit: txp2gene
+    path "spliciref/*t2g_3col.tsv"     , emit: txp2gene_3col
 
     script:
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${genome}${options.suffix}" : "${genome}"
     
     """
-    build_splici_ref.R $genome $gtf $read_length ${prefix}_splici_ref $options.args
+    build_splici_ref.R $genome $gtf $read_length spliciref $options.args
 
     echo "unversioned" > ${software}.version.txt
     """

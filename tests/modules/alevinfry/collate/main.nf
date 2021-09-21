@@ -14,7 +14,7 @@ workflow test_alevinfry_collate {
     ch_input = UNTAR.out.untar
         .map { path -> [[id:"S10_L001", single_end:false], path] }
 
- // Build permitlist and filter index
+    // Build permitlist and filter index
     ALEVINFRY_GENERATE_PERMITLIST( ch_input, "fw" )
     quant_dir = ALEVINFRY_GENERATE_PERMITLIST.out.quant
 

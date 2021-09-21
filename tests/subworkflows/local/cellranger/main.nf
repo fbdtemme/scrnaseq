@@ -19,7 +19,7 @@ workflow test_cellranger
     ch_fastq = Channel.from([fastq])
     index = null
 
-    CELLRANGER(
+    CELLRANGER (
         ch_fastq,             
         genome_fasta,      
         gtf,
