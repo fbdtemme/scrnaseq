@@ -8,14 +8,14 @@
 def modules = params.modules.clone()
 
 def alevinfry_index_options                 = modules['alevinfry_index']
-def salmon_alevin_options                   = modules['salmon_alevin']
-salmon_alevin_options.args                  += '--sketch'
 def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
+def salmon_alevin_options                   = modules['salmon_alevin']
+salmon_alevin_options.args                  += ' --sketch'
 def alevinfry_quant_options                 = modules['alevinfry_quant']
 def postprocess_options                     = modules['postprocess']
-postprocess_options.publish_dir             = 'salmon/alevinfry'
-postprocess_options.args                    += '--transpose'
+postprocess_options.publish_dir             = 'alevinfry'
+postprocess_options.args                    += ' --transpose'
 def gunzip_options                          = modules['gunzip']
 
 ////////////////////////////////////////////////////
@@ -65,7 +65,10 @@ workflow ALEVINFRY {
         ch_txp2gene = txp2gene
     }
 
-    // Align reads with alevin
+    // Align reads with salmon alevin
+    // TODO: Verify the correct library type:
+    // https://salmon.readthedocs.io/en/latest/library_type.html 
+    // for different types of chemistry and protocol
     def lib_type = "IU" 
     SALMON_ALEVIN (
         reads,

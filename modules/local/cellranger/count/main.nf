@@ -6,7 +6,6 @@ def options    = initOptions(params.options)
 process CELLRANGER_COUNT {
     tag "$meta.id"
     label 'process_high'
-
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
@@ -20,8 +19,8 @@ process CELLRANGER_COUNT {
     val protocol
 
     output:
-    tuple val(meta), path("samples/outs")    , emit: results
-    path "*.version.txt"                     , emit: version
+    tuple val(meta), path("${meta.id}/outs")    , emit: results
+    path "*.version.txt"                        , emit: version
 
     script:
     def reference_name = reference.name
@@ -41,15 +40,15 @@ process CELLRANGER_COUNT {
         mv "\$R2" "${meta.id}_\$R2"
     fi
 
-    cellranger count --id='samples' \\
+    cellranger count --id=${meta.id} \\
         --fastqs=. \\
         --sample=${meta.id} \\
         --transcriptome=${reference_name} \\
         --localcores=${task.cpus} \\
         --localmem=${task.memory.toGiga()} \\
         --disable-ui \\
-        --chemistry=${protocol}
-        ${options.args}
+        --chemistry=${protocol} \\
+        $options.args
 
     cellranger --version | grep -o "[0-9\\. ]\\+" > ${software}.version.txt
     """

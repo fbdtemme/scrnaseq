@@ -9,7 +9,7 @@ def kallistobustools_count_options              = modules['kallistobustools_coun
 def gffread_kallisto_genemap_options            = modules['gffread_kallisto_genemap']
 def postprocess_options                         = modules['postprocess']
 postprocess_options.publish_dir                 = 'kallisto'
-postprocess_options.args                       += '--transpose'
+postprocess_options.args                       += ' --transpose'
 def gunzip_options                              = modules['gunzip']
 
 ////////////////////////////////////////////////////

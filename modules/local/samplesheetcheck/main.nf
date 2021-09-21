@@ -3,9 +3,6 @@ include { saveFiles } from './functions'
 
 params.options = [:]
 
-/*
- * Reformat design file and check validity
- */
 process SAMPLESHEET_CHECK {
     tag "$samplesheet"
     publishDir "${params.outdir}",
@@ -29,19 +26,4 @@ process SAMPLESHEET_CHECK {
     """
     check_samplesheet.py $samplesheet samplesheet.valid.csv
     """
-}
-
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def get_samplesheet_paths(LinkedHashMap row) {
-    def meta = [:]
-    meta.id           = row.sample
-    meta.single_end   = row.single_end.toBoolean()
-
-    def array = []
-    if (meta.single_end) {
-        array = [ meta, [ file(row.fastq_1, checkIfExists: true) ] ]
-    } else {
-        array = [ meta, [ file(row.fastq_1, checkIfExists: true), file(row.fastq_2, checkIfExists: true) ] ]
-    }
-    return array
 }
