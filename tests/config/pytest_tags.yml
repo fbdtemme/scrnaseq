@@ -69,6 +69,12 @@ subworkflow-kallistobustools:
 #   - tests/subworkflows/local/starsolo/**
 #   - subworkflows/starsolo.nf
 
+# Disabled because of memory requirements
+# subworkflow-cellranger:
+#   - tests/config/**
+#   - tests/subworkflows/local/cellranger/**
+#   - subworkflows/cellranger.nf
+
 subworkflow-alevinfry:
   - tests/config/**
   - tests/subworkflows/local/alevinfry/**

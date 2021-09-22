@@ -2,9 +2,13 @@
 
 nextflow.enable.dsl = 2
 
+def salmon_index_options                = modules['salmon_index']
+def salmon_alevin_options               = modules['salmon_alevin']
+salmon_alevin_options.args             += ' --dumpFeatures --dumpMtx'
+
 include { GUNZIP }          from '../../../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
-include { SALMON_INDEX }    from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: [:] )
-include { SALMON_ALEVIN }   from '../../../../modules/local/salmon/alevin/main'          addParams( options: [:] )
+include { SALMON_INDEX }    from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
+include { SALMON_ALEVIN }   from '../../../../modules/local/salmon/alevin/main'          addParams( options: salmon_alevin_options )
 
 workflow test_salmon_alevin {
     genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)

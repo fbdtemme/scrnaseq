@@ -2,15 +2,10 @@ name: pytest-workflow
 on:
   push:
     branches:
-      - main
-      - dev
       - dsl2
   pull_request:
     branches:
-      - main
-      - dev
       - dsl2
-
 jobs:
   changes:
     name: Check for changes
