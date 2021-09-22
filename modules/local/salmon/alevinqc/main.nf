@@ -28,14 +28,15 @@ process SALMON_ALEVINQC {
     script:
     def software = "AlevinQC"
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-
     """
     #!/usr/bin/env Rscript
     require(alevinQC)
-    alevinQCReport(baseDir = "${alevin_results}", sampleId = "${prefix}",
+    alevinQCReport(baseDir = "${alevin_results}",
+                   sampleId = "${prefix}",
                    outputFile = "${prefix}_alevinqQCReport.html",
                    outputFormat = "html_document",
-                   outputDir = "./", forceOverwrite = TRUE)
+                   outputDir = "./", 
+                   forceOverwrite = TRUE)
     write(as.character(packageVersion("alevinQC")), paste0("${software}", ".version.txt"))
     """
 }

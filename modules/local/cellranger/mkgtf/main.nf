@@ -8,7 +8,7 @@ process CELLRANGER_MKGTF {
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
 
     // TODO update containers and add conda recipe (if possible)
     container "litd/docker-cellranger"   // Docker image
@@ -22,13 +22,11 @@ process CELLRANGER_MKGTF {
 
     script:
     def software = getSoftwareName(task.process)
-
     """
     cellranger mkgtf \\
         $gtf \\
         ${gtf.baseName}_mkgtf.gtf \\
         $options.args
-
     echo \$(cellranger --version 2>&1) | sed 's/^.*cellranger //; s/ .*\$//' > ${software}.version.txt
     """
 }

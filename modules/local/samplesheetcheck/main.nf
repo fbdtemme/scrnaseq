@@ -3,7 +3,7 @@ include { saveFiles } from './functions'
 
 params.options = [:]
 
-process SAMPLESHEET_CHECK {
+process SAMPLESHEETCHECK {
     tag "$samplesheet"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
@@ -22,7 +22,10 @@ process SAMPLESHEET_CHECK {
     output:
     path '*.csv'
 
-    script:  // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
+    // TODO add options.args
+    // TODO generate version output with software name
+    // TODO use options.suffix for the output file
+    script:  // This script is bundled with the pipeline, in bin/
     """
     check_samplesheet.py $samplesheet samplesheet.valid.csv
     """

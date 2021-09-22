@@ -1,5 +1,0 @@
-- name: mean-read-length
-  command: nextflow run ./tests/modules/mean_read_length/main.nf -entry test_mean_read_length -c ./tests/config/nextflow.config
-  tags:
-    - alevin-fry
-  

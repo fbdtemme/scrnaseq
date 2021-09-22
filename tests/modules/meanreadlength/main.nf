@@ -2,11 +2,9 @@
 
 nextflow.enable.dsl = 2
 
-// include { READ_LENGTH } from '../../../subworkflows/local/read_length.nf' addParams( options: [:] )
-include { MEAN_READ_LENGTH } from '../../../modules/local/mean_read_length/main' addParams( options: [:] )
+include { MEANREADLENGTH } from '../../../modules/local/meanreadlength/main' addParams( options: [:] )
 
-
-workflow test_mean_read_length {
+workflow test_meanreadlength {
     fastq        =  [
                         [[id:"S10_L001", single_end:false], [
                             file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
@@ -34,5 +32,5 @@ workflow test_mean_read_length {
 
     ch_all_reads = ch_all_fw.mix ( ch_all_rv )
 
-    MEAN_READ_LENGTH ( ch_all_reads )
+    MEANREADLENGTH ( ch_all_reads )
 }

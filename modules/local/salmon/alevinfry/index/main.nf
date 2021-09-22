@@ -29,13 +29,11 @@ process SALMON_ALEVINFRY_INDEX {
     script:
     def software = getSoftwareName(task.process)
     """
-     salmon \\
-        index \\
+    salmon index \\
         --threads $task.cpus \\
         -t $splici_transcriptome \\
         -i alevinfry \\
         $options.args
-
     salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
     """
 }

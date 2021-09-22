@@ -10,7 +10,7 @@ process SALMON_ALEVIN {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
 
     conda (params.enable_conda ? 'bioconda::salmon=1.5.2' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -33,7 +33,6 @@ process SALMON_ALEVIN {
     script:
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-
     def strandedness_opts = [
         'A', 'U', 'SF', 'SR',
         'IS', 'IU' , 'ISF', 'ISR',
@@ -55,7 +54,6 @@ process SALMON_ALEVIN {
             strandedness = meta.single_end ? 'SR' : 'ISR'
         }
     }
-
     """
     salmon alevin \\
         -p $task.cpus \\
@@ -67,7 +65,6 @@ process SALMON_ALEVIN {
         --tgMap $txp2gene \\
         $options.args \\
         -o ${prefix}_alevin_results
-    
     salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
     """
 }

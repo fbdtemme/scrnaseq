@@ -1,4 +1,4 @@
-name: mean_read_length
+name: MEANREADLENGTH
 description: Calculate the mean read length of input fastq files
 keywords:
   - fastq

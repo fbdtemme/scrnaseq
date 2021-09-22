@@ -8,7 +8,7 @@
 def modules = params.modules.clone()
 
 def alevinfry_index_options                 = modules['alevinfry_index']
-def alevinfry_generate_permitlist_options   = modules['alevinfry_permitlist']
+def alevinfry_generatepermitlist_options    = modules['alevinfry_generatepermitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 def salmon_alevin_options                   = modules['salmon_alevin']
 salmon_alevin_options.publish_dir           = 'alevinfry'
@@ -24,7 +24,7 @@ def gunzip_options                          = modules['gunzip']
 ////////////////////////////////////////////////////
 include { ALEVINFRY_BUILD_INDEX }           from '../../subworkflows/local/alevinfry_build_index'           addParams( options: alevinfry_index_options )
 include { SALMON_ALEVIN }                   from '../../modules/local/salmon/alevin/main'                   addParams( options: salmon_alevin_options )
-include { ALEVINFRY_GENERATE_PERMITLIST }   from '../../modules/local/alevinfry/generate_permitlist/main'   addParams( options: alevinfry_generate_permitlist_options )
+include { ALEVINFRY_GENERATEPERMITLIST }    from '../../modules/local/alevinfry/generatepermitlist/main'    addParams( options: alevinfry_generatepermitlist_options )
 include { ALEVINFRY_COLLATE }               from '../../modules/local/alevinfry/collate/main'               addParams( options: alevinfry_collate_options )
 include { ALEVINFRY_QUANT }                 from '../../modules/local/alevinfry/quant/main'                 addParams( options: alevinfry_quant_options )
 include { POSTPROCESS }                     from '../../modules/local/postprocess/main'                     addParams( options: postprocess_options )
@@ -77,8 +77,8 @@ workflow ALEVINFRY {
     )
 
     // Build permitlist and filter index
-    ALEVINFRY_GENERATE_PERMITLIST( SALMON_ALEVIN.out.results, expected_orientation )
-    ALEVINFRY_COLLATE ( ALEVINFRY_GENERATE_PERMITLIST.out.quant, SALMON_ALEVIN.out.results )
+    ALEVINFRY_GENERATEPERMITLIST( SALMON_ALEVIN.out.results, expected_orientation )
+    ALEVINFRY_COLLATE ( ALEVINFRY_GENERATEPERMITLIST.out.quant, SALMON_ALEVIN.out.results )
 
     // Perform quantification with alevin-fry quant
     ALEVINFRY_QUANT ( ALEVINFRY_COLLATE.out.results, ch_txp2gene )

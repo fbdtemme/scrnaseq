@@ -1,4 +1,0 @@
-- name: alevinfry-build-splici-ref
-  command: nextflow run ./tests/modules/alevinfry/build_splici_ref/main.nf -entry test_build_splici_ref -c ./tests/config/nextflow.config
-  tags:
-    - alevinfry

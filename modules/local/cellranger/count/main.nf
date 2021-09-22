@@ -8,7 +8,7 @@ process CELLRANGER_COUNT {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
 
     // TODO update containers and add conda recipe (if possible)
     container "litd/docker-cellranger"   // Docker image
@@ -28,18 +28,14 @@ process CELLRANGER_COUNT {
 
     """
     # Make sure reads are prefixed with the meta.id
-
     R1="${reads[0]}"
     R2="${reads[1]}"
-
     if [[ ! "\$R1" =~ "^${meta.id}.*" ]]; then
         mv "\$R1" "${meta.id}_\$R1"
     fi
-
     if [[ ! "\$R2" =~ "^${meta.id}.*" ]]; then
         mv "\$R2" "${meta.id}_\$R2"
     fi
-
     cellranger count --id=${meta.id} \\
         --fastqs=. \\
         --sample=${meta.id} \\
@@ -49,7 +45,6 @@ process CELLRANGER_COUNT {
         --disable-ui \\
         --chemistry=${protocol} \\
         $options.args
-
     cellranger --version | grep -o "[0-9\\. ]\\+" > ${software}.version.txt
     """
 }

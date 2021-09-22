@@ -24,10 +24,10 @@ process GET_SOFTWARE_VERSIONS {
     path versions
 
     output:
-    path "software_versions.tsv"     , emit: tsv
-    path 'software_versions_mqc.yaml', emit: yaml
+    path "software_versions.tsv"         , emit: tsv
+    path 'software_versions_mqc.yaml'    , emit: yaml
 
-    script: // This script is bundled with the pipeline, in nf-core/sarek/bin/
+    script: // This script is bundled with the pipeline, in bin/
     """
     echo $workflow.manifest.version > pipeline.version.txt
     echo $workflow.nextflow.version > nextflow.version.txt

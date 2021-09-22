@@ -10,7 +10,7 @@ process ALEVINFRY_QUANT {
     label "process_medium"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:meta.id) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
 
     conda (params.enable_conda ? 'bioconda::alevin-fry=0.4.1' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -30,8 +30,6 @@ process ALEVINFRY_QUANT {
     script:
     def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-
-    // alevin-fry complains when passing empty options.args
     """
     alevin-fry quant \\
         --threads $task.cpus \\
@@ -41,7 +39,6 @@ process ALEVINFRY_QUANT {
         --resolution cr-like \\
         $options.args \\
         --use-mtx
-
     alevin-fry --version | sed -e "s/alevin-fry //g" > ${software}.version.txt
     """
 }

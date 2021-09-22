@@ -8,7 +8,7 @@ process CELLRANGER_MKREF {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'index', meta:[:], publish_by_meta:[]) }
 
     // TODO update containers and add conda recipe (if possible)
     container "litd/docker-cellranger"   // Docker image
@@ -23,7 +23,6 @@ process CELLRANGER_MKREF {
 
     script:
     def software = getSoftwareName(task.process)
-
     """
     cellranger mkref \\
         --genome=cellranger \\
@@ -31,7 +30,6 @@ process CELLRANGER_MKREF {
         --genes=${gtf} \\
         --memgb ${task.memory.giga} \\
         --nthreads ${task.cpus}
-
     cellranger --version | grep -o "[0-9\\. ]\\+" > ${software}.version.txt
     """
 }

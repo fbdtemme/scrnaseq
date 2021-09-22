@@ -7,8 +7,8 @@ def modules = params.modules.clone()
 def star_genomegenerate_options     = modules['star_genomegenerate']
 def star_align_options              = modules['star_align']
 
-include { STAR_GENOMEGENERATE } from '../../../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
-include { STAR_ALIGN }          from '../../../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
+include { STAR_GENOMEGENERATE }     from '../../../../modules/nf-core/modules/star/genomegenerate/main'  addParams( options: star_genomegenerate_options )
+include { STAR_ALIGNSOLO }          from '../../../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 
 workflow test_star_alignsolo {
     genome_fasta        = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
@@ -30,7 +30,7 @@ workflow test_star_alignsolo {
     )
     star_index = STAR_GENOMEGENERATE.out.index
   
-    STAR_ALIGN ( 
+    STAR_ALIGNSOLO ( 
         fastq,
         star_index,
         gtf,

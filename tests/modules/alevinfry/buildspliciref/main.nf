@@ -2,9 +2,9 @@
 
 nextflow.enable.dsl = 2
 
-include { BUILD_SPLICI_REF } from '../../../../modules/local/alevinfry/build_splici_ref/main' addParams( options: [:] )
+include { BUILDSPLICIREF } from '../../../../modules/local/alevinfry/buildspliciref/main' addParams( options: [:] )
 
-workflow test_build_splici_ref {
+workflow test_buildspliciref {
     genome_fasta = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
     gtf          = file(params.test_data_scrnaseq["reference"]["mouse_gtf"], checkIfExists: true)
     read_length  = 100
@@ -12,5 +12,5 @@ workflow test_build_splici_ref {
                         file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
                         file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
 
-    BUILD_SPLICI_REF ( genome_fasta, gtf, read_length )
+    BUILDSPLICIREF ( genome_fasta, gtf, read_length )
 }

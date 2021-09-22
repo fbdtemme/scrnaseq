@@ -15,7 +15,7 @@ jobs:
     # Do a full-scale run with each of the tools
     strategy:
       matrix:
-        tools: ["star", "alevin", "kallisto", "alevinfry"]
+        tools: ["alevin", "kallisto", "alevinfry"] #cellranger and star requires a lot of memory to run
     steps:
       - name: Launch workflow via tower
         uses: nf-core/tower-action@master
@@ -28,7 +28,7 @@ jobs:
           workdir: s3://${{ secrets.AWS_S3_BUCKET }}/work/scrnaseq/work-${{ github.sha }}
           parameters: |
             {
-              "outdir" : "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-${{ github.sha }}/aligner_${{ matrix.tools }}",
+              "outdir" : "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-${{ github.sha }}/tool_${{ matrix.tools }}",
               "aligner": "${{ matrix.tools }}"
             }
           profiles: '[ "test_full", "aws_tower" ]'

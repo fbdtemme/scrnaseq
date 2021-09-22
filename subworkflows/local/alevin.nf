@@ -57,7 +57,7 @@ workflow ALEVIN {
     // Preprocessing - Extract transcriptome fasta from genome fasta
     if (!transcript_fasta && genome_fasta && gtf) {
         GFFREAD_TRANSCRIPTOME ( genome_fasta, gtf )
-        transcript_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
+        transcript_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
     

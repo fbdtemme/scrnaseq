@@ -19,7 +19,7 @@ def gunzip_options                = modules['gunzip']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { STAR_ALIGN }            from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
+include { STAR_ALIGNSOLO }            from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 include { POSTPROCESS }           from '../../modules/local/postprocess/main'                    addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ workflow STARSOLO {
     }
   
     // Perform mapping and quantification with STARsolo
-    STAR_ALIGN ( 
+    STAR_ALIGNSOLO ( 
         reads,
         ch_star_index,
         gtf,
@@ -79,14 +79,14 @@ workflow STARSOLO {
     )
 
     // Collect software versions
-    ch_software_versions    = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
+    ch_software_versions    = ch_software_versions.mix(STAR_ALIGNSOLO.out.version.first().ifEmpty(null))
 
     // Reformat output and run postprocess module
     // TODO there may be a cleaner way of doing this
     // Meta and result could be set in one command and the matrix, barcodes and features could
     // be mixed into one channel
-    ch_star_results_files   = STAR_ALIGN.out.solo_results.map{ it[1] }
-    ch_meta                 = STAR_ALIGN.out.solo_results.map{ it[0] }
+    ch_star_results_files   = STAR_ALIGNSOLO.out.solo_results.map{ it[1] }
+    ch_meta                 = STAR_ALIGNSOLO.out.solo_results.map{ it[0] }
     ch_matrix               = ch_star_results_files.map{ "${it}/Gene/filtered/matrix.mtx" }
     ch_features             = ch_star_results_files.map{ "${it}/Gene/filtered/features.tsv" }
     ch_barcodes             = ch_star_results_files.map{ "${it}/Gene/filtered/barcodes.tsv" }
@@ -96,7 +96,7 @@ workflow STARSOLO {
     ch_software_versions    = ch_software_versions.mix(POSTPROCESS.out.version.first().ifEmpty(null))
 
     // Collect multiqc files
-    ch_multiqc_files        = STAR_ALIGN.out.log_final.collect{ it[1] }
+    ch_multiqc_files        = STAR_ALIGNSOLO.out.log_final.collect{ it[1] }
 
     emit:
     software_versions       = ch_software_versions

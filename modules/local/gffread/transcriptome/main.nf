@@ -9,7 +9,7 @@ process GFFREAD_TRANSCRIPTOME {
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
 
     conda (params.enable_conda ? "bioconda::gffread=0.12.1" : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -19,18 +19,23 @@ process GFFREAD_TRANSCRIPTOME {
     }
 
     input:
-    path genome_fasta
+    path genome
     path gtf
 
     output:
-    path "${genome_fasta}.transcriptome.fa"    , emit: transcriptome_extracted
-    path "*.version.txt"                       , emit: version
+    path "*.transcriptome.fa"    , emit: transcriptome
+    path "*.version.txt"         , emit: version
 
     script:
     def software = getSoftwareName(task.process)
+    def prefix   = options.suffix ? "${genome.baseName}${options.suffix}" : "${genome.baseName}"
     """
-    gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
-
+    gffread \\
+        $gtf \\
+        -F \\
+        -w ${prefix}.transcriptome.fa \\
+        $options.args \\
+        -g $genome 
     echo \$(gffread --version 2>&1) > ${software}.version.txt
     """
 }

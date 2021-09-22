@@ -5,7 +5,7 @@ params.options = [:]
 options        = initOptions(params.options)
 
 /*
- * Reformat output file from the different tools to common formats
+ * Reformat output file from the different tools to common formats and generate QC and post-analysis
  */
 process POSTPROCESS {
     tag "$meta.id"
@@ -33,17 +33,16 @@ process POSTPROCESS {
     path "*_matrices"      , emit: outdir
     path "*.version.txt"   , emit: version
 
-    script:  // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
-    def software = "Postprocess"
+    script:  // This script is bundled with the pipeline, in bin/
+    def software = "postprocess"
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-    
     """
-    postprocessing.py --matrix $matrix \\
-      --features $features \\
-      --barcodes $barcodes \\
-      --output ${prefix}_matrices \\
-      $options.args
-
+    postprocessing.py \\
+        --matrix $matrix \\
+        --features $features \\
+        --barcodes $barcodes \\
+        --output ${prefix}_matrices \\
+        $options.args
     echo "unversioned" > ${software}.version.txt
     """
 }
