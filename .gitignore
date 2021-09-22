@@ -9,3 +9,5 @@ testing*
 log/
 reports/
 testme.sh
+.vscode/
+.pytest_cache/
