@@ -3,10 +3,6 @@
   tags:
     - alevinfry
   files:
-    - path: ./results/alevinfry/S10_L001_permitlist/all_freq.tsv
     - path: ./results/alevinfry/S10_L001_permitlist/collate.json
-    - path: ./results/alevinfry/S10_L001_permitlist/generate_permit_list.json
     - path: ./results/alevinfry/S10_L001_permitlist/map.collated.rad
-    - path: ./results/alevinfry/S10_L001_permitlist/permit_freq.tsv
-    - path: ./results/alevinfry/S10_L001_permitlist/permit_map.bin
     - path: ./results/alevinfry/S10_L001_permitlist/unmapped_bc_count_collated.bin

@@ -12,7 +12,7 @@ process POSTPROCESS {
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
 
     // TODO this conda recipe is probably not working
     conda (params.enable_conda ? "conda-forge::python=3.8.10 conda-forge::scanpy" : null)
