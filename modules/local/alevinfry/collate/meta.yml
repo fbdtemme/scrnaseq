@@ -1,0 +1,43 @@
+name: alevinfry_collate
+description: Produce an output RAD file that is collated by (corrected) cellular barcode.
+keywords:
+  - index
+  - fasta
+  - genome
+  - reference
+tools:
+  - alevinfry_collate:
+      description: |
+        alevin-fry is a suite of tools for the rapid, accurate and memory-frugal processing single-cell and single-nucleus sequencing data.
+      homepage: https://github.com/COMBINE-lab/alevinfry
+      manual: https://alevin-fry.readthedocs.io/en/latest/
+      doi: 10.1101/2021.06.29.450377v1
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - input:
+      type: directory
+      description: |
+        A directory that contains information computed by the generate-permit-list command that will allow successful collation and barcode correction.
+
+output:
+  - meta:
+    type: map
+    description: |
+      Groovy Map containing sample information
+      e.g. [ id:'test', single_end:false ]
+  - input:
+    type: directory
+    description: |
+       A directory that contains the resulting collated rad file.
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+
+authors:
+  - "@fbdtemme"
+  - "@jfnavarro"

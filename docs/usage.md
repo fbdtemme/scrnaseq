@@ -9,10 +9,12 @@
 The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --reads samplesheet.csv --fasta human.fasta --gtf human.gtf --aligner alevin -profile docker
 ```
 
-This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and other options.
+
+<!-- TODO add description of parameters, specially aligner -->
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -39,6 +41,12 @@ First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scr
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
+## Samplesheet input
+
+Multiple runs of the same sample
+
+The sample identifiers and replicate id have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+
 ## Core Nextflow arguments
 
 > **NB:** These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
@@ -61,27 +69,27 @@ They are loaded in sequence, so later profiles can overwrite earlier profiles.
 If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended.
 
 - `docker`
-  - A generic configuration profile to be used with [Docker](https://docker.com/)
-  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+    - A generic configuration profile to be used with [Docker](https://docker.com/)
+    - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
 - `singularity`
-  - A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
-  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+    - A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
+    - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
 - `podman`
-  - A generic configuration profile to be used with [Podman](https://podman.io/)
-  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+    - A generic configuration profile to be used with [Podman](https://podman.io/)
+    - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
 - `shifter`
-  - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
-  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+    - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
+    - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
 - `charliecloud`
-  - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
-  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+    - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+    - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
 - `conda`
-  - Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
-  - A generic configuration profile to be used with [Conda](https://conda.io/docs/)
-  - Pulls most software from [Bioconda](https://bioconda.github.io/)
+    - Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
+    - A generic configuration profile to be used with [Conda](https://conda.io/docs/)
+    - Pulls most software from [Bioconda](https://bioconda.github.io/)
 - `test`
-  - A profile with a complete configuration for automated testing
-  - Includes links to test data so needs no other parameters
+    - A profile with a complete configuration for automated testing
+    - Includes links to test data so needs no other parameters
 
 ### `-resume`
 

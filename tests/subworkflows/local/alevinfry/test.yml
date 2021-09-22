@@ -1,0 +1,35 @@
+- name: subworkflow-alevinfry
+  command: nextflow run ./tests/subworkflows/local/alevinfry/main.nf -entry test_alevinfry -c ./tests/config/nextflow.config
+  tags:
+    - subworkflow-alevinfry
+  files:
+    - path: ./results/alevinfry/S10_L001_quant_results/alevin
+    - path: ./results/alevinfry/S10_L001_quant_results/alevin/quants_mat_cols.txt
+    - path: ./results/alevinfry/S10_L001_quant_results/alevin/quants_mat_rows.txt
+    - path: ./results/alevinfry/S10_L001_quant_results/alevin/quants_mat.mtx
+    - path: ./results/alevinfry/S10_L001_quant_results/featureDump.txt
+    - path: ./results/alevinfry/S10_L001_quant_results/quant.json
+    - path: ./results/index/alevinfry/complete_ref_lens.bin
+    - path: ./results/index/alevinfry/ctable.bin
+    - path: ./results/index/alevinfry/ctg_offsets.bin
+    - path: ./results/index/alevinfry/duplicate_clusters.tsv
+    - path: ./results/index/alevinfry/info.json
+    - path: ./results/index/alevinfry/mphf.bin
+    - path: ./results/index/alevinfry/pos.bin
+    - path: ./results/index/alevinfry/pre_indexing.log
+    - path: ./results/index/alevinfry/rank.bin
+    - path: ./results/index/alevinfry/ref_indexing.log
+    - path: ./results/index/alevinfry/refAccumLengths.bin
+    - path: ./results/index/alevinfry/reflengths.bin
+    - path: ./results/index/alevinfry/refseq.bin
+    - path: ./results/index/alevinfry/seq.bin
+    - path: ./results/index/alevinfry/versionInfo.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/alevin/alevin.log
+    - path: ./results/alevinfry/S10_L001_alevin_results/aux_info
+    - path: ./results/alevinfry/S10_L001_alevin_results/aux_info/meta_info.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/libParams
+    - path: ./results/alevinfry/S10_L001_alevin_results/logs
+    - path: ./results/alevinfry/S10_L001_alevin_results/logs/salmon_quant.log
+    - path: ./results/alevinfry/S10_L001_alevin_results/cmd_info.json
+    - path: ./results/alevinfry/S10_L001_alevin_results/map.rad
+    - path: ./results/alevinfry/S10_L001_alevin_results/unmapped_bc_count.bin

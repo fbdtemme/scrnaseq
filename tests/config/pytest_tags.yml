@@ -1,0 +1,81 @@
+gffread-transcriptome:
+  - tests/config/**
+  - modules/local/gffread/transcriptome/**
+  - tests/modules/gffread/transcriptome/**
+
+samplesheetcheck:
+  - tests/config/**
+  - modules/local/samplesheetcheck/**
+  - tests/modules/samplesheetcheck/**
+
+salmon-alevin:
+  - tests/config/**
+  - modules/local/salmon/alevin/**
+  - tests/modules/salmon/alevin/**
+
+salmon-alevinqc:
+  - tests/config/**
+  - modules/local/salmon/alevinqc/**
+  - tests/modules/salmon/alevinqc/**
+
+star-alignsolo:
+  - tests/config/**
+  - modules/local/star/alignsolo/**
+  - tests/modules/star/alignsolo/**
+
+alevinfry-buildspliciref:
+  - tests/config/**
+  - modules/local/alevinfry/buildspliciref/**
+  - tests/modules/alevinfry/buildspliciref/**
+
+alevinfry-collate:
+  - tests/config/**
+  - modules/local/alevinfry/collate/**
+  - tests/modules/alevinfry/collate/**
+
+alevinfry-generatepermitlist:
+  - tests/config/**
+  - modules/local/alevinfry/generatepermitlist/**
+  - tests/modules/alevinfry/generatepermitlist/**
+
+alevinfry-index:
+  - tests/config/**
+  - modules/local/alevinfry/index/**
+  - tests/modules/alevinfry/index/**
+
+alevinfry-map:
+  - tests/config/**
+  - modules/local/alevinfry/map/**
+  - tests/modules/alevinfry/map/**
+
+alevinfry-quant:
+  - tests/config/**
+  - modules/local/alevinfry/quant/**
+  - tests/modules/alevinfry/quant/**
+
+subworkflow-alevin:
+  - tests/config/**
+  - tests/subworkflows/local/alevin/**
+  - subworkflows/alevin.nf
+
+subworkflow-kallistobustools:
+  - tests/config/**
+  - tests/subworkflows/local/kallistobustools/**
+  - subworkflows/bustools.nf
+
+# Disabled because of memory requirements
+# subworkflow-starsolo:
+#   - tests/config/**
+#   - tests/subworkflows/local/starsolo/**
+#   - subworkflows/starsolo.nf
+
+# Disabled because of memory requirements
+# subworkflow-cellranger:
+#   - tests/config/**
+#   - tests/subworkflows/local/cellranger/**
+#   - subworkflows/cellranger.nf
+
+subworkflow-alevinfry:
+  - tests/config/**
+  - tests/subworkflows/local/alevinfry/**
+  - subworkflows/alevinfry.nf

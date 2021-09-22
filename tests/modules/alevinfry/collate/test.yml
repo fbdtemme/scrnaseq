@@ -1,0 +1,8 @@
+- name: alevinfry-collate
+  command: nextflow run ./tests/modules/alevinfry/collate/main.nf -entry test_alevinfry_collate -c ./tests/config/nextflow.config
+  tags:
+    - alevinfry
+  files:
+    - path: ./results/alevinfry/S10_L001_permitlist/collate.json
+    - path: ./results/alevinfry/S10_L001_permitlist/map.collated.rad
+    - path: ./results/alevinfry/S10_L001_permitlist/unmapped_bc_count_collated.bin

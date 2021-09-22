@@ -1,0 +1,36 @@
+name: MEANREADLENGTH
+description: Calculate the mean read length of input fastq files
+keywords:
+  - fastq
+  - statistics
+tools: []
+
+input:
+    - meta:
+        type: map
+        description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+    - reads:
+        type: file
+        description: |
+            A list of file to calculate the average read length over.
+        pattern: "*.fasta"
+
+output:
+    - meta:
+        type: map
+        description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+    - results:
+        type: integer
+        description: "The average read length over the given set of reads."
+    - version:
+        type: file
+        description: File containing software version
+        pattern: "*.{version.txt}"
+
+authors:
+    - "@fbdtemme"
+    - "@jfnvarro"
