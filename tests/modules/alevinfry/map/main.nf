@@ -2,15 +2,14 @@
 
 nextflow.enable.dsl = 2
 
-def modules = params.modules.clone()
+def modules                         = params.modules.clone()
+def alevinfry_index_options         = modules['alevinfry_index']
+def salmon_alevin_options           = modules['salmon_alevin']
+salmon_alevin_options.publish_dir   = 'alevinfry'
+salmon_alevin_options.args          += ' --sketch'
 
-def alevinfry_index_options                 = modules['alevinfry_index']
-def salmon_alevin_options                   = modules['salmon_alevin']
-salmon_alevin_options.publish_dir           = 'alevinfry'
-salmon_alevin_options.args                  += ' --sketch'
-
-include { SALMON_ALEVINFRY_INDEX } from '../../../../modules/local/salmon/alevinfry/index/main' addParams( options: alevinfry_index_options )
-include { SALMON_ALEVIN }          from '../../../../modules/local/salmon/alevin/main'          addParams( options: salmon_alevin_options )
+include { SALMON_ALEVINFRY_INDEX }  from '../../../../modules/local/salmon/alevinfry/index/main' addParams( options: alevinfry_index_options )
+include { SALMON_ALEVIN }           from '../../../../modules/local/salmon/alevin/main'          addParams( options: salmon_alevin_options )
 
 workflow test_alevinfry_map{
     splici_ref    = params.test_data_scrnaseq["reference"]["alevinfry"]["splici_ref"]

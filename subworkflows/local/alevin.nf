@@ -8,8 +8,7 @@ def whitelist_folder = "$baseDir/assets/whitelist/"
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
 ////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
+def modules                             = params.modules.clone()
 def gffread_txp2gene_options            = modules['gffread_tx2pgene']
 def gffread_transcriptome_options       = modules['gffread_transcriptome']
 def salmon_index_options                = modules['salmon_index']

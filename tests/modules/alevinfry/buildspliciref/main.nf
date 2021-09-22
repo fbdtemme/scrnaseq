@@ -2,7 +2,10 @@
 
 nextflow.enable.dsl = 2
 
-include { BUILDSPLICIREF } from '../../../../modules/local/alevinfry/buildspliciref/main' addParams( options: [:] )
+def modules                   = params.modules.clone()
+def alevinfry_buildspliciref  = modules['alevinfry_buildspliciref']
+
+include { BUILDSPLICIREF }    from '../../../../modules/local/alevinfry/buildspliciref/main' addParams( options: alevinfry_buildspliciref )
 
 workflow test_buildspliciref {
     genome_fasta = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)

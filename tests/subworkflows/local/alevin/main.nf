@@ -2,12 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-def modules                = params.modules.clone()
-def salmon_index_options   = modules["salmon_index"]
-
 include { ALEVIN }         from '../../../../subworkflows/local/alevin'
-include { SALMON_INDEX }   from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )
-
 
 workflow test_alevin
 {

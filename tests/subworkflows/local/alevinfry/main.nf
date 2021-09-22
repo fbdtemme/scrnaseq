@@ -12,7 +12,6 @@ workflow test_alevinfry
                                 file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
                                 file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
     protocol                = "10XV2"
-
     transcript_fasta        = null
     txp2gene                = null
     alevinfry_gene_map      = null

@@ -2,6 +2,7 @@
 
 nextflow.enable.dsl = 2
 
+def modules                             = params.modules.clone()
 def salmon_index_options                = modules['salmon_index']
 def salmon_alevin_options               = modules['salmon_alevin']
 salmon_alevin_options.args             += ' --dumpFeatures --dumpMtx'

@@ -2,6 +2,7 @@
 
 nextflow.enable.dsl = 2
 
+def modules                   = params.modules.clone()
 def salmon_alevinqc_options   = modules['salmon_alevinqc']
 
 include { UNTAR }             from '../../../../modules/nf-core/modules/untar/main'   addParams( options: [:] )

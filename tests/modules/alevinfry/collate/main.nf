@@ -2,6 +2,7 @@
 
 nextflow.enable.dsl = 2
 
+def modules                                 = params.modules.clone()
 def alevinfry_generatepermitlist_options    = modules['alevinfry_generatepermitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 

@@ -2,8 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-def modules = params.modules.clone()
-
+def modules                         = params.modules.clone()
 def star_genomegenerate_options     = modules['star_genomegenerate']
 def star_align_options              = modules['star_align']
 
@@ -21,7 +20,6 @@ workflow test_star_alignsolo {
                           ]
     protocol            = "CB_UMI_Simple"
     chemistry           = "V2"
-
     barcode_whitelist   = file(params.test_data_scrnaseq["reference"]["tenx_V2_barcode_whitelist"], checkIfExists: true)
 
     STAR_GENOMEGENERATE ( 

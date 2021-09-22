@@ -2,8 +2,11 @@
 
 nextflow.enable.dsl = 2
 
-include { UNTAR }                        from '../../../../modules/nf-core/modules/untar/main.nf'           addParams( options: [:] )
-include { ALEVINFRY_GENERATEPERMITLIST } from '../../../../modules/local/alevinfry/generatepermitlist/main' addParams( options: [:] )
+def modules                               = params.modules.clone()
+def alevinfry_generatepermitlist_options  = modules['alevinfry_generatepermitlist']
+
+include { UNTAR }                         from '../../../../modules/nf-core/modules/untar/main.nf'           addParams( options: [:] )
+include { ALEVINFRY_GENERATEPERMITLIST }  from '../../../../modules/local/alevinfry/generatepermitlist/main' addParams( options: alevinfry_generatepermitlist_options)
 
 workflow test_alevinfry_generatepermitlist {
     alevinfry_result_archive = file(params.test_data_scrnaseq["results"]["alevinfry"], checkIfExists: true)

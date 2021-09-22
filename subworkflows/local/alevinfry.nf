@@ -5,8 +5,7 @@
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
 ////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
+def modules                                 = params.modules.clone()
 def alevinfry_index_options                 = modules['alevinfry_index']
 def alevinfry_generatepermitlist_options    = modules['alevinfry_generatepermitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']

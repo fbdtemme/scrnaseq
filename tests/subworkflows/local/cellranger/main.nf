@@ -2,10 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-def modules          = params.modules.clone()
-
-include { CELLRANGER }              from '../../../../subworkflows/local/cellranger'
-
+include { CELLRANGER }  from '../../../../subworkflows/local/cellranger'
 
 workflow test_cellranger
 {
@@ -15,7 +12,6 @@ workflow test_cellranger
                                 file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
                                 file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
     protocol            = "10XV2"
-
     ch_fastq = Channel.from([fastq])
     index = null
 

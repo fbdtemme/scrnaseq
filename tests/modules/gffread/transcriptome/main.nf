@@ -2,7 +2,10 @@
 
 nextflow.enable.dsl = 2
 
-include { GFFREAD_TRANSCRIPTOME } from '../../../../modules/local/gffread/transcriptome/main.nf' addParams( options: [:] )
+def modules                        = params.modules.clone()
+def gffread_transcriptome_options  = modules['gffread_transcriptome']
+
+include { GFFREAD_TRANSCRIPTOME }  from '../../../../modules/local/gffread/transcriptome/main.nf' addParams( options: gffread_transcriptome_options )
 
 workflow test_gffread_transcriptome {
     genome_fasta = file(params.test_data_scrnaseq["reference"]["mouse_genome"], checkIfExists: true)
