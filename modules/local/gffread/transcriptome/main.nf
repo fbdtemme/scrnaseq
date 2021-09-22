@@ -5,7 +5,7 @@ params.options = [:]
 options        = initOptions(params.options)
 
 process GFFREAD_TRANSCRIPTOME {
-    tag "gffread_transcriptome"
+    tag "$gff"
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
