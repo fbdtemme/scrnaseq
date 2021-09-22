@@ -18,8 +18,15 @@ workflow test_alevinfry_map{
                         file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
                         file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
     alevin_protocol = "chromium"
+    lib_type = "IU"
 
     ch_index = SALMON_ALEVINFRY_INDEX ( splici_ref ).index
 
-    SALMON_ALEVIN ( fastq, ch_index, txp2gene_3col, alevin_protocol, "IU" )
+    SALMON_ALEVIN ( 
+        fastq, 
+        ch_index, 
+        txp2gene_3col, 
+        alevin_protocol, 
+        lib_type 
+    )
 }

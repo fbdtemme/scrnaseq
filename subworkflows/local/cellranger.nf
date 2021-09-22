@@ -5,8 +5,7 @@
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
 ////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
+def modules                            = params.modules.clone()
 def cellranger_mkref_options           = modules['cellranger_mkref']
 def cellranger_mkgtf_options           = modules['cellranger_mkgtf']
 def cellranger_count_options           = modules['cellranger_count']

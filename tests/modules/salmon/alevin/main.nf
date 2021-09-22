@@ -2,10 +2,10 @@
 
 nextflow.enable.dsl = 2
 
-def modules                             = params.modules.clone()
-def salmon_index_options                = modules['salmon_index']
-def salmon_alevin_options               = modules['salmon_alevin']
-salmon_alevin_options.args             += ' --dumpFeatures --dumpMtx'
+def modules                  = params.modules.clone()
+def salmon_index_options     = modules['salmon_index']
+def salmon_alevin_options    = modules['salmon_alevin']
+salmon_alevin_options.args   += ' --dumpFeatures --dumpMtx'
 
 include { GUNZIP }          from '../../../../modules/nf-core/modules/gunzip/main'       addParams( options: [:] )
 include { SALMON_INDEX }    from '../../../../modules/nf-core/modules/salmon/index/main' addParams( options: salmon_index_options )

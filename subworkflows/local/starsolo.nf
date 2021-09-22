@@ -8,8 +8,7 @@ def whitelist_folder = "$baseDir/assets/whitelist/"
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
 ////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
+def modules                       = params.modules.clone()
 def star_genomegenerate_options   = modules['star_genomegenerate']
 def star_align_options            = modules['star_align']
 def postprocess_options           = modules['postprocess']
@@ -19,7 +18,7 @@ def gunzip_options                = modules['gunzip']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { STAR_ALIGNSOLO }            from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
+include { STAR_ALIGNSOLO }        from '../../modules/local/star/alignsolo/main'                 addParams( options: star_align_options )
 include { POSTPROCESS }           from '../../modules/local/postprocess/main'                    addParams( options: postprocess_options )
 
 ////////////////////////////////////////////////////

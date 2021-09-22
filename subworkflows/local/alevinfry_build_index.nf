@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////
 
 def modules = params.modules.clone()
-
 def alevinfry_index_options         = modules['salmon_alevinfry_index']
 def alevinfry_buildspliciref        = modules['alevinfry_buildspliciref']
 
