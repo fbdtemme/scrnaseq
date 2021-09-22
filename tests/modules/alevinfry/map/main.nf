@@ -12,9 +12,9 @@ include { SALMON_ALEVINFRY_INDEX }  from '../../../../modules/local/salmon/alevi
 include { SALMON_ALEVIN }           from '../../../../modules/local/salmon/alevin/main'          addParams( options: salmon_alevin_options )
 
 workflow test_alevinfry_map{
-    splici_ref    = params.test_data_scrnaseq["reference"]["alevinfry"]["splici_ref"]
-    txp2gene_3col = params.test_data_scrnaseq["reference"]["alevinfry"]["txp2gene_3col"]
-    fastq         = [[id:"S10_L001", single_end:false], [
+    splici_ref      = params.test_data_scrnaseq["reference"]["alevinfry"]["splici_ref"]
+    txp2gene_3col   = params.test_data_scrnaseq["reference"]["alevinfry"]["txp2gene_3col"]
+    fastq           = [[id:"S10_L001", single_end:false], [
                         file(params.test_data_scrnaseq["testdata"]["R1"], checkIfExists: true), 
                         file(params.test_data_scrnaseq["testdata"]["R2"], checkIfExists: true)]]
     alevin_protocol = "chromium"
