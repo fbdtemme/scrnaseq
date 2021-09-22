@@ -14,7 +14,6 @@
     - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_mat_rows.txt
     - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/quants_tier_mat.gz
     - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/raw_cb_frequency.txt
-    - path: ./results/salmon/alevin/S10_L001_alevin_results/alevin/whitelist.txt
     - path: ./results/salmon/alevin/S10_L001_alevin_results/logs/salmon_quant.log
     - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/alevin_meta_info.json
     - path: ./results/salmon/alevin/S10_L001_alevin_results/aux_info/ambig_info.tsv

@@ -1,7 +1,7 @@
 - name: gffread-transcriptome
   command: nextflow run ./tests/modules/gffread/transcriptome/main.nf -entry test_gffread_transcriptome -c ./tests/config/nextflow.config
   tags:
-    - gffread_transcriptome
+    - gffread-transcriptome
   files:
-    - path: "./results/gffread/GRCm39.genome.chr19.transcriptome.fa"
+    - path: "./results/index/GRCm39.genome.chr19.transcriptome.fa"
 
