@@ -3,7 +3,7 @@
 nextflow.enable.dsl = 2
 
 def modules                         = params.modules.clone()
-def alevinfry_index_options         = modules['alevinfry_index']
+def alevinfry_index_options         = modules['salmon_alevinfry_index']
 def salmon_alevin_options           = modules['salmon_alevin']
 salmon_alevin_options.publish_dir   = 'alevinfry'
 salmon_alevin_options.args          += ' --sketch'

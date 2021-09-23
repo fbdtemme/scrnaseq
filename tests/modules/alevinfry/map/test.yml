@@ -3,6 +3,9 @@
   tags:
     - alevinfry
   files:
+    - path: ./results/alevinfry
+    - path: ./results/alevinfry/S10_L001_alevin_results
+    - path: ./results/alevinfry/S10_L001_alevin_results/alevin
     - path: ./results/alevinfry/S10_L001_alevin_results/alevin/alevin.log
     - path: ./results/alevinfry/S10_L001_alevin_results/aux_info
     - path: ./results/alevinfry/S10_L001_alevin_results/aux_info/meta_info.json
@@ -12,3 +15,4 @@
     - path: ./results/alevinfry/S10_L001_alevin_results/cmd_info.json
     - path: ./results/alevinfry/S10_L001_alevin_results/map.rad
     - path: ./results/alevinfry/S10_L001_alevin_results/unmapped_bc_count.bin
+
