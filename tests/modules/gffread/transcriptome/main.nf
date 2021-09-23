@@ -4,6 +4,7 @@ nextflow.enable.dsl = 2
 
 def modules                        = params.modules.clone()
 def gffread_transcriptome_options  = modules['gffread_transcriptome']
+gffread_transcriptome_options.remove("publish_files")
 
 include { GFFREAD_TRANSCRIPTOME }  from '../../../../modules/local/gffread/transcriptome/main' addParams( options: gffread_transcriptome_options )
 

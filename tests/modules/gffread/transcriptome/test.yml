@@ -4,4 +4,3 @@
     - gffread-transcriptome
   files:
     - path: "./results/index/GRCm39.genome.chr19.transcriptome.fa"
-

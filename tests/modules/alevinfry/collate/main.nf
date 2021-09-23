@@ -6,6 +6,9 @@ def modules                                 = params.modules.clone()
 def alevinfry_generatepermitlist_options    = modules['alevinfry_generatepermitlist']
 def alevinfry_collate_options               = modules['alevinfry_collate']
 
+alevinfry_generatepermitlist_options["publish_files"] = false
+alevinfry_collate_options.remove("publish_files")
+
 include { UNTAR }                           from '../../../../modules/nf-core/modules/untar/main.nf'            addParams( options: [:] )
 include { ALEVINFRY_GENERATEPERMITLIST }    from '../../../../modules/local/alevinfry/generatepermitlist/main'  addParams( options: alevinfry_generatepermitlist_options )
 include { ALEVINFRY_COLLATE }               from '../../../../modules/local/alevinfry/collate/main'             addParams( options: alevinfry_collate_options )
